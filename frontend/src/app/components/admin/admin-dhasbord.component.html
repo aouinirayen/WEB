@@ -1,0 +1,168 @@
+<div class="admin-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Admin</span>
+        <span>/</span>
+        <span>Dashboard</span>
+      </div>
+      <h1 class="page-title">Admin Dashboard</h1>
+      <p class="page-subtitle">Manage your platform and users</p>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card stat-card-blue">
+      <div class="stat-card-header">
+        <div>
+          <div class="stat-card-value">{{ loadingStats ? '...' : (totalUsers | number) }}</div>
+          <div class="stat-card-label">Total Users</div>
+          <div class="stat-card-sub">Active in platform</div>
+        </div>
+        <i class="fas fa-users stat-card-icon"></i>
+      </div>
+      <div class="stat-card-footer">
+        <i class="fas fa-sync-alt"></i>
+        <span>Real-time data</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-green">
+      <div class="stat-card-header">
+        <div>
+          <div class="stat-card-value">{{ loadingStats ? '...' : (pendingDocuments | number) }}</div>
+          <div class="stat-card-label">Pending Documents</div>
+          <div class="stat-card-sub">Awaiting review</div>
+        </div>
+        <i class="fas fa-file-alt stat-card-icon"></i>
+      </div>
+      <div class="stat-card-footer">
+        <i class="fas fa-sync-alt"></i>
+        <span>Real-time data</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-red">
+      <div class="stat-card-header">
+        <div>
+          <div class="stat-card-value">{{ loadingStats ? '...' : (criticalExpiryAlerts | number) }}</div>
+          <div class="stat-card-label">Critical Expiry Alerts</div>
+          <div class="stat-card-sub">Expiring within 7 days</div>
+        </div>
+        <i class="fas fa-exclamation-circle stat-card-icon"></i>
+      </div>
+      <div class="stat-card-footer">
+        <i class="fas fa-clock"></i>
+        <span>Action required</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-indigo">
+      <div class="stat-card-header">
+        <div>
+          <div class="stat-card-value">{{ loadingStats ? '...' : (todayAuditLogs | number) }}</div>
+          <div class="stat-card-label">Today's Audit Logs</div>
+          <div class="stat-card-sub">System activities</div>
+        </div>
+        <i class="fas fa-history stat-card-icon"></i>
+      </div>
+      <div class="stat-card-footer">
+        <i class="fas fa-sync-alt"></i>
+        <span>Real-time tracking</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="grid-2">
+    <!-- Admin Profile Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <i class="fas fa-user-circle"></i>
+          Your Profile
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-grid">
+          <div class="detail-field" *ngIf="currentUser$ | async as user">
+            <div class="detail-label">Full Name</div>
+            <div class="detail-value">{{ user.name }}</div>
+          </div>
+          <div class="detail-field" *ngIf="currentUser$ | async as user">
+            <div class="detail-label">Username</div>
+            <div class="detail-value">{{ user.username }}</div>
+          </div>
+          <div class="detail-field" *ngIf="currentUser$ | async as user">
+            <div class="detail-label">Email</div>
+            <div class="detail-value">{{ user.email }}</div>
+          </div>
+          <div class="detail-field" *ngIf="currentUser$ | async as user">
+            <div class="detail-label">Role</div>
+            <div class="detail-value">
+              <span class="status-badge status-active">
+                <span class="status-dot"></span>
+                {{ user.role }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <i class="fas fa-bolt"></i>
+          Quick Actions
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="quick-actions">
+          <a class="quick-action-btn qa-blue" routerLink="/admin/users">
+            <i class="fas fa-people-arrows"></i>
+            Manage Users
+          </a>
+          <a class="quick-action-btn qa-green" routerLink="/admin/documents">
+            <i class="fas fa-file-alt"></i>
+            Manage Documents
+          </a>
+          <a class="quick-action-btn qa-red" routerLink="/admin/expiry-alerts">
+            <i class="fas fa-exclamation-circle"></i>
+            Document Expiry Alerts
+          </a>
+          <a class="quick-action-btn qa-purple" routerLink="/admin/audit-log">
+            <i class="fas fa-history"></i>
+            Audit Log
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document Expiry Alerts and User Activity -->
+  <div class="dashboard-alerts-section" style="margin-top: 24px;">
+    <!-- Document Expiry Alerts -->
+    <app-document-expiry-alerts></app-document-expiry-alerts>
+  </div>
+
+  <!-- User Activity Log -->
+  <div class="card" style="margin-top: 24px;">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-user-clock"></i>
+        System Audit Log
+      </div>
+    </div>
+    <div class="card-body">
+      <app-user-activity-log
+        [showAllLogs]="true"
+        [pageSize]="10"
+        [showPagination]="true">
+      </app-user-activity-log>
+    </div>
+  </div>
+</div>

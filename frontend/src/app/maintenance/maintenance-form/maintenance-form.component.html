@@ -1,0 +1,74 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold">{{ isEdit ? 'Edit' : 'Add' }} Maintenance Order</h4>
+  <a routerLink="/admin/maintenance" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form #maintenanceForm="ngForm" (ngSubmit)="save()">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Vehicle</label>
+          <select class="form-select" [(ngModel)]="selectedVehicleId"
+                  name="vehicleId" (change)="onVehicleChange()" required>
+            <option [ngValue]="null" disabled>-- Select vehicle --</option>
+            <option *ngFor="let v of vehicles" [value]="v.id">
+              {{ v.plateNumber }} - {{ v.brand }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Type</label>
+          <select class="form-select" [(ngModel)]="order.type" name="type">
+            <option>PREVENTIVE</option>
+            <option>CORRECTIVE</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="order.status" name="status">
+            <option>PENDING</option>
+            <option>IN_PROGRESS</option>
+            <option>DONE</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Scheduled Date</label>
+          <input type="date" class="form-control"
+                 [(ngModel)]="order.scheduledDate" name="scheduledDate" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Technician Name</label>
+          <input class="form-control" [(ngModel)]="order.technicianName"
+                 name="technicianName" required minlength="3" maxlength="80">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Cost (TND)</label>
+          <input type="number" class="form-control"
+                 [(ngModel)]="order.cost" name="cost" min="0">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" [(ngModel)]="order.description"
+                    name="description" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-warning me-2" [disabled]="maintenanceForm.invalid">
+          {{ isEdit ? 'Update' : 'Create' }}
+        </button>
+        <a routerLink="/admin/maintenance" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+
+    <!-- ✅ Outside form, inside card-body, correct variable name -->
+    <app-part-usage-panel
+      *ngIf="isEdit"
+      [maintenanceOrderId]="id"
+      [maintenanceType]="order.type">
+    </app-part-usage-panel>
+
+  </div>
+</div>

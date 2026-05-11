@@ -1,0 +1,15 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-icon">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <h3>{{ title }}</h3>
+    <p>{{ message }}</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
+      <button type="button" class="btn" [ngClass]="danger ? 'btn-danger' : 'btn-primary'" (click)="confirmAction()">
+        {{ confirmLabel }}
+      </button>
+    </div>
+  </div>
+</div>

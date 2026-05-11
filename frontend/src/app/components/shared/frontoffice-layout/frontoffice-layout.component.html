@@ -1,0 +1,11 @@
+<div class="frontoffice-layout">
+  <app-header *ngIf="!useIncidentsFullLayout() && !hideNavbarAndFooter()"></app-header>
+
+  <main class="frontoffice-main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <app-footer *ngIf="!useIncidentsFullLayout() && !hideNavbarAndFooter()"></app-footer>
+</div>
+
+<app-toast-notification></app-toast-notification>

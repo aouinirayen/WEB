@@ -1,0 +1,181 @@
+<div class="theme-covoiturage">
+  <div class="page-header d-flex justify-content-between align-items-center">
+    <h2><i class="fas fa-car mr-2"></i> Available Carpools</h2>
+    <div class="header-actions">
+      <span class="mr-3" style="background:rgba(255,255,255,0.2);color:#fff;padding:4px 12px;border-radius:20px;font-weight:600;font-size:0.85rem;">
+        <i class="fas fa-list mr-1"></i> {{ covoiturages.length }} trip(s)
+      </span>
+      <a routerLink="/ticket/covoiturages/new" class="btn btn-light" style="color:#004d40;font-weight:600;border-radius:8px;">
+        <i class="fas fa-plus mr-1"></i> Offer
+      </a>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="text-center p-5">
+      <i class="fas fa-spinner fa-spin fa-2x" style="color:#00897b;"></i>
+      <p class="mt-2 text-muted">Loading carpools...</p>
+    </div>
+  }
+
+  @if (!loading) {
+    @if (covoiturages.length === 0) {
+      <div class="alert text-center" style="border-radius:12px;background:#e0f2f1;color:#004d40;border:1px solid #b2dfdb;">
+        <i class="fas fa-exclamation-circle mr-1"></i>
+        No carpool available at the moment.
+      </div>
+    }
+
+    <div class="row">
+      @for (c of pagedCovoiturages; track c.id) {
+        <div class="col-md-6 col-lg-4 mb-3">
+          <div class="card h-100 route-card" style="font-size:0.88rem;">
+            <div class="card-header themed py-2">
+              <h6 class="mb-0">
+                <i class="fas fa-route mr-1"></i>
+                {{ c.departure }} <i class="fas fa-long-arrow-alt-right mx-1"></i> {{ c.destination }}
+              </h6>
+            </div>
+            <div class="card-body py-2 px-3">
+              <div class="d-flex align-items-center mb-1">
+                <i class="fas fa-user mr-2" style="color:#00897b;font-size:0.8rem;"></i>
+                <strong>{{ c.driverName }}</strong>
+              </div>
+              <div class="d-flex align-items-center mb-1">
+                <i class="fas fa-car mr-2" style="color:#757575;font-size:0.8rem;"></i>
+                {{ c.vehicle }}
+              </div>
+              <hr class="my-1">
+              <div class="d-flex align-items-center mb-1">
+                <i class="fas fa-calendar-alt mr-2" style="color:#00897b;font-size:0.8rem;"></i>
+                <strong>{{ c.date }}</strong>
+              </div>
+              <div class="d-flex align-items-center mb-1">
+                <i class="fas fa-clock mr-2" style="color:#004d40;font-size:0.8rem;"></i>
+                {{ c.heureDepart || '--:--' }} <i class="fas fa-long-arrow-alt-right mx-1 text-muted"></i> {{ c.heureArrivee || '--:--' }}
+              </div>
+              <hr class="my-1">
+              <div class="d-flex justify-content-between">
+                <span><i class="fas fa-tag mr-1" style="color:#00897b;"></i> <strong>{{ c.price }} TND</strong></span>
+                <span>
+                  <i class="fas fa-chair mr-1" [style.color]="getRemainingSeats(c) === 0 ? '#c62828' : '#e65100'"></i>
+                  <strong>{{ getRemainingSeats(c) }}</strong>/{{ c.availableSeats }} seats
+                </span>
+              </div>
+              @if (getRemainingSeats(c) < c.availableSeats && getRemainingSeats(c) > 0) {
+                <div class="progress mt-2" style="height:6px;border-radius:3px;">
+                  <div class="progress-bar" role="progressbar"
+                    [style.width.%]="(getRemainingSeats(c) / c.availableSeats) * 100"
+                    style="background:#00897b;border-radius:3px;"></div>
+                </div>
+              }
+            </div>
+            <div class="card-footer d-flex justify-content-center align-items-center" style="background:#f8f9fa;border-radius:0 0 12px 12px;gap:8px;">
+              <button (click)="toggleDetails(c.id!)" class="btn btn-sm px-3"
+                [class.btn-outline-info]="expandedId !== c.id"
+                [class.btn-info]="expandedId === c.id"
+                style="border-radius:8px;">
+                <i class="fas mr-1" [class.fa-eye]="expandedId !== c.id" [class.fa-eye-slash]="expandedId === c.id"></i>
+                {{ expandedId === c.id ? 'Hide' : 'View' }}
+              </button>
+              @if (getRemainingSeats(c) > 0) {
+                <a [routerLink]="['/ticket/reservations/new']" [queryParams]="{covoiturageId: c.id, departure: c.departure, destination: c.destination, date: c.date, driverName: c.driverName}"
+                  class="btn btn-themed btn-sm px-4">
+                  <i class="fas fa-calendar-plus mr-1"></i> Book
+                </a>
+              } @else {
+                <span class="status-pill status-rejected">
+                  <i class="fas fa-times-circle"></i> Full
+                </span>
+              }
+            </div>
+
+            @if (expandedId === c.id) {
+              <div class="card-body border-top" style="background:#f0faf8;">
+                <h6 class="mb-3" style="color:#004d40;"><i class="fas fa-info-circle mr-1"></i> Carpool Details</h6>
+                <div class="row mb-2">
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fas fa-user mr-2" style="color:#00897b;width:20px;"></i>
+                      <span><strong>Driver:</strong> {{ c.driverName }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fas fa-car mr-2" style="color:#00897b;width:20px;"></i>
+                      <span><strong>Vehicle:</strong> {{ c.vehicle }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fas fa-map-marker-alt mr-2" style="color:#00897b;width:20px;"></i>
+                      <span><strong>Departure:</strong> {{ c.departure }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fas fa-flag-checkered mr-2" style="color:#00897b;width:20px;"></i>
+                      <span><strong>Destination:</strong> {{ c.destination }}</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fas fa-calendar-alt mr-2" style="color:#00897b;width:20px;"></i>
+                      <span><strong>Date:</strong> {{ c.date }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fas fa-clock mr-2" style="color:#00897b;width:20px;"></i>
+                      <span><strong>Schedule:</strong> {{ c.heureDepart || '--:--' }} → {{ c.heureArrivee || '--:--' }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fas fa-tag mr-2" style="color:#00897b;width:20px;"></i>
+                      <span><strong>Price:</strong> {{ c.price }} TND</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fas fa-chair mr-2" [style.color]="getRemainingSeats(c) === 0 ? '#c62828' : '#00897b'" style="width:20px;"></i>
+                      <span><strong>Seats:</strong> {{ getRemainingSeats(c) }}/{{ c.availableSeats }} available</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button (click)="toggleDepartureMap(c.id!)" class="btn btn-sm mt-2"
+                  [class.btn-outline-success]="visibleDepartureMapId !== c.id"
+                  [class.btn-secondary]="visibleDepartureMapId === c.id"
+                  style="border-radius:8px;">
+                  <i class="fas fa-map-marked-alt mr-1"></i>
+                  {{ visibleDepartureMapId === c.id ? 'Hide map' : 'View departure location' }}
+                </button>
+
+                @if (visibleDepartureMapId === c.id) {
+                  <div class="mt-2">
+                    @if (c.departureLat && c.departureLng) {
+                      <app-map-picker [mapId]="'detailMap' + c.id" [lat]="c.departureLat!" [lng]="c.departureLng!" [readonly]="true" [zoom]="14"></app-map-picker>
+                    } @else {
+                      <app-map-picker [mapId]="'detailMap' + c.id" [searchQuery]="c.departure" [readonly]="true" [zoom]="14"></app-map-picker>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="d-flex justify-content-between align-items-center mt-1 mb-3">
+        <small class="text-muted">{{ covoiturages.length }} carpool(s) — Page {{ currentPage }}/{{ totalPages }}</small>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="goToPage(currentPage - 1)">&laquo;</button>
+            </li>
+            @for (p of getPages(); track p) {
+              <li class="page-item" [class.active]="p === currentPage">
+                <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+              </li>
+            }
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="goToPage(currentPage + 1)">&raquo;</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    }
+  }
+</div>

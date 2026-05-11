@@ -1,0 +1,104 @@
+<div class="ai-stats-page">
+  <!-- Header -->
+  <div class="ai-header">
+    <div class="ai-title">
+      <span class="ai-icon">🤖</span>
+      <h2>Artificial Intelligence - Stats & Models</h2>
+    </div>
+    <div class="health-badge" *ngIf="health">
+      <span class="dot" [class.green]="health.status === 'READY'" [class.red]="health.status !== 'READY'"></span>
+      {{ health.status === 'READY' ? 'Models ready' : 'Models loading...' }}
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="statsLoading">Loading statistics...</div>
+
+  <div class="stats-grid" *ngIf="stats">
+    <!-- Matching Model -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-icon">🧠</span>
+        <h4>Neural Network (Matching)</h4>
+      </div>
+      <div class="stat-body">
+        <div class="stat-row"><span>Type</span><strong>{{ stats.matchingModel?.type }}</strong></div>
+        <div class="stat-row"><span>Architecture</span><strong>{{ stats.matchingModel?.architecture }}</strong></div>
+        <div class="stat-section-label">Training (80%)</div>
+        <div class="stat-row"><span>Train Accuracy</span><strong>{{ (stats.matchingModel?.accuracy * 100).toFixed(1) }}%</strong></div>
+        <div class="stat-row"><span>Loss Train</span><strong>{{ stats.matchingModel?.loss?.toFixed(4) }}</strong></div>
+        <div class="stat-section-label">Test (20%)</div>
+        <div class="stat-row highlight"><span>Test Accuracy</span><strong class="test-metric">{{ (stats.matchingModel?.testAccuracy * 100).toFixed(1) }}%</strong></div>
+        <div class="stat-row"><span>Loss Test</span><strong>{{ stats.matchingModel?.testLoss?.toFixed(4) }}</strong></div>
+        <div class="stat-row"><span>Status</span>
+          <span class="status-badge green">{{ stats.matchingModel?.status }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancellation Model -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-icon">📉</span>
+        <h4>Logistic Regression (Cancellation)</h4>
+      </div>
+      <div class="stat-body">
+        <div class="stat-row"><span>Type</span><strong>{{ stats.cancellationModel?.type }}</strong></div>
+        <div class="stat-row"><span>Features</span><strong>{{ stats.cancellationModel?.features }}</strong></div>
+        <div class="stat-section-label">Training (80%)</div>
+        <div class="stat-row"><span>Train Accuracy</span><strong>{{ (stats.cancellationModel?.accuracy * 100).toFixed(1) }}%</strong></div>
+        <div class="stat-row"><span>Loss Train</span><strong>{{ stats.cancellationModel?.loss?.toFixed(4) }}</strong></div>
+        <div class="stat-section-label">Test (20%)</div>
+        <div class="stat-row highlight"><span>Test Accuracy</span><strong class="test-metric">{{ (stats.cancellationModel?.testAccuracy * 100).toFixed(1) }}%</strong></div>
+        <div class="stat-row"><span>Loss Test</span><strong>{{ stats.cancellationModel?.testLoss?.toFixed(4) }}</strong></div>
+        <div class="stat-row"><span>Status</span>
+          <span class="status-badge green">{{ stats.cancellationModel?.status }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Satisfaction Model -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-icon">📈</span>
+        <h4>Linear Regression (Satisfaction)</h4>
+      </div>
+      <div class="stat-body">
+        <div class="stat-row"><span>Type</span><strong>{{ stats.satisfactionModel?.type }}</strong></div>
+        <div class="stat-row"><span>Features</span><strong>{{ stats.satisfactionModel?.features }}</strong></div>
+        <div class="stat-section-label">Training (80%)</div>
+        <div class="stat-row"><span>R² Train</span><strong>{{ (stats.satisfactionModel?.r2Score * 100).toFixed(1) }}%</strong></div>
+        <div class="stat-row"><span>MSE Train</span><strong>{{ stats.satisfactionModel?.mse?.toFixed(4) }}</strong></div>
+        <div class="stat-section-label">Test (20%)</div>
+        <div class="stat-row highlight"><span>R² Test</span><strong class="test-metric">{{ (stats.satisfactionModel?.testR2Score * 100).toFixed(1) }}%</strong></div>
+        <div class="stat-row"><span>MSE Test</span><strong>{{ stats.satisfactionModel?.testMSE?.toFixed(4) }}</strong></div>
+        <div class="stat-row"><span>Status</span>
+          <span class="status-badge green">{{ stats.satisfactionModel?.status }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Stats -->
+  <div class="global-card" *ngIf="stats">
+    <div class="global-stats">
+      <div class="global-stat">
+        <span class="big-number">{{ stats.totalTrainingData }}</span>
+        <span>Training data</span>
+      </div>
+      <div class="global-stat">
+        <span class="big-number">3</span>
+        <span>AI Models</span>
+      </div>
+      <div class="global-stat">
+        <span class="big-number status-text" [class.green-text]="stats.status === 'ALL_MODELS_READY'">
+          {{ stats.status === 'ALL_MODELS_READY' ? 'OK' : '...' }}
+        </span>
+        <span>Global status</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-danger" (click)="retrain()" [disabled]="retraining">
+    {{ retraining ? 'Retraining in progress...' : 'Retrain all models' }}
+  </button>
+</div>

@@ -1,0 +1,209 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>{{ displayStatus }}</h1>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading profile information...</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!loading && profile" class="profile-content">
+    <!-- Profile Photo Section -->
+    <div class="profile-photo-section">
+      <div class="photo-container">
+        <div *ngIf="profilePhotoUrl" class="profile-photo">
+          <img [src]="profilePhotoUrl" alt="Profile Photo" />
+        </div>
+        <div *ngIf="!profilePhotoUrl" class="photo-placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <p>No Profile Photo</p>
+        </div>
+      </div>
+
+      <!-- Photo Actions -->
+      <div class="photo-actions">
+        <div *ngIf="!photoSelected" class="upload-input-wrapper">
+          <input
+            type="file"
+            #photoInput
+            accept=".jpg,.jpeg,.png,.gif,.webp"
+            (change)="onFileSelected($event)"
+            style="display: none"
+          />
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="photoInput.click()"
+            [disabled]="photoLoading"
+          >
+            {{ profile.photoContentType ? 'Change Photo' : 'Upload Photo' }}
+          </button>
+        </div>
+
+        <div *ngIf="photoSelected" class="upload-buttons">
+          <button
+            type="button"
+            class="btn btn-success"
+            (click)="uploadPhoto()"
+            [disabled]="photoLoading"
+          >
+            {{ photoLoading ? 'Uploading...' : 'Save Photo' }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cancelPhotoUpload()"
+            [disabled]="photoLoading"
+          >
+            Cancel
+          </button>
+        </div>
+
+        <button
+          *ngIf="profile.photoContentType && !photoSelected"
+          type="button"
+          class="btn btn-danger"
+          (click)="deletePhoto()"
+          [disabled]="photoLoading"
+        >
+          {{ photoLoading ? 'Deleting...' : 'Delete Photo' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Profile Information Form -->
+    <div class="profile-info-section">
+      <!-- Edit Mode Helper Text -->
+      <div *ngIf="editing" class="edit-mode-helper">
+        <p><strong>📝 Editing Mode</strong></p>
+        <p>Update your profile information below. Fields marked with <span class="required-badge">*</span> are required.</p>
+      </div>
+
+      <form [formGroup]="profileForm">
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email:
+            <span class="required-badge">*</span>
+          </label>
+          <small class="hint-text" *ngIf="hasFieldError('email')">ℹ Must be a valid email address</small>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            formControlName="email"
+            [class.error]="hasFieldError('email')"
+            placeholder="example@email.com"
+          />
+          <small *ngIf="hasFieldError('email')" class="error-message">
+            <strong>✗</strong> {{ getFieldError('email') }}
+          </small>
+        </div>
+
+        <!-- Name -->
+        <div class="form-group">
+          <label for="name">Full Name:
+            <span class="required-badge">*</span>
+          </label>
+          <small class="hint-text" *ngIf="hasFieldError('name')">ℹ Minimum 2 characters</small>
+          <input
+            type="text"
+            id="name"
+            class="form-control"
+            formControlName="name"
+            [class.error]="hasFieldError('name')"
+            placeholder="Enter your full name"
+          />
+          <small *ngIf="hasFieldError('name')" class="error-message">
+            <strong>✗</strong> {{ getFieldError('name') }}
+          </small>
+        </div>
+
+        <!-- CIN -->
+        <div class="form-group">
+          <label for="cin">CIN:</label>
+          <small class="hint-text" *ngIf="hasFieldError('cin')">ℹ Exactly 8 numeric digits</small>
+          <input
+            type="text"
+            id="cin"
+            class="form-control"
+            formControlName="cin"
+            [class.error]="hasFieldError('cin')"
+            placeholder="12345678"
+            maxlength="8"
+            inputmode="numeric"
+          />
+          <small *ngIf="hasFieldError('cin')" class="error-message">
+            <strong>✗</strong> {{ getFieldError('cin') }}
+          </small>
+        </div>
+      </form>
+
+      <!-- View Mode - Read-only Information -->
+      <div *ngIf="!editing && profile" class="profile-info-view">
+        <!-- Role -->
+        <div class="info-row">
+          <label>Role:</label>
+          <span>{{ profile.role }}</span>
+        </div>
+
+        <!-- Created At -->
+        <div class="info-row">
+          <label>Account Created:</label>
+          <span>{{ formatDate(profile.createdAt) }}</span>
+        </div>
+
+        <!-- Updated At -->
+        <div class="info-row">
+          <label>Last Updated:</label>
+          <span>{{ formatDate(profile.updatedAt) }}</span>
+        </div>
+      </div>
+
+      <!-- Form End -->
+      <div *ngIf="editing"></div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button
+          *ngIf="!editing"
+          type="button"
+          class="btn btn-primary"
+          (click)="startEditing()"
+        >
+          Edit Profile
+        </button>
+
+        <button
+          *ngIf="editing"
+          type="button"
+          class="btn btn-success"
+          (click)="saveProfile()"
+          [disabled]="!isFormValid || loading"
+        >
+          {{ loading ? 'Saving...' : 'Save Changes' }}
+        </button>
+
+        <button
+          *ngIf="editing"
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancelEditing()"
+          [disabled]="loading"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Profile Data -->
+  <div *ngIf="!loading && !profile" class="no-data">
+    <p>Unable to load profile information. Please try again later.</p>
+  </div>
+</div>

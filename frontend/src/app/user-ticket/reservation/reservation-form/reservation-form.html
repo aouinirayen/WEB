@@ -1,0 +1,196 @@
+<div class="theme-reservation">
+<div class="page-header">
+  <h2><i class="fas fa-calendar-plus mr-2"></i> Make a Reservation</h2>
+</div>
+
+@if (covoiturageInfo) {
+  <div class="alert alert-info">
+    <i class="fas fa-car mr-1"></i> <strong>Carpool:</strong> {{ covoiturageInfo }}
+  </div>
+}
+
+@if (success) {
+  <div class="text-center p-5">
+    <div class="mb-4">
+      <i class="fas fa-check-circle fa-4x" style="color:#2e7d32;"></i>
+    </div>
+    <h3 style="color:#2e7d32;">Reservation sent successfully!</h3>
+    <p class="text-muted mt-2">Status: <strong style="color:#e65100;">PENDING</strong> — The driver will confirm your reservation.</p>
+    <p class="text-muted"><i class="fas fa-spinner fa-spin mr-1"></i> Automatic redirect in a few seconds...</p>
+    <div class="mt-3">
+      <a routerLink="/ticket/reservations" class="btn btn-success mr-2" style="border-radius:8px;">
+        <i class="fas fa-list mr-1"></i> View my reservations
+      </a>
+      <a routerLink="/ticket/covoiturages" class="btn btn-outline-secondary" style="border-radius:8px;">
+        <i class="fas fa-car mr-1"></i> Back to carpools
+      </a>
+    </div>
+  </div>
+}
+
+@if (error) {
+  <div class="alert alert-danger">
+    <i class="fas fa-times-circle mr-1"></i> Error during reservation. Please try again.
+  </div>
+}
+
+@if (!success) {
+<div class="card">
+  <div class="card-body">
+    <form #resForm="ngForm" (ngSubmit)="submit()" class="themed-form">
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group position-relative">
+            <label for="clientName"><i class="fas fa-user mr-1"></i> Your Name</label>
+            <input type="text" id="clientName" class="form-control" [(ngModel)]="reservation.clientName" name="clientName"
+              #clientNameRef="ngModel" required minlength="3" maxlength="50" pattern="[A-Za-zÀ-ÿ\s\-]+"
+              [class.is-invalid]="clientNameRef.invalid && clientNameRef.touched"
+              (input)="onNameInput($event)" autocomplete="off">
+            @if (userSuggestions.length > 0 && showSuggestions) {
+              <div class="list-group position-absolute w-100" style="z-index:1000;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.15);border-radius:8px;">
+                @for (u of userSuggestions; track u.name) {
+                  <button type="button" class="list-group-item list-group-item-action py-2" (click)="selectUser(u)">
+                    <i class="fas fa-user mr-1" style="color:#00897b;"></i> {{ u.name }}
+                    <small class="text-muted ml-2">{{ u.phone }}</small>
+                  </button>
+                }
+              </div>
+            }
+            <div class="invalid-feedback">
+              @if (clientNameRef.errors?.['required']) { Name is required. }
+              @if (clientNameRef.errors?.['minlength']) { Name must be at least 3 characters. }
+              @if (clientNameRef.errors?.['pattern']) { Name must contain only letters. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="phone"><i class="fas fa-phone mr-1"></i> Phone</label>
+            <input type="text" id="phone" class="form-control" [(ngModel)]="reservation.phone" name="phone"
+              #phoneRef="ngModel" required minlength="8" maxlength="12" pattern="[0-9]+"
+              [class.is-invalid]="phoneRef.invalid && phoneRef.touched"
+              (input)="onPhoneInput($event)" autocomplete="off">
+            @if (phoneSuggestions.length > 0 && showPhoneSuggestions) {
+              <div class="list-group position-absolute" style="z-index:1000;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.15);border-radius:8px;width:calc(100% - 30px);">
+                @for (u of phoneSuggestions; track u.phone) {
+                  <button type="button" class="list-group-item list-group-item-action py-2" (click)="selectUser(u)">
+                    <i class="fas fa-phone mr-1" style="color:#00897b;"></i> {{ u.phone }}
+                    <small class="text-muted ml-2">{{ u.name }}</small>
+                  </button>
+                }
+              </div>
+            }
+            <div class="invalid-feedback">
+              @if (phoneRef.errors?.['required']) { Phone number is required. }
+              @if (phoneRef.errors?.['minlength']) { Phone must contain at least 8 digits. }
+              @if (phoneRef.errors?.['maxlength']) { Phone cannot exceed 12 digits. }
+              @if (phoneRef.errors?.['pattern']) { Phone must contain only digits (no letters or spaces). }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="email"><i class="fas fa-envelope mr-1"></i> Email</label>
+            <input type="email" id="email" class="form-control" [(ngModel)]="reservation.email" name="email"
+              #emailRef="ngModel" required email
+              [class.is-invalid]="emailRef.invalid && emailRef.touched"
+              placeholder="your@email.com">
+            <div class="invalid-feedback">
+              @if (emailRef.errors?.['required']) { Email is required for confirmation. }
+              @if (emailRef.errors?.['email']) { Please enter a valid email. }
+            </div>
+            <small class="text-muted"><i class="fas fa-info-circle mr-1"></i> A confirmation email will be sent.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="seatsReserved"><i class="fas fa-chair mr-1"></i> Number of Seats (max {{ maxSeats }})</label>
+            <input type="number" id="seatsReserved" class="form-control" [(ngModel)]="reservation.seatsReserved" name="seatsReserved"
+              #seatsRef="ngModel" required min="1" [max]="maxSeats"
+              [class.is-invalid]="seatsRef.invalid && seatsRef.touched">
+            <div class="invalid-feedback">
+              @if (seatsRef.errors?.['required']) { Number of seats is required. }
+              @if (seatsRef.errors?.['min']) { You must reserve at least 1 seat. }
+              @if (seatsRef.errors?.['max']) { Maximum {{ maxSeats }} seats available for this carpool. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="d-flex align-items-center h-100">
+            <div class="alert mb-0 w-100" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:10px;">
+              <i class="fas fa-info-circle mr-1"></i>
+              <strong>Note:</strong> Date and time are set by the carpool.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3" style="border:2px dashed #fb8c00; border-radius:12px;">
+        <div class="card-body">
+          <div class="custom-control custom-switch mb-2">
+            <input type="checkbox" class="custom-control-input" id="displacementSwitch"
+              [(ngModel)]="reservation.displacementRequested" name="displacementRequested">
+            <label class="custom-control-label font-weight-bold" for="displacementSwitch">
+              <i class="fas fa-car-side mr-1" style="color:#e65100;"></i> Request a pickup (the driver comes to get you)
+            </label>
+          </div>
+          <small class="text-muted d-block mb-2">
+            <i class="fas fa-info-circle mr-1"></i> Paid option: the driver comes to your location.
+          </small>
+          @if (reservation.displacementRequested) {
+            <div class="form-group">
+              <label for="clientAddress"><i class="fas fa-map-marker-alt mr-1"></i> Your Address / Location</label>
+              <div class="input-group">
+                <input type="text" id="clientAddress" class="form-control" [(ngModel)]="reservation.clientAddress" name="clientAddress"
+                  placeholder="Type your address (e.g.: Tunis, Ariana, Sousse...)" required minlength="3">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-info" (click)="useMyLocation()" [disabled]="geoLoading"
+                    style="border-radius:0 8px 8px 0;">
+                    @if (geoLoading) {
+                      <i class="fas fa-spinner fa-spin mr-1"></i> GPS...
+                    } @else {
+                      <i class="fas fa-crosshairs mr-1"></i> My location
+                    }
+                  </button>
+                </div>
+              </div>
+              @if (geoError) {
+                <small class="text-danger"><i class="fas fa-exclamation-triangle mr-1"></i> {{ geoError }}</small>
+              }
+              <small class="text-muted d-block mt-1"><i class="fas fa-info-circle mr-1"></i> The map updates automatically when you type your address.</small>
+            </div>
+            <div class="form-group">
+              <app-map-picker mapId="clientMap" [searchQuery]="reservation.clientAddress || ''" (locationSelected)="onClientLocationSelected($event)"></app-map-picker>
+            </div>
+            <div class="form-group mb-0">
+              <label for="displacementPrice"><i class="fas fa-coins mr-1"></i> Pickup fee (TND)</label>
+              <input type="number" id="displacementPrice" class="form-control" [(ngModel)]="reservation.displacementPrice" name="displacementPrice"
+                #dispPriceRef="ngModel" required min="1" max="100"
+                [class.is-invalid]="dispPriceRef.invalid && dispPriceRef.touched">
+              <div class="invalid-feedback">
+                @if (dispPriceRef.errors?.['required']) { Pickup price is required when the option is enabled. }
+                @if (dispPriceRef.errors?.['min']) { Minimum price is 1 TND. }
+                @if (dispPriceRef.errors?.['max']) { Maximum price is 100 TND. }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="d-flex">
+        <button type="submit" class="btn btn-themed mr-2" [disabled]="submitting || resForm.invalid">
+          <i class="fas fa-paper-plane mr-1"></i> {{ submitting ? 'Sending...' : 'Send Reservation' }}
+        </button>
+        <a routerLink="/ticket/covoiturages" class="btn btn-themed-outline">
+          <i class="fas fa-arrow-left mr-1"></i> Back
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+}
+</div>

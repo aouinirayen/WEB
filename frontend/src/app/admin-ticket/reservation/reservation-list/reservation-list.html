@@ -1,0 +1,82 @@
+<div class="theme-reservation">
+  <div class="page-header d-flex justify-content-between align-items-center">
+    <h2 class="mb-0"><i class="fas fa-calendar-check mr-2"></i> Reservation Management</h2>
+    <span style="background:rgba(255,255,255,0.2);color:#fff;padding:4px 12px;border-radius:20px;font-weight:600;font-size:0.85rem;">
+      <i class="fas fa-list mr-1"></i> {{ reservations.length }} reservation(s)
+    </span>
+  </div>
+
+  <div class="card">
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover text-nowrap mb-0">
+        <thead>
+          <tr>
+            <th>CLIENT</th>
+            <th>PHONE</th>
+            <th>SEATS</th>
+            <th>DATE</th>
+            <th>COVOITURAGE</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (pagedReservations.length === 0) {
+            <tr><td colspan="6" class="text-center text-muted py-4">No reservation found</td></tr>
+          }
+          @for (r of pagedReservations; track r.id) {
+            <tr>
+              <td><i class="fas fa-user mr-1" style="color:#e65100;"></i> {{ r.clientName }}</td>
+              <td><i class="fas fa-phone mr-1 text-muted"></i> {{ r.phone }}</td>
+              <td><span class="status-pill status-pending" style="font-size:0.75rem;">{{ r.seatsReserved }} seat(s)</span></td>
+              <td><i class="fas fa-calendar mr-1 text-muted"></i> {{ r.bookingDate }}</td>
+              <td>
+                @if (getCovoiturageForReservation(r.covoiturageId)) {
+                  <small>
+                    <i class="fas fa-route mr-1" style="color:#00897b;"></i>{{ getCovoiturageForReservation(r.covoiturageId)!.departure }}
+                    <i class="fas fa-long-arrow-alt-right mx-1"></i> {{ getCovoiturageForReservation(r.covoiturageId)!.destination }}
+                    <br>
+                    <i class="fas fa-user mr-1 text-muted"></i>{{ getCovoiturageForReservation(r.covoiturageId)!.driverName }}
+                  </small>
+                } @else {
+                  <span class="text-muted">-</span>
+                }
+              </td>
+              <td>
+                @if (r.status === 'PENDING') {
+                  <span class="status-pill status-pending"><i class="fas fa-clock"></i> Pending</span>
+                }
+                @if (r.status === 'CONFIRMED') {
+                  <span class="status-pill status-confirmed"><i class="fas fa-check-circle"></i> Confirmed</span>
+                }
+                @if (r.status === 'REJECTED') {
+                  <span class="status-pill status-rejected"><i class="fas fa-times-circle"></i> Rejected</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="card-footer d-flex justify-content-between align-items-center py-2" style="background:#f8f9fa;">
+        <small class="text-muted">{{ reservations.length }} reservation(s) — Page {{ currentPage }}/{{ totalPages }}</small>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="goToPage(currentPage - 1)">&laquo;</button>
+            </li>
+            @for (p of getPages(); track p) {
+              <li class="page-item" [class.active]="p === currentPage">
+                <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+              </li>
+            }
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="goToPage(currentPage + 1)">&raquo;</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    }
+  </div>
+</div>

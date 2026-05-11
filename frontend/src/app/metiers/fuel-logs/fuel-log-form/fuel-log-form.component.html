@@ -1,0 +1,69 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold">{{ isEdit ? 'Edit' : 'Add' }} Fuel Log</h4>
+  <a routerLink="/admin/fuel-logs" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form #fuelLogForm="ngForm" (ngSubmit)="save()">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Vehicle</label>
+          <select class="form-select" [(ngModel)]="fuelLog.vehicle" name="vehicle"
+                  required [compareWith]="compareById">
+            <option *ngFor="let v of vehicles" [ngValue]="v">
+              {{ v.plateNumber }} — {{ v.brand }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Fuel Date</label>
+          <input type="date" class="form-control"
+                 [(ngModel)]="fuelLog.fuelDate" name="fuelDate" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Liters</label>
+          <input type="number" class="form-control" min="0" step="0.01"
+                 max="1000"
+                 [(ngModel)]="fuelLog.liters" name="liters"
+                 (ngModelChange)="recalcTotal()" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Cost per Liter (TND)</label>
+          <input type="number" class="form-control" min="0" step="0.001"
+                 max="20"
+                 [(ngModel)]="fuelLog.costPerLiter" name="costPerLiter"
+                 (ngModelChange)="recalcTotal()" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Total Cost (TND)</label>
+          <input type="number" class="form-control"
+                 [(ngModel)]="fuelLog.totalCost" name="totalCost" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Mileage at Fill-up (km)</label>
+          <input type="number" class="form-control" min="0"
+                 [(ngModel)]="fuelLog.mileageAtFillUp" name="mileageAtFillUp" required max="2000000">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Station (optional)</label>
+          <input class="form-control" [(ngModel)]="fuelLog.station"
+                 name="station" placeholder="ex: Shell Tunis Centre">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Notes (optional)</label>
+          <textarea class="form-control" [(ngModel)]="fuelLog.notes"
+                    name="notes" rows="2"
+                    placeholder="Any additional notes..."></textarea>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-warning text-dark me-2" [disabled]="fuelLogForm.invalid">
+          {{ isEdit ? 'Update' : 'Save Log' }}
+        </button>
+        <a routerLink="/admin/fuel-logs" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

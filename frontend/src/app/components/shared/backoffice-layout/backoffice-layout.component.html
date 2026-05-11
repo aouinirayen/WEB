@@ -1,0 +1,36 @@
+<div class="backoffice-layout">
+  <app-backoffice-sidebar></app-backoffice-sidebar>
+
+  <nav class="backoffice-topbar">
+    <div class="backoffice-topbar-title">
+      <i class="fas fa-th-large"></i>
+      <span>TransitTN Backoffice</span>
+    </div>
+    <div class="backoffice-topbar-actions">
+      <button class="topbar-icon-btn" title="Notifications">
+        <i class="fas fa-bell"></i>
+        <span class="topbar-badge"></span>
+      </button>
+      <button class="topbar-icon-btn" title="Settings">
+        <i class="fas fa-cog"></i>
+      </button>
+      <div class="topbar-user">
+        <div class="topbar-avatar">{{ userName.charAt(0).toUpperCase() }}</div>
+        <div>
+          <div class="topbar-user-name">{{ userName }}</div>
+          <div class="topbar-user-role">Administrator</div>
+        </div>
+      </div>
+      <button class="topbar-logout-btn" (click)="logout()" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="backoffice-main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<app-toast-notification></app-toast-notification>

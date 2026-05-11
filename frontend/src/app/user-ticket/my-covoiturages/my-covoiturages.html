@@ -1,0 +1,190 @@
+<div class="theme-covoiturage">
+<div class="page-header">
+  <h2><i class="fas fa-tasks mr-2"></i> My Carpools</h2>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form (ngSubmit)="search()" class="d-flex align-items-end themed-form">
+      <div class="form-group mb-0 mr-3 flex-grow-1">
+        <label for="userName"><i class="fas fa-user mr-1"></i> Your Name (driver)</label>
+        <input type="text" id="userName" class="form-control" [(ngModel)]="userName" name="userName"
+          placeholder="Enter your name..." required>
+      </div>
+      <button type="submit" class="btn btn-themed">
+        <i class="fas fa-search mr-1"></i> Search
+      </button>
+    </form>
+  </div>
+</div>
+
+@if (searched) {
+  @if (myCovoiturages.length === 0) {
+    <div class="alert alert-warning text-center">
+      <i class="fas fa-exclamation-circle mr-1"></i> No carpool found for "{{ userName }}".
+      <br>
+      <a routerLink="/ticket/covoiturages/new" class="btn btn-success btn-sm mt-2">
+        <i class="fas fa-plus mr-1"></i> Offer a carpool
+      </a>
+    </div>
+  }
+
+  @for (c of pagedCovoiturages; track c.id) {
+    <div class="card mb-2 route-card">
+      <div class="card-header themed d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          <i class="fas fa-route mr-2"></i>
+          {{ c.departure }} <i class="fas fa-long-arrow-alt-right mx-1"></i> {{ c.destination }}
+        </h5>
+        <div>
+          @if (c.status === 'PENDING') {
+            <span class="status-pill status-pending" style="background:rgba(255,255,255,0.2);color:#fff;"><i class="fas fa-clock mr-1"></i>Pending</span>
+          }
+          @if (c.status === 'CONFIRMED') {
+            <span class="status-pill" style="background:rgba(255,255,255,0.2);color:#fff;"><i class="fas fa-check-circle mr-1"></i>Confirmed</span>
+          }
+          @if (c.status === 'REJECTED') {
+            <span class="status-pill" style="background:rgba(255,0,0,0.2);color:#fff;"><i class="fas fa-times-circle mr-1"></i>Rejected</span>
+          }
+        </div>
+      </div>
+      <div class="card-body py-2 px-3">
+        <div class="row mb-2" style="font-size:0.9rem;">
+          <div class="col-md-2"><i class="fas fa-calendar mr-1 text-info"></i> {{ c.date }}</div>
+          <div class="col-md-3"><i class="fas fa-clock mr-1 text-dark"></i> {{ c.heureDepart || '--:--' }} → {{ c.heureArrivee || '--:--' }}</div>
+          <div class="col-md-2"><i class="fas fa-car mr-1 text-secondary"></i> {{ c.vehicle }}</div>
+          <div class="col-md-2"><i class="fas fa-tag mr-1 text-success"></i> {{ c.price }} TND</div>
+          <div class="col-md-3"><i class="fas fa-chair mr-1 text-warning"></i> {{ c.availableSeats }} seats</div>
+        </div>
+
+        @if (c.status === 'CONFIRMED') {
+          <h6 class="mt-3"><i class="fas fa-users mr-1"></i> Reservations:</h6>
+
+          @if (getReservationsForCovoiturage(c.id!).length === 0) {
+            <p class="text-muted"><i class="fas fa-info-circle mr-1"></i> No reservation for this carpool.</p>
+          }
+
+          @for (r of getReservationsForCovoiturage(c.id!); track r.id) {
+            <div class="border rounded mb-2" style="border-radius:10px !important;overflow:hidden;">
+              <div class="d-flex align-items-center justify-content-between p-2">
+                <div>
+                  <strong><i class="fas fa-user mr-1"></i>{{ r.clientName }}</strong>
+                  <span class="ml-2"><i class="fas fa-chair mr-1"></i>{{ r.seatsReserved }} seat(s)</span>
+                  @if (r.displacementRequested) {
+                    <span class="ml-2 status-pill" style="background:#fff3e0;color:#e65100;font-size:0.75rem;">
+                      <i class="fas fa-car-side mr-1"></i> Pickup
+                    </span>
+                  }
+                </div>
+                <div class="d-flex align-items-center">
+                  <button (click)="toggleReservationDetails(r.id!)" class="btn btn-sm mr-1"
+                    [class.btn-outline-info]="expandedReservationId !== r.id"
+                    [class.btn-info]="expandedReservationId === r.id"
+                    style="border-radius:8px;">
+                    <i class="fas mr-1" [class.fa-eye]="expandedReservationId !== r.id" [class.fa-eye-slash]="expandedReservationId === r.id"></i>
+                    {{ expandedReservationId === r.id ? 'Hide' : 'View' }}
+                  </button>
+                  @if (r.status === 'PENDING') {
+                    <button (click)="confirmReservation(r)" class="btn btn-success btn-sm mr-1">
+                      <i class="fas fa-check mr-1"></i> Confirm
+                    </button>
+                    <button (click)="rejectReservation(r)" class="btn btn-danger btn-sm">
+                      <i class="fas fa-ban mr-1"></i> Reject
+                    </button>
+                  }
+                  @if (r.status === 'CONFIRMED') {
+                    <span class="status-pill status-confirmed"><i class="fas fa-check-circle mr-1"></i>Confirmed</span>
+                  }
+                  @if (r.status === 'REJECTED') {
+                    <span class="status-pill status-rejected"><i class="fas fa-times-circle mr-1"></i>Rejected</span>
+                  }
+                </div>
+              </div>
+
+              @if (expandedReservationId === r.id) {
+                <div class="p-3 border-top" style="background:#fafafa;">
+                  <h6 style="color:#004d40;"><i class="fas fa-id-card mr-1"></i> Booker Details</h6>
+                  <div class="row mb-2">
+                    <div class="col-md-6">
+                      <div class="mb-1"><i class="fas fa-user mr-1" style="color:#00897b;width:18px;"></i> <strong>Name:</strong> {{ r.clientName }}</div>
+                      <div class="mb-1"><i class="fas fa-phone mr-1" style="color:#00897b;width:18px;"></i> <strong>Phone:</strong> {{ r.phone }}</div>
+                      <div class="mb-1"><i class="fas fa-chair mr-1" style="color:#00897b;width:18px;"></i> <strong>Seats reserved:</strong> {{ r.seatsReserved }}</div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-1"><i class="fas fa-calendar mr-1" style="color:#00897b;width:18px;"></i> <strong>Date:</strong> {{ r.bookingDate }}</div>
+                      <div class="mb-1">
+                        <i class="fas fa-info-circle mr-1" style="color:#00897b;width:18px;"></i> <strong>Status:</strong>
+                        @if (r.status === 'PENDING') { <span class="badge" style="background:#fff3e0;color:#e65100;">Pending</span> }
+                        @if (r.status === 'CONFIRMED') { <span class="badge" style="background:#e8f5e9;color:#2e7d32;">Confirmed</span> }
+                        @if (r.status === 'REJECTED') { <span class="badge" style="background:#ffebee;color:#c62828;">Rejected</span> }
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (r.displacementRequested) {
+                    <div class="card mt-2 mb-2" style="border:2px dashed #fb8c00;border-radius:10px;">
+                      <div class="card-body py-2 px-3">
+                        <h6 class="mb-2" style="color:#e65100;"><i class="fas fa-car-side mr-1"></i> Pickup Option Requested</h6>
+                        <div class="mb-1">
+                          <i class="fas fa-coins mr-1" style="color:#e65100;width:18px;"></i>
+                          <strong>Pickup fee:</strong> {{ r.displacementPrice }} TND
+                        </div>
+                        <div class="mb-1">
+                          <i class="fas fa-map-marker-alt mr-1" style="color:#e65100;width:18px;"></i>
+                          <strong>Client address:</strong> {{ r.clientAddress || 'Not specified' }}
+                        </div>
+                        @if (r.clientLat && r.clientLng) {
+                          <div class="mb-2">
+                            <i class="fas fa-globe mr-1" style="color:#e65100;width:18px;"></i>
+                            <strong>Coordinates:</strong> {{ r.clientLat!.toFixed(4) }}, {{ r.clientLng!.toFixed(4) }}
+                          </div>
+                          <button (click)="toggleClientMap(r.id!)" class="btn btn-sm mb-2"
+                            [class.btn-warning]="visibleClientMapId !== r.id"
+                            [class.btn-secondary]="visibleClientMapId === r.id"
+                            style="border-radius:8px;">
+                            <i class="fas fa-map-marked-alt mr-1"></i>
+                            {{ visibleClientMapId === r.id ? 'Hide map' : 'View location on map' }}
+                          </button>
+                          @if (visibleClientMapId === r.id) {
+                            <app-map-picker [mapId]="'clientLoc' + r.id" [lat]="r.clientLat!" [lng]="r.clientLng!" [readonly]="true" [zoom]="15"></app-map-picker>
+                          }
+                        }
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="text-muted mt-2">
+                      <i class="fas fa-info-circle mr-1"></i> No pickup option requested.
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Pagination -->
+  @if (totalPages > 1) {
+    <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+      <small class="text-muted">{{ myCovoiturages.length }} carpool(s) — Page {{ currentPage }}/{{ totalPages }}</small>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="goToPage(currentPage - 1)">&laquo;</button>
+          </li>
+          @for (p of getPages(); track p) {
+            <li class="page-item" [class.active]="p === currentPage">
+              <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+            </li>
+          }
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="goToPage(currentPage + 1)">&raquo;</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  }
+}
+</div>

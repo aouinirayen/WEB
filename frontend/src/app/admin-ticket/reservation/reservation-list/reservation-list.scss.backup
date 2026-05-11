@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  .theme-reservation {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .table th, .table td {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.82rem;
+    vertical-align: middle;
+  }
+  .table th {
+    font-size: 0.72rem;
+  }
+  .page-header h2 {
+    font-size: 1.2rem;
+  }
+  .pagination .page-link {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.8rem;
+  }
+}

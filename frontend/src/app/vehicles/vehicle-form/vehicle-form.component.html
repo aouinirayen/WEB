@@ -1,0 +1,71 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold">{{ isEdit ? 'Edit' : 'Add' }} Vehicle</h4>
+    <a routerLink="/admin/vehicles" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <form #vehicleForm="ngForm" (ngSubmit)="save()">
+        <div class="alert alert-warning py-2" *ngIf="vehicleForm.invalid && vehicleForm.submitted">
+          Please fix the highlighted fields before submitting.
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Plate Number</label>
+            <input class="form-control" [(ngModel)]="vehicle.plateNumber"
+                   (ngModelChange)="normalizePlateNumber($event)"
+                   name="plateNumber" required minlength="5" maxlength="20"
+                   pattern="^TN-[A-Z0-9-]{2,16}$" placeholder="TN-1234">
+            <div class="form-text">Plate format must always start with <strong>TN-</strong>.</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Brand</label>
+            <input class="form-control" [(ngModel)]="vehicle.brand"
+                   (ngModelChange)="normalizeBrand($event)"
+                   name="brand" required minlength="2" maxlength="50"
+                   pattern="^[A-Za-z][A-Za-z0-9\s-]{1,49}$" placeholder="ex: Toyota">
+            <div class="form-text">Use letters/numbers only (no special symbols).</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Type</label>
+            <select class="form-select" [(ngModel)]="vehicle.type" name="type">
+              <option>BUS</option><option>METRO</option>
+              <option>TRAIN</option><option>LOUAGE</option>
+              <option>BATAH</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="vehicle.status" name="status">
+              <option>ACTIVE</option><option>INACTIVE</option>
+              <option>IN_MAINTENANCE</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Capacity</label>
+            <input type="number" class="form-control"
+                   [(ngModel)]="vehicle.capacity" name="capacity" required min="1">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Mileage (km)</label>
+            <input type="number" class="form-control"
+                   [(ngModel)]="vehicle.mileage" name="mileage" required min="0">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Purchase Date</label>
+            <input type="date" class="form-control"
+                   [(ngModel)]="vehicle.purchaseDate" name="purchaseDate" required>
+          </div>
+        </div>
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary me-2" [disabled]="vehicleForm.invalid">
+            {{ isEdit ? 'Update' : 'Create' }}
+          </button>
+          <a routerLink="/admin/vehicles" class="btn btn-outline-secondary">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>

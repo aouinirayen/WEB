@@ -1,0 +1,153 @@
+<div class="route-page">
+
+  <!-- Header -->
+  <div class="route-header">
+    <div>
+      <h4 class="fw-bold mb-0">
+        <i class="bi bi-geo-alt me-2 text-success"></i>Route Optimization & Live Tracking
+      </h4>
+      <small class="text-muted">Dijkstra / AI-weighted routing · Leaflet.js map · GPS simulation</small>
+    </div>
+    <div class="d-flex gap-2">
+      <select class="form-select form-select-sm w-auto"
+              [(ngModel)]="selectedLineId" (ngModelChange)="onLineSelected()">
+        <option [ngValue]="null">— Select a line —</option>
+        <option *ngFor="let l of lines" [ngValue]="l.id">{{ l.code }} — {{ l.name }}</option>
+      </select>
+      <button class="btn btn-sm btn-success" (click)="optimizeRoute()"
+              [disabled]="!selectedLineId || optimizing">
+        <span *ngIf="optimizing" class="spinner-border spinner-border-sm me-1"></span>
+        <i *ngIf="!optimizing" class="bi bi-lightning me-1"></i>
+        Optimize
+      </button>
+    </div>
+  </div>
+
+  <div class="route-grid">
+
+    <!-- LEFT: Map -->
+    <div class="map-col">
+      <div class="map-wrap">
+        <div id="routeMap" style="height:100%;width:100%;border-radius:12px"></div>
+        <!-- Live tracking badge -->
+        <div class="live-badge">
+          <span class="live-dot"></span> Live tracking — {{ positions.length }} vehicles
+        </div>
+        <!-- Real GPS button -->
+        <button class="gps-btn" (click)="startRealGps()" *ngIf="!realGpsActive">
+          <i class="bi bi-crosshair me-1"></i>Use My GPS
+        </button>
+        <button class="gps-btn gps-btn-stop" (click)="stopRealGps()" *ngIf="realGpsActive">
+          <i class="bi bi-stop-circle me-1"></i>Stop GPS
+        </button>
+      </div>
+
+      <!-- Traffic indicator -->
+      <div class="traffic-bar mt-2" *ngIf="routeResult">
+        <span class="traffic-label">Traffic:</span>
+        <span class="traffic-pill"
+          [class.traffic-low]="routeResult.trafficLevel === 'LOW'"
+          [class.traffic-med]="routeResult.trafficLevel === 'MEDIUM'"
+          [class.traffic-high]="routeResult.trafficLevel === 'HIGH'">
+          {{ routeResult.trafficLevel }}
+          <span *ngIf="routeResult.trafficDelayMin > 0">
+            (+{{ routeResult.trafficDelayMin | number:'1.0-0' }} min delay)
+          </span>
+        </span>
+        <span class="method-pill ms-2"
+          [class.method-ai]="routeResult.method === 'WEIGHTED_AI'"
+          [class.method-dijk]="routeResult.method === 'DIJKSTRA'">
+          {{ routeResult.method === 'WEIGHTED_AI' ? '🤖 AI-Weighted' : '📐 Dijkstra' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- RIGHT: Info panel -->
+    <div class="info-col">
+
+      <!-- Route stats (shown after optimization) -->
+      <div class="stats-card" *ngIf="routeResult">
+        <div class="stats-title">Optimized Route — {{ routeResult.lineCode }}</div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-val text-primary">{{ routeResult.totalDistanceKm | number:'1.1-1' }} km</span>
+            <span class="stat-lbl">Distance</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val text-warning">{{ routeResult.estimatedFuelLiters | number:'1.1-1' }} L</span>
+            <span class="stat-lbl">Est. Fuel</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val text-info">{{ routeResult.estimatedDurationMin | number:'1.0-0' }} min</span>
+            <span class="stat-lbl">Duration</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val text-success">{{ routeResult.efficiencyScore | number:'1.0-0' }}%</span>
+            <span class="stat-lbl">Efficiency</span>
+          </div>
+        </div>
+        <div class="explanation-box">
+          <i class="bi bi-info-circle me-1"></i>{{ routeResult.explanation }}
+        </div>
+      </div>
+
+      <!-- Stop sequence -->
+      <div class="stops-card" *ngIf="routeResult">
+        <div class="stops-title">
+          Optimal Stop Sequence
+          <span class="badge bg-secondary ms-1">{{ routeResult.optimalRoute.length }} stops</span>
+        </div>
+        <div class="stop-list">
+          <div class="stop-item" *ngFor="let s of routeResult.optimalRoute; let i = index">
+            <div class="stop-left">
+              <div class="stop-num">{{ s.sequence }}</div>
+              <div class="stop-line-seg" *ngIf="i < routeResult.optimalRoute.length - 1"></div>
+            </div>
+            <div class="stop-info">
+              <span class="stop-name">{{ s.name }}</span>
+              <div class="stop-meta">
+                <span class="road-badge"
+                  [class.road-highway]="s.roadType === 'HIGHWAY'"
+                  [class.road-urban]="s.roadType === 'URBAN'"
+                  [class.road-rural]="s.roadType === 'RURAL'">
+                  {{ s.roadType }}
+                </span>
+                <span *ngIf="s.distanceFromPrevKm > 0" class="dist-text">
+                  +{{ s.distanceFromPrevKm | number:'1.2-2' }} km
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live vehicles list -->
+      <div class="vehicles-card">
+        <div class="stops-title">
+          Live Vehicles
+          <span class="live-dot ms-1"></span>
+        </div>
+        <div class="vehicle-item" *ngFor="let p of positions">
+          <div class="v-plate">{{ p.vehicle.plateNumber }}</div>
+          <div class="v-info">
+            <span class="v-status"
+              [class.status-on]="p.status === 'ON_ROUTE'"
+              [class.status-idle]="p.status === 'IDLE'">
+              {{ p.status }}
+            </span>
+            <span class="v-speed">{{ p.speedKmh | number:'1.0-0' }} km/h</span>
+            <span class="v-gps-type"
+              [class.real-gps]="!p.simulated"
+              [class.sim-gps]="p.simulated">
+              {{ p.simulated ? '🔄 SIM' : '📡 GPS' }}
+            </span>
+          </div>
+        </div>
+        <div *ngIf="positions.length === 0" class="text-muted text-center py-3" style="font-size:13px">
+          No active vehicles tracked yet.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

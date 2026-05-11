@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransEasier — Front-Office Template</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+
+    /* ============================================================
+       DESIGN TOKENS — TransEasier Front-Office
+       ============================================================ */
+    :root {
+      --brand-orange:      #ff7000;
+      --brand-orange-dark: #e06200;
+      --brand-yellow:      #ffc609;
+      --brand-dark:        #232324;
+      --brand-dark2:       #272727;
+      --brand-teal:        #45f2dd;
+
+      --text-white:    #ffffff;
+      --text-light:    rgba(255,255,255,0.8);
+      --text-muted-w:  rgba(255,255,255,0.55);
+      --text-dark:     #1f2029;
+      --text-gray:     #555;
+
+      --bg-page:       #f7f7f7;
+      --bg-dark:       #1a1a2e;
+      --bg-section:    ghostwhite;
+
+      --nav-height:    80px;
+      --radius-sm:     8px;
+      --radius-md:     14px;
+      --radius-pill:   50px;
+
+      --shadow-card:   0px 6px 15px rgba(16,110,234,0.12);
+      --shadow-orange: 0 4px 18px rgba(255,112,0,0.35);
+    }
+
+    /* ============================================================
+       RESET & BASE
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      color: var(--text-dark);
+      background: var(--bg-page);
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; }
+    ul { list-style: none; margin: 0; padding: 0; }
+    button { font-family: inherit; cursor: pointer; }
+
+    /* ============================================================
+       NAVBAR
+       ============================================================ */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-height);
+      background: linear-gradient(var(--brand-dark), var(--brand-dark2));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+      transition: all 0.3s;
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .navbar-logo-icon {
+      width: 42px; height: 42px;
+      background: var(--brand-orange);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .navbar-logo-icon i { color: #fff; font-size: 20px; }
+    .navbar-logo-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .navbar-logo-text span { color: var(--brand-orange); }
+
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-link {
+      padding: 6px 14px;
+      color: rgba(255,255,255,0.8);
+      font-size: 0.88rem;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 2px; left: 14px; right: 14px;
+      height: 2px;
+      background: var(--brand-orange);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.3s;
+      border-radius: 2px;
+    }
+    .nav-link:hover { color: #fff; }
+    .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
+    .nav-link.active { color: var(--brand-orange); }
+    .nav-link.active::after { transform: scaleX(1); }
+
+    .navbar-actions { display: flex; align-items: center; gap: 10px; }
+
+    .btn-signin {
+      padding: 8px 22px;
+      border-radius: var(--radius-pill);
+      background: transparent;
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: 2px solid var(--brand-orange);
+      transition: all 0.2s;
+    }
+    .btn-signin:hover { background: var(--brand-orange); }
+
+    .dropdown-profile {
+      position: relative;
+    }
+    .profile-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--radius-pill);
+      color: #fff;
+      font-size: 0.85rem;
+      transition: background 0.15s;
+    }
+    .profile-btn:hover { background: rgba(255,255,255,0.18); }
+    .profile-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--brand-orange);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      color: #fff;
+      font-weight: 700;
+    }
+    .dropdown-menu {
+      position: absolute;
+      right: 0; top: calc(100% + 8px);
+      background: #fff;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      min-width: 160px;
+      overflow: hidden;
+      z-index: 100;
+    }
+    .dropdown-item {
+      display: block;
+      padding: 10px 18px;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      transition: background 0.12s;
+    }
+    .dropdown-item:hover { background: #f5f5f5; color: var(--brand-orange); }
+    .dropdown-divider { border: none; border-top: 1px solid #f0f0f0; }
+
+    /* Mobile hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ============================================================
+       PAGE WRAPPER
+       ============================================================ */
+    main { margin-top: var(--nav-height); }
+
+    /* ============================================================
+       SECTION UTILITIES
+       ============================================================ */
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      padding: 28px 0;
+      background-image: url("https://www.klaviyo.com/wp-content/uploads/2016/09/abstract-background-1024x273.jpg");
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-gray);
+      font-size: 1rem;
+      margin-top: -18px;
+      margin-bottom: 32px;
+    }
+
+    /* ============================================================
+       DEMO NAVIGATION TABS (template nav only)
+       ============================================================ */
+    .demo-nav {
+      position: sticky;
+      top: var(--nav-height);
+      background: #1a1a2e;
+      z-index: 900;
+      display: flex;
+      gap: 4px;
+      padding: 8px 20px;
+      overflow-x: auto;
+      border-bottom: 2px solid var(--brand-orange);
+    }
+    .demo-nav-btn {
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      background: none;
+      border: none;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .demo-nav-btn.active,
+    .demo-nav-btn:hover { color: #fff; background: rgba(255,112,0,0.25); }
+    .demo-nav-btn.active { color: var(--brand-orange); }
+
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* ============================================================
+       1. HOME — HERO
+       ============================================================ */
+    .hero {
+      width: 100%;
+      min-height: 90vh;
+      background-image: url("https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1400&q=80");
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(120deg, rgba(35,35,36,0.88) 0%, rgba(35,35,36,0.5) 100%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+      padding: 0 60px;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,112,0,0.15);
+      border: 1px solid rgba(255,112,0,0.4);
+      color: var(--brand-orange);
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: #fff;
+      margin-bottom: 18px;
+    }
+    .hero h1 span { color: var(--brand-orange); }
+    .hero p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-hero-primary {
+      padding: 13px 32px;
+      background: var(--brand-orange);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-pill);
+      font-size: 1rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-orange);
+      transition: all 0.2s;
+    }
+    .btn-hero-primary:hover { background: var(--brand-orange-dark); transform: translateY(-2px); }
+    .btn-hero-outline {
+      padding: 13px 32px;
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: var(--radius-pill);
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-hero-outline:hover { border-color: #fff; background: rgba(255,255,255,0.08); }
+
+    .hero-stats {
+      position: absolute;
+      bottom: 30px;
+      left: 60px;
+      right: 60px;
+      display: flex;
+      gap: 0;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      z-index: 1;
+    }
+    .hero-stat {
+      flex: 1;
+      padding: 18px 24px;
+      text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    .hero-stat:last-child { border-right: none; }
+    .hero-stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--brand-orange);
+      line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+
+    /* ============================================================
+       FEATURES GRID
+       ============================================================ */
+    .features-section {
+      background: var(--bg-section);
+      padding-bottom: 60px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 24px 20px;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(16,110,234,0.18); }
+    .feature-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, rgba(255,112,0,0.12), rgba(255,112,0,0.05));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .feature-icon i { color: var(--brand-orange); font-size: 22px; }
+    .feature-card h5 { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); }
+    .feature-card p { font-size: 0.84rem; color: var(--text-gray); line-height: 1.6; }
+
+    /* ============================================================
+       2. PUBLIC TRANSIT
+       ============================================================ */
+    .transit-section {
+      min-height: calc(100vh - var(--nav-height));
+      background: var(--bg-section);
+      padding-bottom: 50px;
+    }
+    .transit-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+    }
+    .transit-tab {
+      padding: 10px 28px;
+      border-radius: var(--radius-pill);
+      border: 2px solid #ddd;
+      background: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-gray);
+      transition: all 0.2s;
+    }
+    .transit-tab:hover { border-color: var(--brand-orange); color: var(--brand-orange); }
+    .transit-tab.active { background: var(--brand-orange); border-color: var(--brand-orange); color: #fff; }
+
+    .transit-filters {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding: 18px 30px;
+      background: #fff;
+      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 24px;
+    }
+    .filter-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .filter-label { font-weight: 600; font-size: 0.88rem; color: var(--text-dark); }
+    .filter-input {
+      height: 38px;
+      padding: 0 14px;
+      border: 1px solid #ddd;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .filter-input:focus { border-color: var(--brand-orange); }
+    .filter-select {
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid #ddd;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Transport data table */
+    .data-section { padding: 0 30px; }
+    .data-table-card {
+      background: #fff;
+      border-radius: var(--radius-md);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .data-table-header {
+      padding: 16px 22px;
+      background: var(--brand-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .data-table-header h3 { color: #fff; font-size: 1rem; font-weight: 700; }
+    .data-table-header i { color: var(--brand-orange); }
+    table.transport-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .transport-table thead tr { background: #f8f9ff; }
+    .transport-table th {
+      padding: 12px 18px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--brand-dark);
+      border-bottom: 2px solid #eee;
+    }
+    .transport-table td {
+      padding: 14px 18px;
+      font-size: 0.88rem;
+      border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
+    }
+    .transport-table tbody tr { transition: background 0.12s; }
+    .transport-table tbody tr:hover { background: #fff8f4; }
+    .transport-table tbody tr:last-child td { border-bottom: none; }
+
+    .line-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: #fff;
+    }
+    .line-badge-bus    { background: linear-gradient(135deg, var(--brand-orange), var(--brand-orange-dark)); }
+    .line-badge-metro  { background: linear-gradient(135deg, #1a73e8, #0d47a1); }
+    .line-badge-tgm    { background: linear-gradient(135deg, #2e7d32, #1b5e20); }
+    .line-badge-train  { background: linear-gradient(135deg, #7b1fa2, #4a148c); }
+
+    .location-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      background: #e3f2fd;
+      color: #1a73e8;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .location-chip:hover { background: #bbdefb; }
+
+    .next-station-link {
+      color: var(--brand-orange);
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 1px dashed var(--brand-orange);
+      transition: color 0.12s;
+    }
+    .next-station-link:hover { color: var(--brand-orange-dark); }
+
+    .time-cell { color: #333; font-weight: 600; }
+    .time-cell i { color: var(--brand-orange); margin-right: 5px; font-size: 12px; }
+
+    .seats-cell { display: flex; align-items: center; gap: 6px; }
+    .seats-count { font-weight: 700; }
+    .seats-high { color: #2e7d32; }
+    .seats-mid  { color: #f57f17; }
+    .seats-low  { color: #c62828; }
+
+    /* Station popup */
+    .station-popup {
+      background: #f8f9ff;
+      border-left: 3px solid var(--brand-orange);
+      padding: 14px 18px;
+      margin: 4px 0;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+    .station-popup h5 { color: var(--brand-dark); font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; }
+    .station-info-row { display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-gray); }
+    .station-info-row span { display: flex; align-items: center; gap: 5px; }
+    .station-info-row i { color: var(--brand-orange); }
+
+    /* ============================================================
+       3. CARPOOL (Fi Thneytek / Wassalni)
+       ============================================================ */
+    .carpool-hero {
+      width: 100%;
+      min-height: 65vh;
+      background-image: url("https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1400&q=80");
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .carpool-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.65);
+    }
+    .carpool-hero-content { position: relative; z-index: 1; text-align: center; width: 100%; max-width: 900px; }
+    .carpool-title {
+      font-family: 'Lato', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: var(--brand-yellow);
+      -webkit-text-stroke: 0.5px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    .carpool-subtitle { color: rgba(255,255,255,0.75); margin-bottom: 32px; font-size: 1.05rem; }
+
+    .carpool-search-form {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+      flex-wrap: wrap;
+    }
+    .carpool-form-field {
+      flex: 1;
+      min-width: 160px;
+      border-right: 1px solid #eee;
+      position: relative;
+    }
+    .carpool-form-field:last-of-type { border-right: none; }
+    .carpool-form-field label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-gray);
+      padding: 12px 16px 0;
+    }
+    .carpool-form-field input {
+      width: 100%;
+      border: none;
+      padding: 4px 16px 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      color: var(--text-dark);
+    }
+    .btn-find-ride {
+      padding: 0 30px;
+      background: var(--brand-yellow);
+      color: var(--text-dark);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s;
+      min-width: 130px;
+      justify-content: center;
+    }
+    .btn-find-ride:hover { background: #e6b000; }
+
+    .carpool-actions {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .btn-offer-ride {
+      padding: 10px 24px;
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.4);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex; align-items: center; gap: 8px;
+      transition: all 0.15s;
+    }
+    .btn-offer-ride:hover { background: rgba(255,255,255,0.25); }
+    .btn-my-rides {
+      padding: 10px 24px;
+      border-radius: var(--radius-pill);
+      background: var(--brand-yellow);
+      border: none;
+      color: var(--text-dark);
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex; align-items: center; gap: 8px;
+      transition: all 0.15s;
+    }
+    .btn-my-rides:hover { background: #e6b000; }
+
+    /* Ride Cards */
+    .rides-section { padding: 30px; background: var(--bg-section); }
+    .rides-section h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 20px; }
+    .rides-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 18px;
+    }
+    .ride-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(192,128,128,0.18);
+      position: relative;
+      transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .ride-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(192,128,128,0.28); }
+
+    .ride-price {
+      position: absolute;
+      top: 16px; right: 18px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+    .ride-price span { font-size: 0.75rem; color: var(--text-gray); }
+
+    .ride-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .ride-datetime { text-align: center; }
+    .ride-time { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
+    .ride-date { font-size: 0.75rem; color: var(--text-gray); }
+
+    .ride-path {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      position: relative;
+    }
+    .path-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      margin-right: 10px;
+    }
+    .dot-start {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 3px solid var(--brand-teal);
+      background: #fff;
+    }
+    .path-line {
+      width: 2px;
+      height: 30px;
+      background: var(--brand-teal);
+    }
+    .dot-end {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--brand-teal);
+    }
+    .path-labels { display: flex; flex-direction: column; justify-content: space-between; height: 52px; }
+    .path-from, .path-to { font-size: 0.9rem; font-weight: 600; color: #1a73e8; }
+
+    .ride-seats {
+      font-size: 0.8rem;
+      color: var(--text-gray);
+      margin-bottom: 8px;
+    }
+    .ride-seats strong { color: #2e7d32; }
+
+    .ride-divider { border: none; border-top: 1px solid #f0f0f0; margin: 12px 0; }
+
+    .ride-driver { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .driver-pfp {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #eee;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      font-size: 14px;
+    }
+    .driver-pfp-placeholder { background: linear-gradient(135deg, var(--brand-orange), var(--brand-orange-dark)); }
+    .driver-name { font-weight: 600; font-size: 0.9rem; }
+
+    .btn-contact-driver {
+      width: 100%;
+      padding: 9px;
+      background: var(--brand-yellow);
+      color: var(--text-dark);
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      transition: background 0.15s;
+    }
+    .btn-contact-driver:hover { background: #e6b000; }
+
+    /* My Rides table */
+    .my-rides-section { padding: 30px; }
+    .my-rides-table-wrap {
+      background: #fff;
+      border-radius: var(--radius-md);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+      overflow: hidden;
+    }
+    .my-rides-table { width: 100%; border-collapse: collapse; }
+    .my-rides-table th {
+      padding: 13px 16px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--brand-dark);
+      background: #f8f9ff;
+      border-bottom: 2px solid #eee;
+    }
+    .my-rides-table td {
+      padding: 12px 16px;
+      font-size: 0.88rem;
+      border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
+    }
+    .my-rides-table tbody tr:hover { background: #fff8f4; }
+    .my-rides-table tbody tr:last-child td { border-bottom: none; }
+    .seats-ctrl { display: flex; align-items: center; gap: 8px; }
+    .seats-btn {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: #e3f2fd;
+      color: #1a73e8;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      transition: background 0.12s;
+    }
+    .seats-btn:hover { background: #1a73e8; color: #fff; }
+    .btn-delete-ride {
+      padding: 5px 14px;
+      background: #fce4ec;
+      color: #c62828;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.12s;
+    }
+    .btn-delete-ride:hover { background: #c62828; color: #fff; }
+
+    /* ============================================================
+       4. COMMUNITY
+       ============================================================ */
+    .community-section {
+      min-height: calc(100vh - var(--nav-height));
+      padding: 40px 30px;
+      background: var(--bg-section);
+      position: relative;
+    }
+    .community-section::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: linear-gradient(-60deg, rgba(255,112,0,0.08) 50%, rgba(85,85,85,0.05) 50%);
+      animation: bgslide 4s ease-in-out infinite alternate;
+      z-index: 0;
+      pointer-events: none;
+    }
+    @keyframes bgslide {
+      0%   { transform: translateX(-25%); }
+      100% { transform: translateX(25%); }
+    }
+    .community-inner { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; }
+    .community-header { margin-bottom: 30px; }
+    .community-header h2 { font-size: 1.6rem; font-weight: 700; color: var(--text-dark); }
+    .community-header p { color: var(--text-gray); font-size: 0.9rem; }
+
+    /* Feed */
+    .comment-card {
+      background: rgba(16,46,46,0.96);
+      border: 1px solid rgba(16,46,46,1);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .comment-author { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .comment-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--brand-orange);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .comment-meta h4 { color: #fff; font-size: 0.95rem; font-weight: 700; display: inline; margin-right: 8px; }
+    .comment-meta span { color: rgba(184,183,183,0.7); font-size: 0.78rem; }
+    .comment-body { color: rgba(184,183,183,1); font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px; }
+    .btn-reply {
+      padding: 6px 18px;
+      background: var(--brand-orange);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: background 0.12s;
+    }
+    .btn-reply:hover { background: var(--brand-orange-dark); }
+
+    /* Leave comment form */
+    .leave-comment {
+      background: rgba(16,46,46,0.96);
+      border: 1px solid rgba(16,46,46,1);
+      border-radius: 10px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+    .leave-comment h4 { color: #fff; font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+    .community-textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(16,46,46,1);
+      border-radius: 10px;
+      background: #000;
+      color: rgba(184,183,183,1);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      resize: vertical;
+      outline: none;
+      min-height: 100px;
+    }
+    .community-textarea:focus { border-color: var(--brand-orange); }
+    .btn-post-comment {
+      margin-top: 12px;
+      padding: 8px 28px;
+      background: var(--brand-yellow);
+      color: var(--text-dark);
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      transition: background 0.12s;
+    }
+    .btn-post-comment:hover { background: #e6b000; }
+
+    /* ============================================================
+       5. AUTH (Sign In / Register)
+       ============================================================ */
+    .auth-section {
+      min-height: calc(100vh - var(--nav-height));
+      background: var(--bg-section);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .auth-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      width: 100%;
+      max-width: 500px;
+      overflow: hidden;
+    }
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 16px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      background: #f8f8f8;
+      color: var(--text-gray);
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+    .auth-tab.active { background: #fff; color: var(--brand-orange); border-bottom: 3px solid var(--brand-orange); }
+    .auth-tab:hover:not(.active) { background: #fff; color: var(--text-dark); }
+
+    .auth-form { padding: 32px; }
+    .auth-form-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .auth-form-group i { color: var(--text-gray); width: 18px; text-align: center; flex-shrink: 0; }
+    .auth-input {
+      flex: 1;
+      height: 44px;
+      padding: 0 14px;
+      border: 1.5px solid #ddd;
+      border-radius: var(--radius-sm);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .auth-input:focus { border-color: var(--brand-orange); }
+    .auth-input.error { border-color: #c62828; }
+    .auth-error-msg { font-size: 0.75rem; color: #c62828; margin-top: -12px; margin-bottom: 10px; padding-left: 30px; }
+    .forgot-link {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+    .forgot-link a { font-size: 0.82rem; color: var(--brand-orange); }
+    .forgot-link a:hover { text-decoration: underline; }
+    .btn-auth {
+      width: 100%;
+      padding: 13px;
+      border-radius: var(--radius-pill);
+      background: var(--brand-orange);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      box-shadow: var(--shadow-orange);
+      transition: all 0.15s;
+    }
+    .btn-auth:hover { background: var(--brand-orange-dark); transform: translateY(-1px); }
+    .btn-auth:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .auth-shake { animation: shake 0.5s ease; }
+    @keyframes shake {
+      0%,100%{ transform:translateX(0) }
+      20%,60%{ transform:translateX(-6px) }
+      40%,80%{ transform:translateX(6px) }
+    }
+
+    /* ============================================================
+       6. ABOUT US
+       ============================================================ */
+    .about-section { background: var(--bg-section); padding-bottom: 60px; }
+    .about-intro {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 50px 30px;
+    }
+    .about-text { max-width: 500px; }
+    .about-text h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--brand-dark);
+      margin-bottom: 8px;
+    }
+    .about-text h3 span { color: var(--brand-orange); }
+    .about-text p { color: var(--text-gray); line-height: 1.7; margin-bottom: 20px; }
+    .about-img-wrap {
+      width: 320px;
+      height: 220px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--brand-dark), #3949ab);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .about-img-icon { font-size: 80px; color: rgba(255,112,0,0.4); }
+
+    .team-section { padding: 0 30px 60px; }
+    .team-heading { text-align: center; margin-bottom: 50px; }
+    .team-heading h2 { font-size: 1.8rem; font-weight: 700; color: var(--brand-orange); margin-bottom: 10px; }
+    .team-heading h4 { color: var(--text-gray); font-weight: 400; font-size: 1rem; }
+    .team-heading h4::before {
+      content: '';
+      display: block;
+      width: 50px; height: 2px;
+      background: var(--brand-orange);
+      margin: 14px auto 0;
+    }
+
+    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 900px; margin: 0 auto; }
+    .team-card { border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .team-thumb {
+      height: 200px;
+      background: linear-gradient(135deg, var(--brand-dark), #3949ab);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .team-thumb-icon { font-size: 70px; color: rgba(255,255,255,0.1); }
+    .team-thumb-initials {
+      position: absolute;
+      font-size: 3rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.5);
+    }
+    .team-thumb-overlay {
+      position: absolute; inset: 0;
+      background: rgba(35,35,36,0.7);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .team-card:hover .team-thumb-overlay { opacity: 1; }
+    .team-overlay-name { color: #fff; font-weight: 700; font-size: 1rem; text-align: center; }
+    .team-info { background: #fff; padding: 20px; text-align: center; position: relative; }
+    .team-linkedin {
+      position: absolute;
+      top: -20px; left: 50%;
+      transform: translateX(-50%);
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+      color: #00b6f1;
+      font-size: 18px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .team-linkedin:hover { background: #00b6f1; color: #fff; }
+    .team-info h4 { font-weight: 700; font-size: 1rem; color: var(--text-dark); margin: 10px 0 2px; }
+    .team-info span { color: var(--brand-orange); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ============================================================
+       7. CONTACT
+       ============================================================ */
+    .contact-section {
+      background: var(--bg-section);
+      padding: 50px 30px;
+    }
+    .contact-card {
+      display: flex;
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+    }
+    .contact-sidebar {
+      width: 260px;
+      background: var(--brand-dark);
+      padding: 40px 30px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .contact-sidebar-header { font-size: 1.2rem; font-weight: 700; color: var(--brand-orange); }
+    .contact-info-item { display: flex; align-items: flex-start; gap: 12px; }
+    .contact-info-item i { color: var(--brand-orange); margin-top: 2px; }
+    .contact-info-item p { color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.6; }
+    .contact-info-item strong { color: #fff; display: block; font-size: 0.8rem; margin-bottom: 2px; }
+
+    .contact-form-wrap { flex: 1; padding: 40px; }
+    .contact-form-wrap h3 { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin-bottom: 24px; }
+    .contact-form-row { display: flex; gap: 16px; margin-bottom: 16px; }
+    .contact-form-group { flex: 1; }
+    .contact-form-group label { font-size: 0.78rem; font-weight: 600; color: var(--text-gray); display: block; margin-bottom: 6px; }
+    .contact-input {
+      width: 100%;
+      height: 42px;
+      padding: 0 14px;
+      border: 1.5px solid #ddd;
+      border-radius: var(--radius-sm);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .contact-input:focus { border-color: var(--brand-orange); }
+    textarea.contact-input { height: 120px; padding: 12px 14px; resize: vertical; }
+    .btn-contact-submit {
+      padding: 12px 32px;
+      background: var(--brand-orange);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow-orange);
+      transition: all 0.15s;
+    }
+    .btn-contact-submit:hover { background: var(--brand-orange-dark); transform: translateY(-2px); }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer {
+      background: #f8f9fa;
+      border-top: 1px solid #eee;
+    }
+    .footer-social {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid #e0e0e0;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .footer-social-text { color: var(--text-gray); font-size: 0.88rem; }
+    .footer-social-icons { display: flex; gap: 12px; }
+    .footer-social-icon {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-gray);
+      font-size: 14px;
+      transition: all 0.15s;
+    }
+    .footer-social-icon:hover { background: var(--brand-orange); color: #fff; }
+
+    .footer-main {
+      display: flex;
+      gap: 40px;
+      padding: 40px 40px 30px;
+      flex-wrap: wrap;
+    }
+    .footer-col { flex: 1; min-width: 200px; }
+    .footer-col h6 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dark); margin-bottom: 16px; }
+    .footer-about { color: var(--text-gray); font-size: 0.85rem; line-height: 1.6; }
+    .footer-links { display: flex; flex-direction: column; gap: 8px; }
+    .footer-links a { color: var(--text-gray); font-size: 0.85rem; transition: color 0.12s; }
+    .footer-links a:hover { color: var(--brand-orange); }
+    .footer-contact-item { display: flex; align-items: center; gap: 8px; color: var(--text-gray); font-size: 0.85rem; margin-bottom: 8px; }
+    .footer-contact-item i { color: var(--brand-orange); width: 14px; }
+
+    .footer-bottom {
+      text-align: center;
+      padding: 16px;
+      background: rgba(0,0,0,0.04);
+      font-size: 0.82rem;
+      color: var(--text-gray);
+    }
+    .footer-bottom strong { color: var(--brand-orange); }
+
+    /* ============================================================
+       ALERTS / TOAST
+       ============================================================ */
+    .alert {
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .alert-success { background: #e8f5e9; color: #1b5e20; border-left: 4px solid #2e7d32; }
+    .alert-warning { background: #fff8e1; color: #e65100; border-left: 4px solid #f57f17; }
+    .alert-info    { background: #e3f2fd; color: #0d47a1; border-left: 4px solid #1a73e8; }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    .modal-overlay {
+      background: rgba(31,32,41,0.75);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal-box-header {
+      padding: 20px 24px;
+      background: var(--brand-dark);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-box-title { color: #fff; font-size: 1.05rem; font-weight: 700; }
+    .modal-close-btn {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .modal-close-btn:hover { background: rgba(255,255,255,0.2); }
+    .modal-box-body { padding: 24px; }
+    .modal-box-footer { padding: 16px 24px; border-top: 1px solid #f0f0f0; display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 900px) {
+      .hero-stats { display: none; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+      .about-intro { flex-direction: column; }
+      .about-img-wrap { display: none; }
+      .contact-card { flex-direction: column; }
+      .contact-sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 20px; }
+      .navbar-links { display: none; }
+      .hamburger { display: flex; }
+    }
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 2rem; }
+      .hero-content { padding: 0 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: 1fr; }
+      .rides-grid { grid-template-columns: 1fr; }
+      .carpool-title { font-size: 2rem; }
+      .contact-form-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav class="navbar" id="navbar">
+  <div class="navbar-brand">
+    <div class="navbar-logo-icon"><i class="fa fa-bus"></i></div>
+    <span class="navbar-logo-text">Trans<span>Easier</span></span>
+  </div>
+
+  <div class="navbar-links" id="nav-links">
+    <a href="#" class="nav-link active" onclick="showPage('home', this)">Home</a>
+    <a href="#" class="nav-link" onclick="showPage('transit', this)">Public Transit</a>
+    <a href="#" class="nav-link" onclick="showPage('carpool', this)">Fi Thneytek</a>
+    <a href="#" class="nav-link" onclick="showPage('community', this)">Community</a>
+    <a href="#" class="nav-link" onclick="showPage('about', this)">About</a>
+    <a href="#" class="nav-link" onclick="showPage('contact', this)">Contact</a>
+  </div>
+
+  <div class="navbar-actions">
+    <!-- Not logged in state -->
+    <button class="btn-signin" id="btn-show-signin" onclick="showPage('auth', null)">Sign In</button>
+    <!-- Logged in state (hidden by default) -->
+    <div class="dropdown-profile" id="profile-menu" style="display:none;">
+      <button class="profile-btn" onclick="toggleDropdown()">
+        <div class="profile-avatar">RA</div>
+        Rayen <i class="fa fa-caret-down"></i>
+      </button>
+      <div class="dropdown-menu" id="profile-dropdown" style="display:none;">
+        <a href="#" class="dropdown-item"><i class="fa fa-user" style="margin-right:8px;"></i>My account</a>
+        <hr class="dropdown-divider">
+        <a href="#" class="dropdown-item" onclick="logout()"><i class="fa fa-sign-out" style="margin-right:8px;"></i>Sign out</a>
+      </div>
+    </div>
+  </div>
+  <button class="hamburger" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Demo section switcher bar -->
+<div class="demo-nav">
+  <button class="demo-nav-btn active" onclick="showPage('home', this)">🏠 Home</button>
+  <button class="demo-nav-btn" onclick="showPage('transit', this)">🚌 Public Transit</button>
+  <button class="demo-nav-btn" onclick="showPage('carpool', this)">🚗 Carpool (Wassalni)</button>
+  <button class="demo-nav-btn" onclick="showPage('community', this)">💬 Community</button>
+  <button class="demo-nav-btn" onclick="showPage('auth', this)">🔐 Auth</button>
+  <button class="demo-nav-btn" onclick="showPage('about', this)">👥 About Us</button>
+  <button class="demo-nav-btn" onclick="showPage('contact', this)">📩 Contact</button>
+</div>
+
+<main>
+
+  <!-- ======================================================
+       PAGE: HOME
+       ====================================================== -->
+  <div id="page-home" class="page-section active">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-tag"><i class="fa fa-map-marker"></i> Tunisia's smart transport platform</div>
+        <h1>We think about <span>Transport</span>, so you don't have to.</h1>
+        <p>If you need to get anywhere, you need TransEasier. Real-time schedules, maps, carpooling and parking — all in one place.</p>
+        <div class="hero-actions">
+          <button class="btn-hero-primary" onclick="showPage('transit', null)"><i class="fa fa-bus"></i> View Schedules</button>
+          <button class="btn-hero-outline" onclick="showPage('carpool', null)"><i class="fa fa-car"></i> Find a Ride</button>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value">50+</div>
+          <div class="hero-stat-label">Bus Lines</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">12</div>
+          <div class="hero-stat-label">Metro Stations</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">3</div>
+          <div class="hero-stat-label">TGM Lines</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">1k+</div>
+          <div class="hero-stat-label">Daily Users</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features-section">
+      <h2 class="section-title">Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa fa-map-marker"></i></div>
+          <h5>GPS Tracking</h5>
+          <p>See real-time arrival updates directly from the maps. Track buses, metros and TGM live.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa fa-calendar"></i></div>
+          <h5>Public Transport Schedules</h5>
+          <p>Access departure and arrival times for all public means of transport through the platform.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa fa-television"></i></div>
+          <h5>Connected Panels</h5>
+          <p>Smart panels at each station showing temperature, humidity and traffic conditions in real-time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa fa-map"></i></div>
+          <h5>Maps</h5>
+          <p>Find the shortest way to your destination and locate trains, buses and TGM in real-time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa fa-car"></i></div>
+          <h5>Fi Thneytek</h5>
+          <p>Ridematching service with commuters in your area sharing similar work locations and hours.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa fa-parking"></i></div>
+          <h5>Parkini</h5>
+          <p>Done searching for parking? Pay online and find your spot in seconds. Enjoy your day!</p>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /page-home -->
+
+
+  <!-- ======================================================
+       PAGE: PUBLIC TRANSIT
+       ====================================================== -->
+  <div id="page-transit" class="page-section">
+    <section class="transit-section">
+      <h2 class="section-title">Public Transit</h2>
+
+      <!-- Tab bar: Bus / Metro / TGM -->
+      <div class="transit-tabs">
+        <button class="transit-tab active" onclick="switchTransitTab(this, 'bus')"><i class="fa fa-bus"></i> Bus</button>
+        <button class="transit-tab" onclick="switchTransitTab(this, 'metro')"><i class="fa fa-subway"></i> Metro</button>
+        <button class="transit-tab" onclick="switchTransitTab(this, 'tgm')"><i class="fa fa-train"></i> TGM</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="transit-filters">
+        <div class="filter-group">
+          <span class="filter-label">Filter by:</span>
+          <input type="text" class="filter-input" placeholder="Location..." style="width:160px;">
+          <input type="text" class="filter-input" placeholder="Station..." style="width:160px;">
+        </div>
+        <div class="filter-group">
+          <span class="filter-label" style="font-size:.82rem;">Sort by:</span>
+          <select class="filter-select">
+            <option>Time</option>
+            <option>Seats</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Bus table -->
+      <div class="data-section" id="tab-bus">
+        <div class="data-table-card">
+          <div class="data-table-header">
+            <i class="fa fa-bus"></i>
+            <h3>Bus Lines — Real-time Status</h3>
+          </div>
+          <table class="transport-table">
+            <thead>
+              <tr>
+                <th>Bus</th>
+                <th>Current Location</th>
+                <th>Next Station</th>
+                <th>Arrival Time</th>
+                <th>Available Seats</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:10px;"><div class="line-badge line-badge-bus">B1</div><span style="font-weight:600;">Ligne 1</span></div></td>
+                <td><span class="location-chip"><i class="fa fa-map-marker"></i> Avenue Habib Bourguiba</span></td>
+                <td><a class="next-station-link" onclick="toggleStation('s1')">Bab Bhar</a>
+                  <div id="s1" style="display:none;"><div class="station-popup"><h5>Bab Bhar Station</h5><div class="station-info-row"><span><i class="fa fa-thermometer-half"></i>26°C</span><span><i class="fa fa-tint"></i>65% humidity</span><span><i class="fa fa-car"></i>Moderate traffic</span></div></div></div>
+                </td>
+                <td class="time-cell"><i class="fa fa-clock-o"></i>08:15</td>
+                <td><div class="seats-cell"><i class="fa fa-users" style="color:#2e7d32;"></i><span class="seats-count seats-high">24</span> seats</div></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:10px;"><div class="line-badge line-badge-bus">B5</div><span style="font-weight:600;">Ligne 5</span></div></td>
+                <td><span class="location-chip"><i class="fa fa-map-marker"></i> Place Barcelone</span></td>
+                <td><a class="next-station-link" onclick="toggleStation('s2')">La Goulette</a>
+                  <div id="s2" style="display:none;"><div class="station-popup"><h5>La Goulette Station</h5><div class="station-info-row"><span><i class="fa fa-thermometer-half"></i>24°C</span><span><i class="fa fa-tint"></i>70% humidity</span><span><i class="fa fa-car"></i>Light traffic</span></div></div></div>
+                </td>
+                <td class="time-cell"><i class="fa fa-clock-o"></i>08:32</td>
+                <td><div class="seats-cell"><i class="fa fa-users" style="color:#f57f17;"></i><span class="seats-count seats-mid">8</span> seats</div></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:10px;"><div class="line-badge line-badge-bus">B12</div><span style="font-weight:600;">Ligne 12</span></div></td>
+                <td><span class="location-chip"><i class="fa fa-map-marker"></i> Ariana Centre</span></td>
+                <td><a class="next-station-link" onclick="toggleStation('s3')">Menzah 6</a>
+                  <div id="s3" style="display:none;"><div class="station-popup"><h5>Menzah 6 Station</h5><div class="station-info-row"><span><i class="fa fa-thermometer-half"></i>25°C</span><span><i class="fa fa-tint"></i>60%</span><span><i class="fa fa-car"></i>Heavy traffic</span></div></div></div>
+                </td>
+                <td class="time-cell"><i class="fa fa-clock-o"></i>08:48</td>
+                <td><div class="seats-cell"><i class="fa fa-users" style="color:#c62828;"></i><span class="seats-count seats-low">2</span> seats</div></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:10px;"><div class="line-badge line-badge-bus">B20</div><span style="font-weight:600;">Ligne 20</span></div></td>
+                <td><span class="location-chip"><i class="fa fa-map-marker"></i> Bardo</span></td>
+                <td><a class="next-station-link">El Omrane</a></td>
+                <td class="time-cell"><i class="fa fa-clock-o"></i>09:05</td>
+                <td><div class="seats-cell"><i class="fa fa-users" style="color:#2e7d32;"></i><span class="seats-count seats-high">18</span> seats</div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Metro table (hidden by default) -->
+      <div class="data-section" id="tab-metro" style="display:none;">
+        <div class="data-table-card">
+          <div class="data-table-header">
+            <i class="fa fa-subway"></i>
+            <h3>Metro Lines — Real-time Status</h3>
+          </div>
+          <table class="transport-table">
+            <thead>
+              <tr><th>Metro</th><th>Current Location</th><th>Next Station</th><th>Arrival Time</th><th>Available Seats</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:10px;"><div class="line-badge line-badge-metro">M1</div><span style="font-weight:600;">Ligne 1</span></div></td>
+                <td><span class="location-chip" style="background:#e3f2fd;color:#1a73e8;"><i class="fa fa-map-marker"></i> Ibn Khaldoun</span></td>
+                <td><a class="next-station-link">République</a></td>
+                <td class="time-cell"><i class="fa fa-clock-o"></i>07:58</td>
+                <td><div class="seats-cell"><i class="fa fa-users" style="color:#2e7d32;"></i><span class="seats-count seats-high">55</span> seats</div></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:10px;"><div class="line-badge line-badge-metro">M4</div><span style="font-weight:600;">Ligne 4</span></div></td>
+                <td><span class="location-chip" style="background:#e3f2fd;color:#1a73e8;"><i class="fa fa-map-marker"></i> Tunis Marine</span></td>
+                <td><a class="next-station-link">Bab Souika</a></td>
+                <td class="time-cell"><i class="fa fa-clock-o"></i>08:10</td>
+                <td><div class="seats-cell"><i class="fa fa-users" style="color:#f57f17;"></i><span class="seats-count seats-mid">12</span> seats</div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TGM table (hidden by default) -->
+      <div class="data-section" id="tab-tgm" style="display:none;">
+        <div class="data-table-card">
+          <div class="data-table-header">
+            <i class="fa fa-train"></i>
+            <h3>TGM Lines — Real-time Status</h3>
+          </div>
+          <table class="transport-table">
+            <thead>
+              <tr><th>TGM</th><th>Current Location</th><th>Next Station</th><th>Arrival Time</th><th>Available Seats</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:10px;"><div class="line-badge line-badge-tgm">T1</div><span style="font-weight:600;">TGM Tunis–Marsa</span></div></td>
+                <td><span class="location-chip" style="background:#e8f5e9;color:#2e7d32;"><i class="fa fa-map-marker"></i> La Goulette</span></td>
+                <td><a class="next-station-link">Carthage Dermech</a></td>
+                <td class="time-cell"><i class="fa fa-clock-o"></i>08:22</td>
+                <td><div class="seats-cell"><i class="fa fa-users" style="color:#2e7d32;"></i><span class="seats-count seats-high">80</span> seats</div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+  </div><!-- /page-transit -->
+
+
+  <!-- ======================================================
+       PAGE: CARPOOL (Wassalni / Fi Thneytek)
+       ====================================================== -->
+  <div id="page-carpool" class="page-section">
+
+    <!-- Hero search -->
+    <section class="carpool-hero">
+      <button class="btn-my-rides" style="position:absolute;right:24px;top:20px;z-index:2;" onclick="showMyRides()">
+        <i class="fa fa-car"></i> My rides
+      </button>
+      <div class="carpool-hero-content">
+        <h2 class="carpool-title">Same destination, more companions</h2>
+        <p class="carpool-subtitle">Find someone to share your commute with and save money together</p>
+
+        <div class="carpool-search-form">
+          <div class="carpool-form-field">
+            <label>From</label>
+            <input type="text" placeholder="Departure city..." id="from-input">
+          </div>
+          <div class="carpool-form-field">
+            <label>To</label>
+            <input type="text" placeholder="Arrival city..." id="to-input">
+          </div>
+          <div class="carpool-form-field">
+            <label>Date</label>
+            <input type="date" id="date-input">
+          </div>
+          <div class="carpool-form-field" style="border-right:none;">
+            <label>Passengers</label>
+            <input type="number" placeholder="1" min="1" max="8" id="seats-input">
+          </div>
+          <button class="btn-find-ride" onclick="showRidesResults()">
+            <i class="fa fa-search"></i> Find
+          </button>
+        </div>
+
+        <div class="carpool-actions">
+          <button class="btn-offer-ride" onclick="showOfferModal()">
+            <i class="fa fa-plus"></i> Offer a ride
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rides results -->
+    <section class="rides-section" id="rides-results">
+      <h3><i class="fa fa-list" style="color:var(--brand-orange);margin-right:8px;"></i>Available Rides</h3>
+      <div class="rides-grid">
+
+        <div class="ride-card">
+          <div class="ride-price">12 <span>TND</span></div>
+          <div class="ride-meta">
+            <div class="ride-datetime">
+              <div class="ride-time">08:30</div>
+              <div class="ride-date">13 Apr</div>
+            </div>
+            <div class="ride-path">
+              <div class="path-visual">
+                <div class="dot-start"></div>
+                <div class="path-line"></div>
+                <div class="dot-end"></div>
+              </div>
+              <div class="path-labels">
+                <div class="path-from">Tunis Centre</div>
+                <div class="path-to">Sfax</div>
+              </div>
+            </div>
+          </div>
+          <p class="ride-seats">Available seats: <strong>3</strong></p>
+          <hr class="ride-divider">
+          <div class="ride-driver">
+            <div class="driver-pfp driver-pfp-placeholder">AM</div>
+            <span class="driver-name">Amine M.</span>
+          </div>
+          <button class="btn-contact-driver"><i class="fa fa-phone"></i> Contact Driver</button>
+        </div>
+
+        <div class="ride-card">
+          <div class="ride-price">8 <span>TND</span></div>
+          <div class="ride-meta">
+            <div class="ride-datetime">
+              <div class="ride-time">09:00</div>
+              <div class="ride-date">13 Apr</div>
+            </div>
+            <div class="ride-path">
+              <div class="path-visual">
+                <div class="dot-start"></div>
+                <div class="path-line"></div>
+                <div class="dot-end"></div>
+              </div>
+              <div class="path-labels">
+                <div class="path-from">Ariana</div>
+                <div class="path-to">Sousse</div>
+              </div>
+            </div>
+          </div>
+          <p class="ride-seats">Available seats: <strong>1</strong></p>
+          <hr class="ride-divider">
+          <div class="ride-driver">
+            <div class="driver-pfp driver-pfp-placeholder" style="background:linear-gradient(135deg,#1a73e8,#0d47a1);">RB</div>
+            <span class="driver-name">Rayen B.</span>
+          </div>
+          <button class="btn-contact-driver"><i class="fa fa-phone"></i> Contact Driver</button>
+        </div>
+
+        <div class="ride-card">
+          <div class="ride-price">15 <span>TND</span></div>
+          <div class="ride-meta">
+            <div class="ride-datetime">
+              <div class="ride-time">10:15</div>
+              <div class="ride-date">13 Apr</div>
+            </div>
+            <div class="ride-path">
+              <div class="path-visual">
+                <div class="dot-start"></div>
+                <div class="path-line"></div>
+                <div class="dot-end"></div>
+              </div>
+              <div class="path-labels">
+                <div class="path-from">La Marsa</div>
+                <div class="path-to">Hammamet</div>
+              </div>
+            </div>
+          </div>
+          <p class="ride-seats">Available seats: <strong>4</strong></p>
+          <hr class="ride-divider">
+          <div class="ride-driver">
+            <div class="driver-pfp driver-pfp-placeholder" style="background:linear-gradient(135deg,#7b1fa2,#4a148c);">NK</div>
+            <span class="driver-name">Nour K.</span>
+          </div>
+          <button class="btn-contact-driver"><i class="fa fa-phone"></i> Contact Driver</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- My Rides table -->
+    <section class="my-rides-section" id="my-rides-section" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="font-weight:700;color:var(--text-dark);"><i class="fa fa-car" style="color:var(--brand-orange);margin-right:8px;"></i>My Rides</h3>
+        <button class="btn-signin" style="background:transparent;color:var(--brand-dark);border-color:#ddd;" onclick="hideMyRides()"><i class="fa fa-arrow-left"></i> Back</button>
+      </div>
+      <div class="my-rides-table-wrap">
+        <table class="my-rides-table">
+          <thead>
+            <tr>
+              <th>From</th><th>To</th><th>Date</th><th>Time</th><th>Price</th><th>Seats</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tunis Centre</td><td>Sfax</td><td>13 Apr 2026</td><td>08:30</td><td><strong>12 TND</strong></td>
+              <td>
+                <div class="seats-ctrl">
+                  <button class="seats-btn"><i class="fa fa-minus"></i></button>
+                  <span>3</span>
+                  <button class="seats-btn"><i class="fa fa-plus"></i></button>
+                </div>
+              </td>
+              <td><button class="btn-delete-ride"><i class="fa fa-trash"></i> Delete</button></td>
+            </tr>
+            <tr>
+              <td>La Marsa</td><td>Hammamet</td><td>20 Apr 2026</td><td>10:15</td><td><strong>15 TND</strong></td>
+              <td>
+                <div class="seats-ctrl">
+                  <button class="seats-btn"><i class="fa fa-minus"></i></button>
+                  <span>4</span>
+                  <button class="seats-btn"><i class="fa fa-plus"></i></button>
+                </div>
+              </td>
+              <td><button class="btn-delete-ride"><i class="fa fa-trash"></i> Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div><!-- /page-carpool -->
+
+
+  <!-- ======================================================
+       PAGE: COMMUNITY
+       ====================================================== -->
+  <div id="page-community" class="page-section">
+    <section class="community-section">
+      <div class="community-inner">
+        <div class="community-header">
+          <h2>Community Feed</h2>
+          <p>Share your thoughts, tips and experiences about public transport in Tunisia.</p>
+        </div>
+
+        <!-- Feed items -->
+        <div class="comment-card">
+          <div class="comment-author">
+            <div class="comment-avatar">AM</div>
+            <div class="comment-meta">
+              <h4>Amine Brahem</h4>
+              <span>Apr 12, 2026 · 09:14 AM</span>
+            </div>
+          </div>
+          <p class="comment-body">The new metro line extension to the airport is a game changer! Finally got to work on time today without worrying about traffic. Huge shoutout to the team behind this update 🙌</p>
+          <button class="btn-reply"><i class="fa fa-reply"></i> Reply</button>
+        </div>
+
+        <div class="comment-card">
+          <div class="comment-author">
+            <div class="comment-avatar" style="background:linear-gradient(135deg,#1a73e8,#0d47a1);">CM</div>
+            <div class="comment-meta">
+              <h4>Cyrine Merei</h4>
+              <span>Apr 11, 2026 · 15:30 PM</span>
+            </div>
+          </div>
+          <p class="comment-body">Tried the carpool feature for the first time — found a ride from Ariana to Bardo in under 5 minutes. The app is really easy to use. Would love to see more drivers joining!</p>
+          <button class="btn-reply"><i class="fa fa-reply"></i> Reply</button>
+        </div>
+
+        <div class="comment-card">
+          <div class="comment-author">
+            <div class="comment-avatar" style="background:linear-gradient(135deg,#7b1fa2,#4a148c);">ND</div>
+            <div class="comment-meta">
+              <h4>Nour Dorgham</h4>
+              <span>Apr 10, 2026 · 18:05 PM</span>
+            </div>
+          </div>
+          <p class="comment-body">Suggestion: Can we add push notifications for bus delays? Sometimes the TGM is 10 minutes late and we have no way of knowing in advance. That would be super helpful for daily commuters.</p>
+          <button class="btn-reply"><i class="fa fa-reply"></i> Reply</button>
+        </div>
+
+        <!-- Leave a comment -->
+        <div class="leave-comment">
+          <h4>Leave a comment</h4>
+          <label style="color:rgba(184,183,183,0.7);font-size:.82rem;display:block;margin-bottom:6px;">Message</label>
+          <textarea class="community-textarea" placeholder="Share your thoughts, tips or feedback..."></textarea>
+          <button class="btn-post-comment"><i class="fa fa-paper-plane"></i> Post Comment</button>
+        </div>
+      </div>
+    </section>
+  </div><!-- /page-community -->
+
+
+  <!-- ======================================================
+       PAGE: AUTH
+       ====================================================== -->
+  <div id="page-auth" class="page-section">
+    <section class="auth-section">
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchAuthTab(this,'login')">Login</button>
+          <button class="auth-tab" onclick="switchAuthTab(this,'register')">Register</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id="auth-login" class="auth-form">
+          <div class="auth-form-group">
+            <i class="fa fa-envelope"></i>
+            <input type="email" class="auth-input" placeholder="Email address">
+          </div>
+          <div class="auth-form-group">
+            <i class="fa fa-lock"></i>
+            <input type="password" class="auth-input" placeholder="Password">
+          </div>
+          <div class="forgot-link"><a href="#">Forgot password?</a></div>
+          <button class="btn-auth"><i class="fa fa-sign-in"></i> Sign In</button>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="auth-register" class="auth-form" style="display:none;">
+          <div class="auth-form-group">
+            <i class="fa fa-user"></i>
+            <input type="text" class="auth-input" placeholder="First name">
+          </div>
+          <div class="auth-form-group">
+            <i class="fa fa-user"></i>
+            <input type="text" class="auth-input" placeholder="Last name">
+          </div>
+          <div class="auth-form-group">
+            <i class="fa fa-envelope"></i>
+            <input type="email" class="auth-input" placeholder="Email address">
+          </div>
+          <div class="auth-form-group">
+            <i class="fa fa-lock"></i>
+            <input type="password" class="auth-input" placeholder="Password (min 8 chars)">
+          </div>
+          <div class="auth-form-group">
+            <i class="fa fa-key"></i>
+            <input type="password" class="auth-input" placeholder="Confirm password">
+          </div>
+          <div class="auth-form-group">
+            <i class="fa fa-phone"></i>
+            <input type="tel" class="auth-input" placeholder="Phone number (8 digits)">
+          </div>
+          <div class="auth-form-group">
+            <i class="fa fa-map-marker"></i>
+            <input type="text" class="auth-input" placeholder="Your address">
+          </div>
+          <button class="btn-auth"><i class="fa fa-user-plus"></i> Register</button>
+        </div>
+
+      </div>
+    </section>
+  </div><!-- /page-auth -->
+
+
+  <!-- ======================================================
+       PAGE: ABOUT US
+       ====================================================== -->
+  <div id="page-about" class="page-section">
+    <section class="about-section">
+      <h2 class="section-title">About Us</h2>
+
+      <div class="about-intro">
+        <div class="about-text">
+          <h3>Who are we? <span>🚌</span></h3>
+          <p>Based in Tunisia, TecnoTuners is our team name. We are a group of passionate students from different governorates all over the country united by a common goal: making transport better.</p>
+          <h3>What we do?</h3>
+          <p>We raise the bar in the transportation sector through our innovative solution TransEasier — a platform, mobile app and a network of connected panels that redefine transportation in a more efficient and convenient way.</p>
+        </div>
+        <div class="about-img-wrap">
+          <i class="fa fa-bus about-img-icon"></i>
+        </div>
+      </div>
+
+      <!-- Team -->
+      <div class="team-section">
+        <div class="team-heading">
+          <h2>Our <span style="color:var(--brand-orange);">Team</span></h2>
+          <h4>Meet our awesome and expert team members</h4>
+        </div>
+
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-thumb">
+              <i class="fa fa-user team-thumb-icon"></i>
+              <div class="team-thumb-initials">KR</div>
+              <div class="team-thumb-overlay"><div class="team-overlay-name">Karim Rezgani</div></div>
+            </div>
+            <div class="team-info">
+              <a href="#" class="team-linkedin"><i class="fa fa-linkedin"></i></a>
+              <h4>Karim Rezgani</h4>
+              <span>Adviser</span>
+            </div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-thumb" style="background:linear-gradient(135deg,#7b1fa2,#4a148c);">
+              <i class="fa fa-user team-thumb-icon"></i>
+              <div class="team-thumb-initials">CM</div>
+              <div class="team-thumb-overlay"><div class="team-overlay-name">Cyrine Merei</div></div>
+            </div>
+            <div class="team-info">
+              <a href="#" class="team-linkedin"><i class="fa fa-linkedin"></i></a>
+              <h4>Cyrine Merei</h4>
+              <span>Community Manager</span>
+            </div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-thumb" style="background:linear-gradient(135deg,#1a73e8,#0d47a1);">
+              <i class="fa fa-user team-thumb-icon"></i>
+              <div class="team-thumb-initials">AB</div>
+              <div class="team-thumb-overlay"><div class="team-overlay-name">Amine Brahem</div></div>
+            </div>
+            <div class="team-info">
+              <a href="#" class="team-linkedin"><i class="fa fa-linkedin"></i></a>
+              <h4>Amine Brahem</h4>
+              <span>CTO</span>
+            </div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-thumb" style="background:linear-gradient(135deg,#2e7d32,#1b5e20);">
+              <i class="fa fa-user team-thumb-icon"></i>
+              <div class="team-thumb-initials">ND</div>
+              <div class="team-thumb-overlay"><div class="team-overlay-name">Nour Dorgham</div></div>
+            </div>
+            <div class="team-info">
+              <a href="#" class="team-linkedin"><i class="fa fa-linkedin"></i></a>
+              <h4>Nour Dorgham</h4>
+              <span>Co-CTO</span>
+            </div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-thumb" style="background:linear-gradient(135deg,#f57f17,#e65100);">
+              <i class="fa fa-user team-thumb-icon"></i>
+              <div class="team-thumb-initials">AM</div>
+              <div class="team-thumb-overlay"><div class="team-overlay-name">Ataa Mars</div></div>
+            </div>
+            <div class="team-info">
+              <a href="#" class="team-linkedin"><i class="fa fa-linkedin"></i></a>
+              <h4>Ataa Mars</h4>
+              <span>CMO</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div><!-- /page-about -->
+
+
+  <!-- ======================================================
+       PAGE: CONTACT
+       ====================================================== -->
+  <div id="page-contact" class="page-section">
+    <section class="contact-section">
+      <h2 class="section-title">Contact Us</h2>
+      <div class="contact-card">
+        <div class="contact-sidebar">
+          <div class="contact-sidebar-header"><i class="fa fa-envelope" style="margin-right:8px;"></i>Get in touch</div>
+          <div class="contact-info-item">
+            <i class="fa fa-map-marker"></i>
+            <p><strong>Location</strong>Tunis, Tunisia</p>
+          </div>
+          <div class="contact-info-item">
+            <i class="fa fa-envelope"></i>
+            <p><strong>Email</strong>tecnotuners@gmail.com</p>
+          </div>
+          <div class="contact-info-item">
+            <i class="fa fa-phone"></i>
+            <p><strong>Phone</strong>+ 216 27 567 88</p>
+          </div>
+          <div class="contact-info-item">
+            <i class="fa fa-print"></i>
+            <p><strong>Fax</strong>+ 216 73 567 89</p>
+          </div>
+        </div>
+        <div class="contact-form-wrap">
+          <h3>Send Us A Message</h3>
+          <div class="contact-form-row">
+            <div class="contact-form-group">
+              <label>Your Name</label>
+              <input type="text" class="contact-input" placeholder="John Doe">
+            </div>
+            <div class="contact-form-group">
+              <label>Your Email</label>
+              <input type="email" class="contact-input" placeholder="john@example.com">
+            </div>
+          </div>
+          <div class="contact-form-group" style="margin-bottom:20px;">
+            <label>Message</label>
+            <textarea class="contact-input" placeholder="How can we help you?"></textarea>
+          </div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn-contact-submit"><i class="fa fa-paper-plane"></i> Submit</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div><!-- /page-contact -->
+
+</main>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="footer-social">
+    <span class="footer-social-text">Get connected with us on social networks:</span>
+    <div class="footer-social-icons">
+      <a class="footer-social-icon"><i class="fa fa-facebook"></i></a>
+      <a class="footer-social-icon"><i class="fa fa-twitter"></i></a>
+      <a class="footer-social-icon"><i class="fa fa-google"></i></a>
+      <a class="footer-social-icon"><i class="fa fa-instagram"></i></a>
+      <a class="footer-social-icon"><i class="fa fa-linkedin"></i></a>
+    </div>
+  </div>
+  <div class="footer-main">
+    <div class="footer-col">
+      <h6><i class="fa fa-gem" style="margin-right:8px;"></i>About Us</h6>
+      <p class="footer-about">We make transport more efficient and convenient in addition to serving the economic and environmental situation in Tunisia.</p>
+    </div>
+    <div class="footer-col">
+      <h6>Useful Links</h6>
+      <div class="footer-links">
+        <a onclick="showPage('home',null)">Home</a>
+        <a onclick="showPage('transit',null)">Public Transit</a>
+        <a onclick="showPage('carpool',null)">Fi Thneytek</a>
+        <a onclick="showPage('community',null)">Community</a>
+        <a onclick="showPage('about',null)">About Us</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h6>Contact</h6>
+      <div class="footer-contact-item"><i class="fa fa-home"></i>Tunis, Tunisia</div>
+      <div class="footer-contact-item"><i class="fa fa-envelope"></i>tecnotuners@gmail.com</div>
+      <div class="footer-contact-item"><i class="fa fa-phone"></i>+216 27 567 88</div>
+      <div class="footer-contact-item"><i class="fa fa-print"></i>+216 73 567 89</div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © 2024 Copyright: <strong>TecnoTuners</strong> — TransEasier
+  </div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+  // Page navigation
+  function showPage(name, triggerBtn) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('page-' + name)?.classList.add('active');
+
+    // Update demo nav
+    if (triggerBtn && triggerBtn.classList.contains('demo-nav-btn')) {
+      document.querySelectorAll('.demo-nav-btn').forEach(b => b.classList.remove('active'));
+      triggerBtn.classList.add('active');
+    }
+    // Update real nav links
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    window.scrollTo(0, 0);
+    return false;
+  }
+
+  // Transit tabs
+  function switchTransitTab(btn, tab) {
+    document.querySelectorAll('.transit-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-bus').style.display = 'none';
+    document.getElementById('tab-metro').style.display = 'none';
+    document.getElementById('tab-tgm').style.display = 'none';
+    document.getElementById('tab-' + tab).style.display = 'block';
+  }
+
+  // Auth tabs
+  function switchAuthTab(btn, tab) {
+    document.querySelectorAll('.auth-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
+  }
+
+  // Station popup toggle
+  function toggleStation(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // Carpool results
+  function showRidesResults() {
+    document.getElementById('rides-results').style.display = 'block';
+    document.getElementById('my-rides-section').style.display = 'none';
+    document.getElementById('rides-results').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function showMyRides() {
+    document.getElementById('my-rides-section').style.display = 'block';
+    document.getElementById('rides-results').style.display = 'none';
+    document.getElementById('my-rides-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function hideMyRides() {
+    document.getElementById('my-rides-section').style.display = 'none';
+    document.getElementById('rides-results').style.display = 'block';
+  }
+
+  // Profile dropdown
+  function toggleDropdown() {
+    const dd = document.getElementById('profile-dropdown');
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+  }
+  function logout() {
+    document.getElementById('profile-menu').style.display = 'none';
+    document.getElementById('btn-show-signin').style.display = 'block';
+  }
+
+  // Mobile menu
+  function toggleMobileMenu() {
+    const links = document.getElementById('nav-links');
+    if (links.style.display === 'flex') {
+      links.style.display = 'none';
+    } else {
+      links.style.cssText = 'display:flex;flex-direction:column;position:absolute;top:80px;left:0;right:0;background:#232324;padding:10px 20px;gap:2px;';
+    }
+  }
+
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if (window.scrollY > 30) {
+      nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.5)';
+    } else {
+      nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.4)';
+    }
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown-profile')) {
+      const dd = document.getElementById('profile-dropdown');
+      if (dd) dd.style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>

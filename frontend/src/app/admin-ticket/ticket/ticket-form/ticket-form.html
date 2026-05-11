@@ -1,0 +1,139 @@
+<div class="theme-ticket">
+  <div class="page-header">
+    <h2><i class="fas fa-ticket-alt mr-2"></i> {{ isEdit ? 'Edit Ticket' : 'Add Ticket' }}</h2>
+  </div>
+
+  @if (backendErrors.length > 0) {
+    <div class="alert alert-danger" style="border-radius:12px;">
+      <strong><i class="fas fa-exclamation-triangle mr-1"></i> Errors:</strong>
+      <ul class="mb-0 mt-1">
+        @for (err of backendErrors; track err) {
+          <li>{{ err }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="card">
+    <div class="card-body">
+      <form #ticketForm="ngForm" (ngSubmit)="save()" class="themed-form">
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="type"><i class="fas fa-tag mr-1"></i> Ticket Type</label>
+            <select id="type" class="form-control" [(ngModel)]="ticket.type" name="type"
+              #typeRef="ngModel" required [class.is-invalid]="typeRef.invalid && typeRef.touched">
+              <option value="">-- Select --</option>
+              <option value="Standard">Standard</option>
+              <option value="VIP">VIP</option>
+            </select>
+            <div class="invalid-feedback">Please select a type.</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="transportType"><i class="fas fa-bus mr-1"></i> Transport Type</label>
+            <select id="transportType" class="form-control" [(ngModel)]="ticket.transportType" name="transportType"
+              #transportRef="ngModel" required [class.is-invalid]="transportRef.invalid && transportRef.touched">
+              <option value="">-- Select --</option>
+              @for (t of transportTypes; track t.value) {
+                <option [value]="t.value">{{ t.label }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">Transport type is required.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="price"><i class="fas fa-coins mr-1"></i> Price (TND)</label>
+            <input type="number" id="price" class="form-control" [(ngModel)]="ticket.price" name="price"
+              #priceRef="ngModel" required min="1" max="500" step="0.5"
+              [class.is-invalid]="priceRef.invalid && priceRef.touched">
+            <div class="invalid-feedback">
+              @if (priceRef.errors?.['required']) { Price is required. }
+              @if (priceRef.errors?.['min']) { Price must be at least 1 TND. }
+              @if (priceRef.errors?.['max']) { Price cannot exceed 500 TND. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="quantite"><i class="fas fa-boxes mr-1"></i> Available Quantity</label>
+            <input type="number" id="quantite" class="form-control" [(ngModel)]="ticket.quantiteDisponible" name="quantiteDisponible"
+              #qteRef="ngModel" required min="1" max="10000"
+              [class.is-invalid]="qteRef.invalid && qteRef.touched">
+            <div class="invalid-feedback">
+              @if (qteRef.errors?.['required']) { Quantity is required. }
+              @if (qteRef.errors?.['min']) { Minimum 1 ticket. }
+              @if (qteRef.errors?.['max']) { Maximum 10000 tickets. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="heureDepart"><i class="fas fa-clock mr-1"></i> Departure Time</label>
+            <input type="time" id="heureDepart" class="form-control" [(ngModel)]="ticket.heureDepart" name="heureDepart"
+              #heureRef="ngModel" required
+              [class.is-invalid]="heureRef.invalid && heureRef.touched">
+            <div class="invalid-feedback">Departure time is required.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="lieuDepart"><i class="fas fa-map-marker-alt mr-1"></i> Departure Location</label>
+            <input type="text" id="lieuDepart" class="form-control" [(ngModel)]="ticket.lieuDepart" name="lieuDepart"
+              placeholder="ex: Tunis"
+              #departRef="ngModel" required
+              [class.is-invalid]="departRef.invalid && departRef.touched">
+            <div class="invalid-feedback">Departure location is required.</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="destination"><i class="fas fa-flag-checkered mr-1"></i> Destination</label>
+            <input type="text" id="destination" class="form-control" [(ngModel)]="ticket.destination" name="destination"
+              placeholder="ex: Sousse"
+              #destRef="ngModel" required
+              [class.is-invalid]="destRef.invalid && destRef.touched">
+            <div class="invalid-feedback">Destination is required.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="validity"><i class="fas fa-hourglass-half mr-1"></i> Validity</label>
+        <input type="text" id="validity" class="form-control" [(ngModel)]="ticket.validity" name="validity"
+               placeholder="e.g.: 1 day, 1 trip"
+               #validityRef="ngModel" required minlength="3" maxlength="50"
+               [class.is-invalid]="validityRef.invalid && validityRef.touched">
+        <div class="invalid-feedback">
+          @if (validityRef.errors?.['required']) { Validity is required. }
+          @if (validityRef.errors?.['minlength']) { Minimum 3 characters. }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description"><i class="fas fa-info-circle mr-1"></i> Description (optional)</label>
+        <textarea id="description" class="form-control" [(ngModel)]="ticket.description" name="description"
+                  rows="2" maxlength="200"
+                  #descRef="ngModel"></textarea>
+        <small class="text-muted">{{ (ticket.description.length || 0) }}/200 characters</small>
+      </div>
+
+      <button type="submit" class="btn btn-themed mr-2" [disabled]="ticketForm.invalid || saving">
+        <i class="fas fa-save mr-1"></i> {{ saving ? 'Saving...' : (isEdit ? 'Update' : 'Create') }}
+      </button>
+      <a routerLink="/admin/ticket/tickets" class="btn btn-themed-outline">
+        <i class="fas fa-arrow-left mr-1"></i> Cancel
+      </a>
+    </form>
+  </div>
+</div>
+</div>

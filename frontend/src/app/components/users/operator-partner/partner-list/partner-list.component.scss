@@ -1,0 +1,10 @@
+.card-3d {
+  border-radius: 16px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+
+  &:hover {
+    box-shadow: 0 16px 50px rgba(26, 115, 232, 0.25);
+  }
+}

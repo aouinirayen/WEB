@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold">{{ isEdit ? 'Edit' : 'Add' }} Line</h4>
+    <a routerLink="/admin/lines" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <form #lineForm="ngForm" (ngSubmit)="save()">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Line Name</label>
+            <input class="form-control" [(ngModel)]="line.name"
+                   name="name" required
+                   minlength="3" maxlength="100"
+                   placeholder="ex: Tunis Centre - Ariana">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Code</label>
+            <input class="form-control" [(ngModel)]="line.code"
+                   name="code" required
+                   minlength="1" maxlength="15"
+                   placeholder="ex: L1">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Transport Mode</label>
+            <select class="form-select" [(ngModel)]="line.mode" name="mode">
+              <option>BUS</option>
+              <option>METRO</option>
+              <option>TRAIN</option>
+              <option>LOUAGE</option>
+              <option>BATAH</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="line.status" name="status">
+              <option>ACTIVE</option>
+              <option>INACTIVE</option>
+              <option>SUSPENDED</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4">
+          <button type="submit" class="btn btn-success me-2" [disabled]="lineForm.invalid">
+            {{ isEdit ? 'Update' : 'Create' }}
+          </button>
+          <a routerLink="/admin/lines" class="btn btn-outline-secondary">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>

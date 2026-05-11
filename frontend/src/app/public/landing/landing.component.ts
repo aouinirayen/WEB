@@ -1,0 +1,11 @@
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-landing',
+  standalone: true,
+  imports: [RouterLink, CommonModule],
+  templateUrl: './landing.component.html'
+})
+export class LandingComponent {}

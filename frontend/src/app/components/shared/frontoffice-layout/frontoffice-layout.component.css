@@ -1,0 +1,11 @@
+﻿:host {
+  display: block;
+  height: 100%;
+}
+
+:host ::ng-deep {
+  /* Styles are in global styles.css */
+}
+
+
+

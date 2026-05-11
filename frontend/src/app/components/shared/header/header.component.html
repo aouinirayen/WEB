@@ -1,0 +1,127 @@
+<!-- Navigation Navbar -->
+<nav class="navbar" [class.scrolled]="isScrolled" [class.on-home]="isHomePage()">
+  <div class="navbar-container">
+    <!-- Left Section: Title + Navigation Links -->
+    <div class="navbar-left">
+      <h1 class="navbar-title">{{ title }}</h1>
+      <a routerLink="/home" class="home-link" [class.active]="isHomePage()">Home</a>
+
+      <a routerLink="/public/lines" class="home-link" [class.active]="currentRoute.includes('/public/lines')">Lines</a>
+      <a routerLink="/public/schedules" class="home-link" [class.active]="currentRoute.includes('/public/schedules')">Schedules</a>
+      <a routerLink="/public/trips" class="home-link" [class.active]="currentRoute.includes('/public/trips')">Trips</a>
+      <a routerLink="/public/alerts" class="home-link" [class.active]="currentRoute.includes('/public/alerts')">Alerts</a>
+
+      <a *ngIf="isAuthenticated$ | async" [routerLink]="getDashboardLink()" class="dashboard-link" [class.active]="isDashboardPage()">Dashboard</a>
+
+      <ng-container *ngIf="isAuthenticated$ | async">
+
+        <ng-container *ngIf="isAgent()">
+          <a routerLink="/admin/vehicles" class="home-link" [class.active]="currentRoute.includes('/admin/')">Fleet</a>
+        </ng-container>
+
+        <ng-container *ngIf="isPassenger()">
+          <div class="nav-dropdown" [class.open]="openDropdown === 'bookings'">
+            <button type="button" class="nav-dropdown-toggle"
+                    [class.has-active]="currentRoute.includes('/ticket/') || currentRoute.includes('/operators') || currentRoute.includes('/partners')"
+                    (click)="toggleDropdown('bookings')">
+              Bookings
+            </button>
+            <div class="nav-dropdown-menu">
+              <a routerLink="/operators" [class.active]="currentRoute.includes('/operators')">Operators</a>
+              <a routerLink="/partners" [class.active]="currentRoute.includes('/partners')">Partners</a>
+              <a routerLink="/ticket/covoiturages" [class.active]="currentRoute === '/ticket/covoiturages'">Carpools</a>
+              <a routerLink="/ticket/my-covoiturages" [class.active]="currentRoute.includes('/ticket/my-covoiturages')">My Carpools</a>
+              <a routerLink="/ticket/tickets" [class.active]="currentRoute.includes('/ticket/tickets')">Tickets</a>
+              <a routerLink="/ticket/reservations" [class.active]="currentRoute.includes('/ticket/reservations')">Reservations</a>
+              <a routerLink="/ticket/ai" class="ai-link" [class.active]="currentRoute.includes('/ticket/ai')">🤖 AI</a>
+            </div>
+          </div>
+        </ng-container>
+
+        <a routerLink="/documents" class="documents-link" [class.active]="isDocumentsPage()">Documents</a>
+        <a routerLink="/notifications" class="documents-link" [class.active]="isNotificationsPage()">Notifs</a>
+        <a *ngIf="isAgent()" routerLink="/incidents/create" class="documents-link" [class.active]="isIncidentsPage()">Incidents</a>
+
+        <ng-container *ngIf="isPassenger()">
+          <div class="nav-dropdown" [class.open]="openDropdown === 'subscriptions'">
+            <button type="button" class="nav-dropdown-toggle"
+                    [class.has-active]="currentRoute.includes('/passenger/')"
+                    (click)="toggleDropdown('subscriptions')">
+              My Plans
+            </button>
+            <div class="nav-dropdown-menu">
+              <a routerLink="/passenger/plans" [class.active]="currentRoute.includes('/passenger/plans')">Plans</a>
+              <a routerLink="/passenger/subscriptions" [class.active]="currentRoute.includes('/passenger/subscriptions')">Subscriptions</a>
+              <a routerLink="/passenger/loyalty" [class.active]="currentRoute.includes('/passenger/loyalty')">Loyalty</a>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="isOperator()">
+          <div class="nav-dropdown" [class.open]="openDropdown === 'operator'">
+            <button type="button" class="nav-dropdown-toggle"
+                    [class.has-active]="currentRoute.includes('/operator/')"
+                    (click)="toggleDropdown('operator')">
+              Operator
+            </button>
+            <div class="nav-dropdown-menu">
+              <a routerLink="/operator/pricing-plans" [class.active]="currentRoute.includes('/operator/pricing-plans')">Plans</a>
+              <a routerLink="/operator/subscriptions" [class.active]="currentRoute.includes('/operator/subscriptions')">Subscriptions</a>
+              <a routerLink="/operator/reductions" [class.active]="currentRoute.includes('/operator/reductions')">Discounts</a>
+              <a routerLink="/operator/loyalty" [class.active]="currentRoute.includes('/operator/loyalty')">Loyalty</a>
+              <a routerLink="/operator/ml" [class.active]="currentRoute.includes('/operator/ml')">ML Analysis</a>
+            </div>
+          </div>
+        </ng-container>
+
+      </ng-container>
+    </div>
+
+    <div class="navbar-right">
+      <ng-container *ngIf="isAuthenticated$ | async as isAuth">
+        <ng-container *ngIf="isAuth">
+          <div class="notification-wrapper">
+            <button class="notification-btn" (click)="toggleNotifications()">
+              <i class="fas fa-bell"></i>
+              <span class="notification-count" *ngIf="(unreadNotifications$ | async) as unread" [class.hidden]="unread === 0">
+                {{ unread }}
+              </span>
+            </button>
+
+            <div class="notification-dropdown" *ngIf="isNotificationOpen">
+              <div class="notification-dropdown-header">
+                <span>Notifications</span>
+                <button type="button" (click)="openNotificationsPage()">View all</button>
+              </div>
+              <button
+                type="button"
+                class="notification-item"
+                *ngFor="let item of (latestNotifications$ | async)?.slice(0, 5)"
+                (click)="markAsRead(item.id)"
+              >
+                <strong>{{ item.title }}</strong>
+                <p>{{ item.message }}</p>
+              </button>
+              <p class="notification-empty" *ngIf="(latestNotifications$ | async)?.length === 0">No notifications yet.</p>
+            </div>
+          </div>
+
+          <span class="user-info">{{ (currentUser$ | async)?.name }}</span>
+          <a routerLink="/profile" class="profile-link" [class.active]="isProfilePage()">Profile</a>
+          <button (click)="logout()" class="btn-logout">Logout</button>
+        </ng-container>
+      </ng-container>
+
+      <div class="auth-buttons">
+        <ng-container *ngIf="!(isAuthenticated$ | async)">
+          <a *ngIf="isLoginPage()" href="/register" class="btn-link">Sign Up</a>
+          <a *ngIf="isRegisterPage()" href="/login" class="btn-link">Login</a>
+          <ng-container *ngIf="!isLoginPage() && !isRegisterPage()">
+            <a href="/login" class="btn-link">Login</a>
+            <a href="/register" class="btn-link">Sign Up</a>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</nav>

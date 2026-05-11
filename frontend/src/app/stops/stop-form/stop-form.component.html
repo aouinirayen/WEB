@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold">{{ isEdit ? 'Edit' : 'Add' }} Stop</h4>
+    <a routerLink="/admin/stops" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <form #stopForm="ngForm" (ngSubmit)="save()">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Stop Name</label>
+            <input class="form-control" [(ngModel)]="stop.name"
+                   name="name" required minlength="2" maxlength="100">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Line</label>
+            <select class="form-select" [(ngModel)]="selectedLineId"
+                    name="lineId" (change)="onLineChange()" required>
+              <option [ngValue]="null" disabled>-- Select line --</option>
+              <option *ngFor="let l of lines" [value]="l.id">
+                {{ l.code }} - {{ l.name }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Sequence</label>
+            <input type="number" class="form-control"
+                   [(ngModel)]="stop.sequence" name="sequence" required min="1">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Latitude</label>
+            <input type="number" step="0.0001" class="form-control"
+                   [(ngModel)]="stop.latitude" name="latitude" required min="-90" max="90">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Longitude</label>
+            <input type="number" step="0.0001" class="form-control"
+                   [(ngModel)]="stop.longitude" name="longitude" required min="-180" max="180">
+          </div>
+        </div>
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary me-2" [disabled]="stopForm.invalid">
+            {{ isEdit ? 'Update' : 'Create' }}
+          </button>
+          <a routerLink="/admin/stops" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>

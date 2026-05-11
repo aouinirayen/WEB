@@ -1,0 +1,149 @@
+﻿<div class="theme-ticket">
+  <div class="page-header d-flex justify-content-between align-items-center">
+    <h2><i class="fas fa-ticket-alt mr-2"></i> Available Tickets</h2>
+    <span class="stat-badge" style="background:rgba(255,255,255,0.2);color:#fff;">
+      <i class="fas fa-list mr-1"></i> {{ tickets.length }} ticket(s)
+    </span>
+  </div>
+
+  <!-- Filter buttons -->
+  <div class="mb-4 d-flex flex-wrap" style="gap:8px;">
+    <button class="btn btn-sm" style="border-radius:20px;font-weight:600;"
+      [style.background]="!selectedTransport ? '#1a237e' : '#e8eaf6'"
+      [style.color]="!selectedTransport ? '#fff' : '#1a237e'"
+      (click)="filterByTransport('')">
+      <i class="fas fa-th mr-1"></i> All
+    </button>
+    @for (t of transportTypes; track t.value) {
+      <button class="btn btn-sm" style="border-radius:20px;font-weight:600;"
+        [style.background]="selectedTransport === t.value ? getTransportColor(t.value) : '#f5f5f5'"
+        [style.color]="selectedTransport === t.value ? '#fff' : '#333'"
+        (click)="filterByTransport(t.value)">
+        <i [class]="getTransportIcon(t.value)" class="mr-1"></i> {{ t.label }}
+      </button>
+    }
+  </div>
+
+  @if (acheterMessage) {
+    <div class="alert alert-success" style="border-radius:12px;">
+      <i class="fas fa-check-circle mr-1"></i> {{ acheterMessage }}
+    </div>
+  }
+  @if (acheterError) {
+    <div class="alert alert-danger" style="border-radius:12px;">
+      <i class="fas fa-exclamation-triangle mr-1"></i> {{ acheterError }}
+    </div>
+  }
+
+  @if (loading) {
+    <div class="text-center p-5">
+      <i class="fas fa-spinner fa-spin fa-2x" style="color:#3f51b5;"></i>
+      <p class="mt-2 text-muted">Loading tickets...</p>
+    </div>
+  }
+
+  @if (!loading) {
+    @if (tickets.length === 0) {
+      <div class="alert alert-warning text-center" style="border-radius:12px;">
+        <i class="fas fa-exclamation-circle mr-1"></i>
+        No ticket available at the moment.
+      </div>
+    }
+
+    <div class="row">
+      @for (ticket of pagedTickets; track ticket.id) {
+        <div class="col-md-4 col-sm-6 mb-4">
+          <div class="card h-100" style="border-radius:12px;overflow:hidden;border:none;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+            <div class="card-header text-white d-flex justify-content-between align-items-center"
+                 [style.background]="'linear-gradient(135deg, ' + getTransportColor(ticket.transportType) + ', ' + getTransportColor(ticket.transportType) + 'cc)'"
+                 style="border:none;padding:14px 18px;">
+              <div>
+                <i [class]="getTransportIcon(ticket.transportType)" style="font-size:1.1rem;" class="mr-2"></i>
+                <strong>{{ ticket.transportType }}</strong>
+              </div>
+              <span style="background:rgba(255,255,255,0.25);padding:2px 10px;border-radius:20px;font-size:0.75rem;">
+                {{ ticket.type }}
+              </span>
+            </div>
+            <div class="card-body" style="padding:18px;">
+              <!-- Route -->
+              <div class="d-flex align-items-center mb-3">
+                <i class="fas fa-map-marker-alt mr-2" [style.color]="getTransportColor(ticket.transportType)"></i>
+                <div>
+                  <strong>{{ ticket.lieuDepart }}</strong>
+                  <i class="fas fa-long-arrow-alt-right mx-2" style="color:#bbb;"></i>
+                  <strong>{{ ticket.destination }}</strong>
+                </div>
+              </div>
+              <!-- Heure + Prix -->
+              <div class="d-flex justify-content-between mb-3">
+                <div>
+                  <i class="fas fa-clock mr-1" style="color:#e65100;"></i>
+                  <strong>{{ ticket.heureDepart }}</strong>
+                </div>
+                <div style="font-size:1.3rem;font-weight:700;" [style.color]="getTransportColor(ticket.transportType)">
+                  {{ ticket.price }} TND
+                </div>
+              </div>
+              <!-- Validité -->
+              <div class="mb-2">
+                <small class="text-muted"><i class="fas fa-hourglass-half mr-1"></i> {{ ticket.validity }}</small>
+              </div>
+              <!-- Description -->
+              @if (ticket.description) {
+                <p class="text-muted mb-2" style="font-size:0.85rem;">{{ ticket.description }}</p>
+              }
+              <!-- Quantité -->
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                @if ((ticket.quantiteDisponible ?? 0) > 0) {
+                  <span style="background:#e8f5e9;color:#2e7d32;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;">
+                    <i class="fas fa-check-circle mr-1"></i> {{ ticket.quantiteDisponible }} available
+                  </span>
+                } @else {
+                  <span style="background:#ffebee;color:#c62828;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;">
+                    <i class="fas fa-times-circle mr-1"></i> Sold out
+                  </span>
+                }
+              </div>
+            </div>
+            <div class="card-footer text-center" style="background:#fafafa;border-top:1px solid #eee;padding:12px;">
+              @if ((ticket.quantiteDisponible ?? 0) > 0) {
+                <button class="btn btn-sm text-white" style="border-radius:20px;padding:6px 24px;font-weight:600;"
+                  [style.background]="getTransportColor(ticket.transportType)"
+                  (click)="acheter(ticket)">
+                  <i class="fas fa-shopping-cart mr-1"></i> Buy
+                </button>
+              } @else {
+                <button class="btn btn-sm" style="border-radius:20px;padding:6px 24px;background:#eee;color:#999;cursor:not-allowed;" disabled>
+                  <i class="fas fa-ban mr-1"></i> Sold out
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+        <small class="text-muted">{{ tickets.length }} ticket(s) — Page {{ currentPage }}/{{ totalPages }}</small>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="goToPage(currentPage - 1)">&laquo;</button>
+            </li>
+            @for (p of getPages(); track p) {
+              <li class="page-item" [class.active]="p === currentPage">
+                <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+              </li>
+            }
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="goToPage(currentPage + 1)">&raquo;</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    }
+  }
+</div>

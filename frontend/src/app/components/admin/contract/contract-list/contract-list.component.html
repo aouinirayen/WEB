@@ -1,0 +1,407 @@
+<div style="background:white; border-radius:16px; box-shadow:0 2px 20px rgba(0,0,0,0.07); overflow:hidden;">
+
+  <!-- Header -->
+  <div style="padding:20px 25px; display:flex; justify-content:space-between; align-items:center;
+              border-bottom:1px solid #f0f2f5;">
+    <div>
+      <h3 style="margin:0; font-weight:700; color:#1a237e; font-size:1.2rem;">
+        <i class="fas fa-file-contract mr-2"></i> Contracts
+      </h3>
+      <small style="color:#999;">{{ contracts.length }} contracts total</small>
+    </div>
+    <a routerLink="/admin/contracts/new"
+       style="background:linear-gradient(135deg,#1a73e8,#0d47a1); color:white;
+              padding:9px 20px; border-radius:10px; text-decoration:none;
+              font-weight:600; font-size:0.9rem; display:inline-flex;
+              align-items:center; gap:8px; box-shadow:0 4px 12px rgba(26,115,232,0.3);
+              transition:opacity 0.2s;"
+       onmouseover="this.style.opacity='0.85'"
+       onmouseout="this.style.opacity='1'">
+      <i class="fas fa-plus"></i> Add Contract
+    </a>
+
+    <button (click)="sendWeeklyReport()" [disabled]="reportLoading" style="margin-left:10px; background:linear-gradient(135deg,#ff9800,#e65100); color:white; padding:9px 20px; border-radius:10px; border:none; font-weight:600; font-size:0.9rem; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(255,152,0,0.3);" [style.opacity]="reportLoading ? '0.6' : '1'" [style.cursor]="reportLoading ? 'not-allowed' : 'pointer'" title="Send weekly report via n8n">
+      <i class="fas" [class.fa-envelope]="!reportLoading" [class.fa-spinner]="reportLoading" [class.fa-spin]="reportLoading"></i>
+      {{ reportLoading ? 'Envoi...' : 'Send Weekly Report' }}
+    </button>
+
+    <button (click)="sendExpirationAlert()" [disabled]="reportLoading" style="margin-left:10px; background:linear-gradient(135deg,#c62828,#8b0000); color:white; padding:9px 20px; border-radius:10px; border:none; font-weight:600; font-size:0.9rem; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(198,40,40,0.3);" [style.opacity]="reportLoading ? '0.6' : '1'" [style.cursor]="reportLoading ? 'not-allowed' : 'pointer'" title="Declencher alerte expiration via n8n">
+      <i class="fas" [class.fa-bell]="!reportLoading" [class.fa-spinner]="reportLoading" [class.fa-spin]="reportLoading"></i>
+      {{ reportLoading ? 'Envoi...' : 'Expiration Alert' }}
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+      <tr style="background:#f8f9ff;">
+        <th style="padding:13px 20px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">TYPE</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">STATUS</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">START DATE</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">END DATE</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">ORGANIZATION</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">PARTNER</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">ACTIONS</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let contract of paginatedContracts"
+          style="border-bottom:1px solid #f5f5f5; transition:background 0.15s;"
+          onmouseover="this.style.background='#f8f9ff'"
+          onmouseout="this.style.background='white'">
+
+        <!-- Type -->
+        <td style="padding:14px 20px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px; border-radius:50%;
+                          background:#f3e5f5; overflow:hidden; flex-shrink:0;
+                          display:flex; align-items:center; justify-content:center;
+                          border:2px solid #e1bee7;">
+              <i class="fas fa-file-contract" style="color:#7b1fa2; font-size:0.85rem;"></i>
+            </div>
+            <span style="font-weight:600; color:#1a237e; font-size:0.9rem;">
+                {{ contract.contractType }}
+              </span>
+          </div>
+        </td>
+
+        <!-- Status -->
+        <td style="padding:14px 15px;">
+            <span style="padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;
+                         display:inline-flex; align-items:center; gap:5px;"
+                  [style.background]="contract.status === 'ACTIVE' ? '#e8f5e9' : contract.status === 'DRAFT' ? '#fff8e1' : contract.status === 'EXPIRED' ? '#fce4ec' : '#f5f5f5'"
+                  [style.color]="contract.status === 'ACTIVE' ? '#2e7d32' : contract.status === 'DRAFT' ? '#f57f17' : contract.status === 'EXPIRED' ? '#c62828' : '#666'">
+              <span style="width:6px; height:6px; border-radius:50%; display:inline-block;"
+                    [style.background]="contract.status === 'ACTIVE' ? '#2e7d32' : contract.status === 'DRAFT' ? '#f57f17' : contract.status === 'EXPIRED' ? '#c62828' : '#999'">
+              </span>
+              {{ contract.status }}
+            </span>
+        </td>
+
+        <!-- Dates -->
+        <td style="padding:14px 15px; color:#666; font-size:0.9rem;">
+          <i class="fas fa-calendar-alt" style="color:#1a73e8; margin-right:5px; font-size:0.8rem;"></i>
+          {{ contract.startDate | date:'dd/MM/yyyy' }}
+        </td>
+        <td style="padding:14px 15px; color:#666; font-size:0.9rem;">
+          <i class="fas fa-calendar-check" style="color:#2e7d32; margin-right:5px; font-size:0.8rem;"></i>
+          {{ contract.endDate | date:'dd/MM/yyyy' }}
+        </td>
+
+        <!-- Organization -->
+        <td style="padding:14px 15px;">
+            <span *ngIf="contract.organizationName"
+                  style="background:#e3f2fd; color:#1a73e8; padding:3px 10px;
+                         border-radius:8px; font-size:0.82rem; font-weight:600;">
+              <i class="fas fa-building mr-1" style="font-size:0.7rem;"></i>
+              {{ contract.organizationName }}
+            </span>
+          <span *ngIf="!contract.organizationName"
+                style="color:#bbb; font-style:italic; font-size:0.85rem;">ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â</span>
+        </td>
+
+        <!-- Partner -->
+        <td style="padding:14px 15px;">
+            <span *ngIf="contract.partnerName"
+                  style="background:#e8f5e9; color:#2e7d32; padding:3px 10px;
+                         border-radius:8px; font-size:0.82rem; font-weight:600;">
+              <i class="fas fa-handshake mr-1" style="font-size:0.7rem;"></i>
+              {{ contract.partnerName }}
+            </span>
+          <span *ngIf="!contract.partnerName"
+                style="color:#bbb; font-style:italic; font-size:0.85rem;">ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â</span>
+        </td>
+
+        <!-- Actions -->
+        <td style="padding:14px 15px;">
+          <div style="display:flex; gap:6px;">
+            <a [routerLink]="['/admin/contracts/edit', contract.id]"
+               style="width:32px; height:32px; border-radius:8px; background:#fff8e1;
+                        color:#f57f17; display:flex; align-items:center; justify-content:center;
+                        text-decoration:none; transition:all 0.2s;"
+               title="Edit"
+               onmouseover="this.style.background='#f57f17'; this.style.color='white'"
+               onmouseout="this.style.background='#fff8e1'; this.style.color='#f57f17'">
+              <i class="fas fa-edit" style="font-size:0.8rem;"></i>
+            </a>
+            <!-- Signature Status Badge -->
+              <span *ngIf="isSigned(contract.id!)"
+                [style.background]="isValidSignature(contract.id!) ? '#e8f5e9' : '#ffebee'"
+                [style.color]="isValidSignature(contract.id!) ? '#2e7d32' : '#c62828'"
+                style="padding:3px 8px; border-radius:12px; font-size:0.7rem; font-weight:600;">
+                <i class="fas" [class.fa-check-circle]="isValidSignature(contract.id!)" [class.fa-exclamation-circle]="!isValidSignature(contract.id!)"></i>
+                {{ isValidSignature(contract.id!) ? "SIGNE" : "FRAUDE" }}
+              </span>
+              <!-- Sign Button -->
+              <button *ngIf="!isSigned(contract.id!)" (click)="signContract(contract.id!)"
+                style="width:32px; height:32px; border-radius:8px; background:#e8f5e9; color:#2e7d32; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;"
+                title="Sign digitally"
+                onmouseover="this.style.background='#2e7d32'; this.style.color='white'"
+                onmouseout="this.style.background='#e8f5e9'; this.style.color='#2e7d32'">
+                <i class="fas fa-signature" style="font-size:0.8rem;"></i>
+              </button>
+              <!-- Verify Button -->
+              <button *ngIf="isSigned(contract.id!)" (click)="verifyContract(contract.id!)"
+                style="width:32px; height:32px; border-radius:8px; background:#e3f2fd; color:#1a73e8; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;"
+                title="Verify signature"
+                onmouseover="this.style.background='#1a73e8'; this.style.color='white'"
+                onmouseout="this.style.background='#e3f2fd'; this.style.color='#1a73e8'">
+                <i class="fas fa-shield-alt" style="font-size:0.8rem;"></i>
+              </button>
+              <button (click)="delete(contract.id!)"
+                    style="width:32px; height:32px; border-radius:8px; background:#fce4ec;
+                             color:#c62828; border:none; cursor:pointer;
+                             display:flex; align-items:center; justify-content:center;
+                             transition:all 0.2s;"
+                    title="Delete"
+                    onmouseover="this.style.background='#c62828'; this.style.color='white'"
+                    onmouseout="this.style.background='#fce4ec'; this.style.color='#c62828'">
+              <i class="fas fa-trash" style="font-size:0.8rem;"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      <tr *ngIf="paginatedContracts.length === 0">
+        <td colspan="7" style="text-align:center; padding:40px; color:#999;">
+          <i class="fas fa-file-contract" style="font-size:2.5rem; display:block;
+               margin-bottom:12px; color:#ddd;"></i>
+          <div style="font-weight:600; margin-bottom:5px;">No contracts found</div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div style="padding:12px 20px; border-top:1px solid #f0f2f5; background:white;">
+    <app-pagination
+      [pageNumber]="currentPage - 1"
+      [totalElements]="contracts.length"
+      [pageSize]="itemsPerPage"
+      [totalPages]="Math.ceil(contracts.length / itemsPerPage)"
+      (pageChanged)="updatePage($event + 1)">
+    </app-pagination>
+  </div>
+<!-- Confirm Sign Modal -->
+<div *ngIf="showConfirmModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:450px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#1a237e,#1a73e8); border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="font-size:3rem; margin-bottom:10px; color:#ffd700;"><i class="fas fa-file-signature"></i></div>
+      <h4 style="color:white; margin:0; font-weight:700;">Digital Signature</h4>
+      <p style="color:rgba(255,255,255,0.8); margin:5px 0 0; font-size:0.9rem;">Confirmation required</p>
+    </div>
+    <div style="background:#e3f2fd; border:1px solid #90caf9; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p style="color:#1a237e; margin:0; font-weight:600; text-align:center;">
+        Do you want to digitally sign this contract with SHA-256 ?
+      </p>
+      <p style="color:#555; margin:8px 0 0; font-size:0.85rem; text-align:center;">
+        This action is irreversible. A unique hash will be generated to guarantee contract integrity.
+      </p>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button (click)="showConfirmModal=false" class="btn btn-secondary" style="flex:1;">
+        <i class="fas fa-times mr-1"></i> Cancel
+      </button>
+      <button (click)="confirmSign()" class="btn btn-primary" style="flex:1;">
+        <i class="fas fa-signature mr-1"></i> Sign
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div *ngIf="showErrorModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:450px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#b71c1c,#d32f2f); border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="font-size:3rem; margin-bottom:10px; color:#fff;"><i class="fas fa-exclamation-triangle"></i></div>
+      <h4 style="color:white; margin:0; font-weight:700;">Signature Error</h4>
+    </div>
+    <div style="background:#ffebee; border:1px solid #ffcdd2; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p style="color:#c62828; margin:0; font-weight:600; text-align:center;">
+        <i class="fas fa-exclamation-circle mr-2"></i>{{ errorMessage }}
+      </p>
+    </div>
+    <button (click)="showErrorModal=false" class="btn btn-danger w-100">
+      <i class="fas fa-times mr-2"></i>Close
+    </button>
+  </div>
+</div>
+
+<!-- Confirm Sign Modal -->
+<div *ngIf="showConfirmModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:450px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#1a237e,#1a73e8); border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="font-size:3rem; margin-bottom:10px; color:#ffd700;"><i class="fas fa-file-signature"></i></div>
+      <h4 style="color:white; margin:0; font-weight:700;">Digital Signature</h4>
+      <p style="color:rgba(255,255,255,0.8); margin:5px 0 0; font-size:0.9rem;">Confirmation required</p>
+    </div>
+    <div style="background:#e3f2fd; border:1px solid #90caf9; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p style="color:#1a237e; margin:0; font-weight:600; text-align:center;">
+        Do you want to digitally sign this contract with SHA-256 ?
+      </p>
+      <p style="color:#555; margin:8px 0 0; font-size:0.85rem; text-align:center;">
+        This action is irreversible. A unique hash will be generated to guarantee contract integrity.
+      </p>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button (click)="showConfirmModal=false" class="btn btn-secondary" style="flex:1;">
+        <i class="fas fa-times mr-1"></i> Cancel
+      </button>
+      <button (click)="confirmSign()" class="btn btn-primary" style="flex:1;">
+        <i class="fas fa-signature mr-1"></i> Sign
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div *ngIf="showErrorModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:450px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#b71c1c,#d32f2f); border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="font-size:3.5rem; margin-bottom:10px; color:#4caf50; background:white; width:80px; height:80px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;"><i class="fas fa-check-circle"></i></div>
+      <h4 style="color:white; margin:0; font-weight:700;">Signature Error</h4>
+    </div>
+    <div style="background:#ffebee; border:1px solid #ffcdd2; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p style="color:#c62828; margin:0; font-weight:600; text-align:center;">
+        <i class="fas fa-exclamation-circle mr-2"></i>{{ errorMessage }}
+      </p>
+    </div>
+    <button (click)="showErrorModal=false" class="btn btn-danger w-100">
+      <i class="fas fa-times mr-2"></i>Close
+    </button>
+  </div>
+</div>
+
+<!-- Sign Successs Modal -->
+<div *ngIf="showSignModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:550px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1a237e,#1a73e8); border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="font-size:3rem; margin-bottom:10px; color:#fff;"><i class="fas fa-exclamation-triangle"></i></div>
+      <h4 style="color:white; margin:0; font-weight:700;">CONTRAT SIGNÃ‰ AVEC SUCCÃˆS</h4>
+      <p style="color:rgba(255,255,255,0.8); margin:5px 0 0; font-size:0.9rem;">SHA-256 digital signature generated</p>
+    </div>
+
+    <!-- Successs Message -->
+    <div style="background:#e8f5e9; border:1px solid #c8e6c9; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p style="color:#2e7d32; margin:0; font-weight:600;">
+        <i class="fas fa-check-circle mr-2"></i>{{ signResult?.message }}
+      </p>
+    </div>
+
+    <!-- Signature Details -->
+    <div style="background:#f8f9ff; border-left:4px solid #1a73e8; border-radius:0 8px 8px 0; padding:15px; margin-bottom:20px;">
+      <h6 style="color:#1a237e; margin:0 0 12px;"><i class="fas fa-key mr-2"></i>Digital Signature Details</h6>
+      <div style="font-size:0.85rem; color:#555;">
+        <div class="mb-2"><strong>Contract ID:</strong> #{{ signResult?.contractId }}</div>
+        <div class="mb-2"><strong>Signed by:</strong> {{ signResult?.signedBy }}</div>
+        <div class="mb-2"><strong>Date & Time:</strong> {{ signResult?.signedAt | date:'dd/MM/yyyy HH:mm:ss' }}</div>
+        <div class="mb-2">
+          <strong>Content Hash:</strong>
+          <code style="font-size:0.75rem; background:#eee; padding:2px 6px; border-radius:4px; display:block; margin-top:4px; word-break:break-all;">{{ signResult?.contentHash }}</code>
+        </div>
+        <div>
+          <strong>Signature Hash:</strong>
+          <code style="font-size:0.75rem; background:#eee; padding:2px 6px; border-radius:4px; display:block; margin-top:4px; word-break:break-all;">{{ signResult?.signatureHash }}</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <div style="background:#fff3e0; border:1px solid #ffcc80; border-radius:8px; padding:12px; margin-bottom:20px;">
+      <p style="color:#e65100; margin:0; font-size:0.85rem;">
+        <i class="fas fa-info-circle mr-1"></i>
+        This SHA-256 hash guarantees contract integrity. Any modification will be detected as fraud.
+      </p>
+    </div>
+
+    <button (click)="showSignModal=false" class="btn btn-primary w-100">
+      <i class="fas fa-check mr-2"></i>Close
+    </button>
+  </div>
+</div>
+
+<!-- Verify Modal -->
+<div *ngIf="showVerifyModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:550px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+    <!-- Header -->
+    <div [style.background]="verifyResult?.fraudDetected ? 'linear-gradient(135deg,#b71c1c,#d32f2f)' : 'linear-gradient(135deg,#1b5e20,#2e7d32)'"
+         style="border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="margin-bottom:10px;">
+        <div style="width:70px; height:70px; margin:0 auto; background:rgba(255,255,255,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+          <i class="fas" [class.fa-exclamation-triangle]="verifyResult?.fraudDetected" [class.fa-check-circle]="!verifyResult?.fraudDetected" style="font-size:2.5rem; color:white;"></i>
+        </div>
+      </div>
+      <h4 style="color:white; margin:0; font-weight:700;">
+        {{ verifyResult?.fraudDetected ? 'FRAUD DETECTED' : 'Valid Signature' }}
+      </h4>
+      <p style="color:rgba(255,255,255,0.85); margin:5px 0 0; font-size:0.9rem;">
+        {{ verifyResult?.fraudDetected ? 'Content modified after signing' : 'Contract integrity guaranteed' }}
+      </p>
+    </div>
+
+    <!-- Message -->
+    <div [style.background]="verifyResult?.fraudDetected ? '#ffebee' : '#e8f5e9'"
+         [style.borderColor]="verifyResult?.fraudDetected ? '#ffcdd2' : '#c8e6c9'"
+         style="border:1px solid; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p [style.color]="verifyResult?.fraudDetected ? '#c62828' : '#2e7d32'" style="margin:0; font-weight:600;">
+        {{ verifyResult?.message }}
+      </p>
+    </div>
+
+    <!-- Details -->
+    <div style="background:#f8f9ff; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <h6 style="color:#1a237e; margin:0 0 10px;">Signature Details</h6>
+      <div style="font-size:0.85rem; color:#555;">
+        <div class="mb-1"><strong>Signed by:</strong> {{ verifyResult?.signedBy }}</div>
+        <div class="mb-1"><strong>Signature date:</strong> {{ verifyResult?.signedAt | date:'dd/MM/yyyy HH:mm' }}</div>
+        <div class="mb-1"><strong>Hash contenu:</strong> <code style="font-size:0.75rem;">{{ verifyResult?.contentHash?.substring(0,20) }}...</code></div>
+        <div><strong>Hash signature:</strong> <code style="font-size:0.75rem;">{{ verifyResult?.signatureHash?.substring(0,20) }}...</code></div>
+      </div>
+    </div>
+
+    <button (click)="showVerifyModal=false" class="btn btn-primary w-100">
+      Close
+    </button>
+  </div>
+</div>
+
+<!-- Weekly Report Modal -->
+<div *ngIf="showReportModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:500px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div [style.background]="reportSuccesss ? 'linear-gradient(135deg,#1b5e20,#2e7d32)' : 'linear-gradient(135deg,#b71c1c,#d32f2f)'" style="border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="font-size:2.5rem; margin-bottom:8px; color:white;">
+        <i class="fas" [class.fa-check-circle]="reportSuccesss" [class.fa-exclamation-triangle]="!reportSuccesss"></i>
+      </div>
+      <h4 style="color:white; margin:0; font-weight:700;">{{ reportSuccesss ? 'Report Sent !' : 'Error' }}</h4>
+      <p style="color:rgba(255,255,255,0.85); margin:5px 0 0; font-size:0.9rem;">{{ reportSuccesss ? 'n8n automation triggered successfully' : 'An error occurred' }}</p>
+    </div>
+    <div [style.background]="reportSuccesss ? '#e8f5e9' : '#ffebee'" style="border:1px solid #c8e6c9; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p [style.color]="reportSuccesss ? '#2e7d32' : '#c62828'" style="margin:0; font-weight:600;">
+        <i class="fas fa-envelope-open-text" style="margin-right:8px;"></i>{{ reportMessage }}
+      </p>
+    </div>
+    <button (click)="showReportModal=false" class="btn btn-primary w-100">
+      <i class="fas fa-check mr-2"></i>Close
+    </button>
+  </div>
+</div>
+</div>

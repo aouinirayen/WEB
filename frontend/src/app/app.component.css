@@ -1,0 +1,18 @@
+﻿/* Global App Styles */
+:host {
+  display: block;
+}
+
+body,
+:host ::ng-deep {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:host ::ng-deep .page-content {
+  min-height: calc(100vh - 250px);
+  display: flex;
+  flex-direction: column;
+}
+
+
+

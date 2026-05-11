@@ -1,0 +1,117 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold">
+      <i class="bi bi-card-image me-2"></i>License Upload & AI Validation
+    </h4>
+    <a routerLink="/admin/drivers" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <!-- Driver info -->
+  <div class="card border-0 shadow-sm mb-4" *ngIf="driver">
+    <div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="rounded-circle bg-primary d-flex align-items-center
+                    justify-content-center text-white fw-bold"
+             style="width:50px;height:50px;font-size:18px">
+          {{ driver.firstName.charAt(0) }}{{ driver.lastName.charAt(0) }}
+        </div>
+        <div>
+          <h6 class="fw-bold mb-0">
+            {{ driver.firstName }} {{ driver.lastName }}
+          </h6>
+          <small class="text-muted">
+            License {{ driver.licenseNumber }} —
+            Type {{ driver.licenseType }}
+          </small>
+        </div>
+        <span class="badge ms-auto"
+          [class.bg-warning]="driver.validationStatus==='PENDING'"
+          [class.bg-success]="driver.validationStatus==='APPROVED'"
+          [class.bg-danger]="driver.validationStatus==='REJECTED'">
+          {{ driver.validationStatus }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload area -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h6 class="fw-bold mb-3">Upload License Photo</h6>
+
+      <div class="border-2 border-dashed rounded p-4 text-center mb-3"
+           style="border:2px dashed #dee2e6;cursor:pointer"
+           (click)="fileInput.click()">
+        <div *ngIf="!previewUrl">
+          <i class="bi bi-cloud-upload fs-1 text-muted"></i>
+          <p class="text-muted mt-2 mb-0">
+            Click to upload or drag and drop
+          </p>
+          <small class="text-muted">JPG, PNG up to 10MB</small>
+        </div>
+        <img *ngIf="previewUrl" [src]="previewUrl"
+             style="max-height:300px;max-width:100%;border-radius:8px"/>
+      </div>
+
+      <input #fileInput type="file" hidden
+             accept="image/*"
+             (change)="onFileSelected($event)">
+
+      <button class="btn btn-primary w-100"
+              (click)="upload()"
+              [disabled]="!selectedFile || loading">
+        <span *ngIf="!loading">
+          <i class="bi bi-robot me-2"></i>
+          Upload & Validate with AI
+        </span>
+        <span *ngIf="loading">
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          AI is analyzing your license...
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <!-- AI Result -->
+  <div *ngIf="result" class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-robot me-2"></i>AI Validation Result
+      </h6>
+
+      <div class="alert mb-3"
+        [class.alert-success]="result.validationStatus==='APPROVED'"
+        [class.alert-warning]="result.validationStatus==='PENDING'"
+        [class.alert-danger]="result.validationStatus==='REJECTED'">
+        <div class="fw-bold mb-1">
+          <i class="bi me-2"
+            [class.bi-check-circle-fill]="result.validationStatus==='APPROVED'"
+            [class.bi-exclamation-triangle-fill]="result.validationStatus==='PENDING'"
+            [class.bi-x-circle-fill]="result.validationStatus==='REJECTED'">
+          </i>
+          {{ result.validationStatus === 'APPROVED' ?
+             'Auto-approved by AI!' :
+             result.validationStatus === 'PENDING' ?
+             'Sent to admin for manual review' :
+             'Rejected' }}
+        </div>
+        <small>{{ result.aiValidationNote }}</small>
+      </div>
+
+      <div *ngIf="result.aiExtractedData">
+        <p class="text-muted mb-2" style="font-size:13px">
+          <strong>Data extracted by AI:</strong>
+        </p>
+        <pre class="bg-light p-3 rounded"
+             style="font-size:12px">{{ result.aiExtractedData }}</pre>
+      </div>
+
+      <a routerLink="/admin/drivers" class="btn btn-primary mt-2">
+        Back to Drivers
+      </a>
+    </div>
+  </div>

@@ -1,0 +1,98 @@
+<div class="summary-panel">
+  <div class="summary-header">
+    <div>
+      <div class="summary-title">Document Summary</div>
+      <div class="summary-subtitle">Generate a summary for the file you are currently viewing.</div>
+    </div>
+
+    <div class="health-pill" [class.healthy]="healthState === 'healthy'" [class.unhealthy]="healthState === 'unhealthy'">
+      <span class="health-dot"></span>
+      <span>{{ healthMessage }}</span>
+    </div>
+  </div>
+
+  <div class="summary-actions">
+    <button type="button" class="action-button primary" (click)="summarizeDocument()" [disabled]="loading || !document">
+      <i class="fas fa-spinner fa-spin" *ngIf="loading"></i>
+      <i class="fas fa-file-contract" *ngIf="!loading"></i>
+      {{ loading ? 'Summarizing...' : 'Summarize' }}
+    </button>
+
+    <button type="button" class="action-button secondary" (click)="retry()" [disabled]="loading || !document">
+      <i class="fas fa-rotate-right"></i>
+      Retry
+    </button>
+  </div>
+
+  <div class="info-banner" *ngIf="document">
+    <strong>File:</strong> {{ document.documentUrl }}
+  </div>
+
+  <div class="state error" *ngIf="errorMessage">
+    <i class="fas fa-triangle-exclamation"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div class="state success" *ngIf="backendMessage && !errorMessage">
+    <i class="fas fa-circle-check"></i>
+    <span>{{ backendMessage }}</span>
+  </div>
+
+  <div class="state copied" *ngIf="copiedMessage">
+    <i class="fas fa-copy"></i>
+    <span>{{ copiedMessage }}</span>
+  </div>
+
+  <div class="result-grid" *ngIf="documentType || extractedText || summary">
+    <section class="result-card">
+      <div class="card-label">Document Type</div>
+      <div class="card-value">{{ documentType || 'Unknown' }}</div>
+    </section>
+
+    <section class="result-card">
+      <div class="card-label">Text Length</div>
+      <div class="card-value">{{ textLength || 0 }}</div>
+    </section>
+  </div>
+
+  <section class="output-card" *ngIf="extractedText || loading || errorMessage">
+    <div class="output-card-header">
+      <div>
+        <div class="card-label">Extracted Text Preview</div>
+        <div class="card-helper">Preview from the OCR result returned by the backend.</div>
+      </div>
+
+      <button type="button" class="mini-button" (click)="copyExtractedText()" [disabled]="!extractedText.trim()">
+        <i class="fas fa-copy"></i>
+        Copy
+      </button>
+    </div>
+
+    <pre class="output-text">{{ extractedPreview }}</pre>
+  </section>
+
+  <section class="output-card" *ngIf="summary || loading || errorMessage">
+    <div class="output-card-header">
+      <div>
+        <div class="card-label">Full Summary</div>
+        <div class="card-helper">The full generated summary from the Flask backend.</div>
+      </div>
+
+      <button type="button" class="mini-button" (click)="copySummary()" [disabled]="!summary.trim()">
+        <i class="fas fa-copy"></i>
+        Copy
+      </button>
+    </div>
+
+    <div class="empty-summary" *ngIf="!hasSummary && !loading && !errorMessage">
+      Summary not generated for this file.
+    </div>
+
+    <pre class="output-text" *ngIf="hasSummary">{{ summary }}</pre>
+  </section>
+
+  <div class="loading-strip" *ngIf="loading">
+    <span class="loading-bar"></span>
+    <span>Sending the document to the summarization service...</span>
+  </div>
+</div>

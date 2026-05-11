@@ -1,0 +1,272 @@
+<div class="users-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Admin</span>
+        <span>/</span>
+        <span>Users</span>
+      </div>
+      <h1 class="page-title">User Management</h1>
+      <p class="page-subtitle">Manage accounts, roles, and access</p>
+    </div>
+    <button class="btn btn-primary" (click)="openUserModal('create')">
+      <i class="fas fa-user-plus"></i>
+      Add New User
+    </button>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card stat-card-blue">
+      <div class="stat-card-header">
+        <div>
+          <div class="stat-card-value">{{ stats.total }}</div>
+          <div class="stat-card-label">Total Users</div>
+        </div>
+        <i class="fas fa-users stat-card-icon"></i>
+      </div>
+    </div>
+    <div class="stat-card stat-card-green">
+      <div class="stat-card-header">
+        <div>
+          <div class="stat-card-value">{{ stats.active }}</div>
+          <div class="stat-card-label">Active Users</div>
+        </div>
+        <i class="fas fa-check-circle stat-card-icon"></i>
+      </div>
+    </div>
+    <div class="stat-card stat-card-purple">
+      <div class="stat-card-header">
+        <div>
+          <div class="stat-card-value">{{ stats.agents }}</div>
+          <div class="stat-card-label">Agents</div>
+        </div>
+        <i class="fas fa-id-badge stat-card-icon"></i>
+      </div>
+    </div>
+    <div class="stat-card stat-card-teal">
+      <div class="stat-card-header">
+        <div>
+          <div class="stat-card-value">{{ stats.operators }}</div>
+          <div class="stat-card-label">Operators</div>
+        </div>
+        <i class="fas fa-user-tie stat-card-icon"></i>
+      </div>
+    </div>
+    <div class="stat-card stat-card-pink">
+      <div class="stat-card-header">
+        <div>
+          <div class="stat-card-value">{{ stats.passengers }}</div>
+          <div class="stat-card-label">Passengers</div>
+        </div>
+        <i class="fas fa-user-check stat-card-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-filter"></i>
+        Filters
+      </div>
+    </div>
+    <div class="card-body" style="padding: 20px;">
+      <div class="filters-bar">
+        <div class="filter-search-wrap">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            class="filter-input"
+            placeholder="Search by name or email..."
+            [(ngModel)]="filters.keyword"
+            (keyup.enter)="searchUsers()"
+          />
+        </div>
+        <select class="filter-select" [(ngModel)]="filters.role" (change)="applyRoleFilter(filters.role || '')">
+          <option value="ALL">All Roles</option>
+          <option value="ADMIN">Admin</option>
+          <option value="AGENT">Agent</option>
+          <option value="OPERATOR">Operator</option>
+          <option value="PASSENGER">Passenger</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="card" style="margin-top: 24px;">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-list"></i>
+        Users List
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="card-body">
+      <div style="text-align: center; padding: 40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #1a73e8;"></i>
+        <p style="margin-top: 16px; color: #999;">Loading users...</p>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && users.length === 0" class="card-body">
+      <div class="table-empty">
+        <i class="fas fa-inbox"></i>
+        <div class="table-empty-title">No users found</div>
+        <div class="table-empty-sub">Try adjusting your filters or add a new user</div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && users.length > 0" class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">User</th>
+            <th scope="col">Role</th>
+            <th scope="col">Status</th>
+            <th scope="col">Email</th>
+            <th scope="col">Created</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users; trackBy: trackByUser">
+            <td>
+              <div class="cell-entity">
+                <div class="cell-avatar cell-avatar-blue">
+                  {{ user.username.charAt(0).toUpperCase() }}
+                </div>
+                <div class="cell-entity-name">{{ user.name || user.username }}</div>
+              </div>
+            </td>
+            <td>
+              <span class="cell-tag cell-tag-blue">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="user.enabled ? 'status-active' : 'status-inactive'">
+                <span class="status-dot"></span>
+                {{ user.enabled ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="cell-date">{{ user.email }}</td>
+            <td class="cell-date">
+              <i class="fas fa-calendar-alt"></i>
+              {{ formatDate(user.createdAt) }}
+            </td>
+            <td class="cell-actions">
+              <button class="btn-icon btn-icon-edit" type="button" (click)="openUserModal('edit', user)" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn-icon btn-icon-view" type="button" (click)="openUserModal('view', user)" title="View">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button
+                class="btn-icon"
+                [ngClass]="isUserBanned(user) ? 'btn-icon-success' : 'btn-icon-warning'"
+                type="button"
+                [title]="isUserBanned(user) ? 'Activate user' : 'Deactivate user'"
+                (click)="isUserBanned(user) ? toggleStatus(user) : openBanModal(user)">
+                <i [ngClass]="isUserBanned(user) ? 'fas fa-check-circle' : 'fas fa-ban'"></i>
+              </button>
+              <button class="btn-icon btn-icon-delete" type="button" (click)="openConfirmDelete(user)" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="!loading && users.length > 0">
+      <div class="pagination-info">Showing {{ pageStart }} to {{ pageEnd }} of {{ stats.total }} results</div>
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="pageIndex === 0" (click)="changePage(pageIndex - 1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="page-btn active">{{ pageIndex + 1 }}</button>
+        <button class="page-btn" [disabled]="pageIndex >= getLastPageIndex()" (click)="changePage(pageIndex + 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Modal -->
+  <app-user-modal
+    [isOpen]="showUserModal"
+    [mode]="userModalMode"
+    [user]="selectedUser"
+    (close)="closeUserModal()"
+    (save)="onUserSaved($event)">
+  </app-user-modal>
+
+  <!-- Ban Duration Modal -->
+  <div *ngIf="showBanModal" class="modal-overlay" (click)="closeBanModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <i class="fas fa-ban" style="color: #d32f2f;"></i>
+          Deactivate User: {{ banUserTarget?.username }}
+        </h2>
+        <button class="modal-close" (click)="closeBanModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-description">
+          Select for how long to deactivate this user. They will not be able to access their account during the deactivation period.
+        </p>
+        <div class="ban-options">
+          <button class="ban-option-btn" (click)="banUserForDuration(1)">
+            <i class="fas fa-hourglass-start"></i>
+            <div class="ban-option-title">1 Day</div>
+            <div class="ban-option-desc">24 hours</div>
+          </button>
+          <button class="ban-option-btn" (click)="banUserForDuration(3)">
+            <i class="fas fa-hourglass-half"></i>
+            <div class="ban-option-title">3 Days</div>
+            <div class="ban-option-desc">72 hours</div>
+          </button>
+          <button class="ban-option-btn" (click)="banUserForDuration(7)">
+            <i class="fas fa-calendar-check"></i>
+            <div class="ban-option-title">1 Week</div>
+            <div class="ban-option-desc">7 days</div>
+          </button>
+          <button class="ban-option-btn" (click)="banUserForDuration(30)">
+            <i class="fas fa-calendar-alt"></i>
+            <div class="ban-option-title">1 Month</div>
+            <div class="ban-option-desc">30 days</div>
+          </button>
+          <button class="ban-option-btn ban-permanent" (click)="banUserForDuration(null)">
+            <i class="fas fa-lock"></i>
+            <div class="ban-option-title">Permanent</div>
+            <div class="ban-option-desc">Indefinitely</div>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeBanModal()">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <app-confirmation-modal
+    [isOpen]="showConfirmModal"
+    [title]="confirmTitle"
+    [message]="confirmMessage"
+    [confirmLabel]="'Delete'"
+    [danger]="true"
+    (close)="closeConfirmModal()"
+    (confirm)="executeConfirm()">
+  </app-confirmation-modal>
+</div>

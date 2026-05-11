@@ -1,0 +1,44 @@
+.card {
+  .card-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 15px 20px !important;
+  }
+
+  .card-title {
+    margin: 0 !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+  }
+
+  .table {
+    margin-bottom: 0 !important;
+
+    thead tr th {
+      background: #f8f9ff !important;
+      color: #1a237e !important;
+      font-weight: 700 !important;
+      font-size: 0.75rem !important;
+      letter-spacing: 0.5px !important;
+      border-bottom: 2px solid #e8ecf0 !important;
+      padding: 12px 15px !important;
+    }
+
+    tbody tr td {
+      padding: 12px 15px !important;
+      vertical-align: middle !important;
+      font-size: 0.9rem !important;
+    }
+
+    tbody tr:hover {
+      background: #f8f9ff !important;
+    }
+  }
+
+  .card-footer {
+    background: white !important;
+    border-top: 1px solid #f0f2f5 !important;
+    padding: 12px 20px !important;
+  }
+}

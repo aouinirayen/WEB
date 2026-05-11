@@ -1,0 +1,52 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold">Fuel Logs</h4>
+  <a routerLink="/admin/fuel-logs/new" class="btn btn-warning btn-sm text-dark">
+    <i class="bi bi-plus"></i> Add Fuel Log
+  </a>
+</div>
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Vehicle</th>
+          <th>Date</th>
+          <th>Liters</th>
+          <th>Cost/L (TND)</th>
+          <th>Total (TND)</th>
+          <th>Mileage (km)</th>
+          <th>Station</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of fuelLogs">
+          <td><strong>{{ f.vehicle.plateNumber }}</strong></td>
+          <td>{{ f.fuelDate | date:'mediumDate' }}</td>
+          <td>{{ f.liters }} L</td>
+          <td>{{ f.costPerLiter | number:'1.3-3' }}</td>
+          <td><span class="fw-bold text-warning">{{ f.totalCost | number:'1.2-2' }}</span></td>
+          <td>{{ f.mileageAtFillUp | number }} km</td>
+          <td>{{ f.station || '—' }}</td>
+          <td>
+            <a [routerLink]="['/admin/fuel-logs/edit', f.id]"
+               class="btn btn-sm btn-outline-primary me-1">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <button (click)="delete(f.id!)"
+                    class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot class="table-light" *ngIf="fuelLogs.length > 0">
+        <tr>
+          <td colspan="4" class="text-end fw-bold">Total Spent:</td>
+          <td class="fw-bold text-warning">{{ totalCost | number:'1.2-2' }} TND</td>
+          <td colspan="3"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

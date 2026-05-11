@@ -1,0 +1,200 @@
+:host {
+  display: block;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+.page-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin: 2px 0 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.stat-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card.blue   { background: linear-gradient(135deg, #2563eb, #06b6d4); }
+.stat-card.green  { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.stat-card.amber  { background: linear-gradient(135deg, #ea580c, #f59e0b); }
+.stat-card.purple { background: linear-gradient(135deg, #7c3aed, #ec4899); }
+
+.stat-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+.stat-sub {
+  font-size: 11px;
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.9);
+}
+.stat-sub.up,
+.stat-sub.warn,
+.stat-sub.info {
+  color: rgba(255, 255, 255, 0.9);
+}
+.stat-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 42px;
+  color: #ffffff;
+  opacity: 0.22;
+}
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+.right-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+.dash-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.dash-card-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #0f172a;
+}
+.dash-card-body {
+  padding: 14px 18px;
+}
+.see-all {
+  font-size: 11px;
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  background: white;
+  transition: border-color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+.action-btn:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+.action-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+.action-text .label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #0f172a;
+}
+.action-text .desc {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+.vehicle-list { display: flex; flex-direction: column; gap: 10px; }
+.vehicle-row  { display: flex; align-items: center; justify-content: space-between; }
+.vehicle-info { display: flex; align-items: center; gap: 10px; }
+.vehicle-plate {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+.vehicle-brand { font-size: 12px; color: #64748b; }
+.status-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+.pill-active   { background: #dcfce7; color: #15803d; }
+.pill-maint    { background: #fef9c3; color: #92400e; }
+.pill-inactive { background: #fee2e2; color: #991b1b; }
+
+.alert-list { display: flex; flex-direction: column; }
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.alert-item:last-child { border-bottom: none; }
+.alert-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.dot-red   { background: #ef4444; }
+.dot-amber { background: #f59e0b; }
+.dot-blue  { background: #3b82f6; }
+.alert-text .title { font-size: 12px; font-weight: 500; color: #0f172a; }
+.alert-text .time  { font-size: 10px; color: #64748b; margin-top: 2px; }
+

@@ -1,0 +1,35 @@
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0">Part Usage</h5>
+      <span class="text-muted small">Track parts per maintenance order</span>
+    </div>
+
+    <div class="row g-2 mt-2">
+      <div class="col-md-6">
+        <label class="form-label">Vehicle / Maintenance Order</label>
+        <select class="form-select" [(ngModel)]="maintenanceOrderId" (change)="onOrderChange()">
+          <option [ngValue]="null">-- Select vehicle --</option>
+          <option *ngFor="let order of maintenanceOrders" [ngValue]="order.id">
+            {{ order.vehicle.plateNumber }} - {{ order.vehicle.brand }} | {{ order.type }} | {{ order.scheduledDate | date:'mediumDate' }}
+          </option>
+        </select>
+        <div class="form-text">Choose a vehicle entry to load its maintenance part usage.</div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Maintenance Type</label>
+        <input class="form-control" [ngModel]="maintenanceType" name="maintenanceType" readonly />
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-part-usage-panel
+  *ngIf="maintenanceOrderId && maintenanceOrderId > 0"
+  [maintenanceOrderId]="maintenanceOrderId"
+  [maintenanceType]="maintenanceType">
+</app-part-usage-panel>
+
+<div class="alert alert-info mt-3" *ngIf="!maintenanceOrderId || maintenanceOrderId <= 0">
+  Select a vehicle from the dropdown to display part usage records.
+</div>

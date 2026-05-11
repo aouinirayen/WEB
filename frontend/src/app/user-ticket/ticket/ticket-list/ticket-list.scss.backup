@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  .theme-ticket {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .page-header h2 {
+    font-size: 1.2rem;
+  }
+  .pagination .page-link {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.8rem;
+  }
+}

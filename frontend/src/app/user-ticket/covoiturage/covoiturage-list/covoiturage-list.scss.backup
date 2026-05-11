@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  .theme-covoiturage {
+    max-width: 1050px;
+    margin: 0 auto;
+  }
+  .route-card {
+    font-size: 0.9rem;
+  }
+  .route-card .card-header {
+    padding: 0.5rem 0.8rem;
+  }
+  .route-card .card-header h6 {
+    font-size: 0.95rem;
+  }
+  .route-card .card-body {
+    padding: 0.5rem 0.8rem;
+  }
+  .route-card .card-footer {
+    padding: 0.45rem 0.8rem;
+  }
+  .pagination .page-link {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.8rem;
+  }
+}

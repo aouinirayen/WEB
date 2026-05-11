@@ -1,0 +1,202 @@
+<div class="expiry-alerts-container">
+  <!-- Header with Refresh -->
+  <div class="alerts-header">
+    <div class="header-title">
+      <i class="fas fa-calendar-alt"></i>
+      <h3>Document Expiry Alerts</h3>
+    </div>
+    <button class="btn-icon" (click)="refresh()" [disabled]="loading" title="Refresh">
+      <i class="fas fa-sync-alt" [class.spinning]="loading"></i>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <i class="fas fa-spinner fa-spin"></i>
+    <span>Loading expiry alerts...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-banner">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Stats Summary -->
+  <div *ngIf="!loading && !error" class="stats-summary">
+    <div class="stat-item critical">
+      <i class="fas fa-exclamation-circle"></i>
+      <div class="stat-detail">
+        <div class="stat-label">Critical (≤7 days)</div>
+        <div class="stat-value">{{ tabCounts.critical }}</div>
+      </div>
+    </div>
+    <div class="stat-item warning">
+      <i class="fas fa-exclamation-triangle"></i>
+      <div class="stat-detail">
+        <div class="stat-label">Upcoming (≤30 days)</div>
+        <div class="stat-value">{{ tabCounts.upcoming }}</div>
+      </div>
+    </div>
+    <div class="stat-item danger">
+      <i class="fas fa-times-circle"></i>
+      <div class="stat-detail">
+        <div class="stat-label">Expired</div>
+        <div class="stat-value">{{ tabCounts.expired }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div *ngIf="!loading && !error" class="search-filter-section">
+    <div class="search-container">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by username, document type..."
+        [value]="searchQuery"
+        (input)="onSearchChange($event)">
+    </div>
+
+    <div class="filter-controls">
+      <div class="filter-group">
+        <label>Document Type:</label>
+        <select
+          class="filter-select"
+          [value]="selectedDocumentType"
+          (change)="onDocumentTypeFilterChange($event)">
+          <option value="">All Types</option>
+          <option *ngFor="let type of getUniqueDocumentTypes()" [value]="type">
+            {{ type }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Status:</label>
+        <select
+          class="filter-select"
+          [value]="selectedStatus"
+          (change)="onStatusFilterChange($event)">
+          <option value="">All Status</option>
+          <option *ngFor="let status of getUniqueStatuses()" [value]="status">
+            {{ status }}
+          </option>
+        </select>
+      </div>
+
+      <button
+        class="btn-clear-filters"
+        *ngIf="searchQuery || selectedDocumentType || selectedStatus"
+        (click)="clearFilters()">
+        <i class="fas fa-times"></i>
+        Clear Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div *ngIf="!loading && !error" class="tab-navigation">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'critical'"
+      (click)="switchTab('critical')"
+      [attr.data-count]="tabCounts.critical">
+      <i class="fas fa-exclamation-circle"></i>
+      Critical
+      <span class="badge" *ngIf="tabCounts.critical > 0">{{ tabCounts.critical }}</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'upcoming'"
+      (click)="switchTab('upcoming')"
+      [attr.data-count]="tabCounts.upcoming">
+      <i class="fas fa-hourglass-half"></i>
+      Upcoming
+      <span class="badge" *ngIf="tabCounts.upcoming > 0">{{ tabCounts.upcoming }}</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'expired'"
+      (click)="switchTab('expired')"
+      [attr.data-count]="tabCounts.expired">
+      <i class="fas fa-times-circle"></i>
+      Expired
+      <span class="badge" *ngIf="tabCounts.expired > 0">{{ tabCounts.expired }}</span>
+    </button>
+  </div>
+
+  <!-- Content Area -->
+  <div *ngIf="!loading && !error" class="tab-content">
+    <!-- Empty State -->
+    <div *ngIf="currentDocuments.length === 0" class="empty-state">
+      <i class="fas fa-check-circle"></i>
+      <p *ngIf="activeTab === 'critical'">No critical documents expiring soon</p>
+      <p *ngIf="activeTab === 'upcoming'">No documents expiring in the next 30 days</p>
+      <p *ngIf="activeTab === 'expired'">No expired documents</p>
+    </div>
+
+    <!-- Documents List -->
+    <div *ngIf="currentDocuments.length > 0" class="documents-list">
+      <div *ngFor="let doc of currentDocuments" class="document-card"
+           [ngClass]="'urgency-' + documentExpiryService.getUrgencyLevel(doc.expiryDate!)">
+        <div class="urgency-indicator">
+          <i [ngClass]="getUrgencyIcon(doc.expiryDate!)"
+             [style.color]="getUrgencyColor(doc.expiryDate!)"></i>
+        </div>
+
+        <div class="document-info">
+          <div class="document-header">
+            <div class="document-type">
+              <span class="type-badge">{{ doc.documentType.name || 'Document' }}</span>
+            </div>
+            <div class="urgency-label" [style.color]="getUrgencyColor(doc.expiryDate!)">
+              {{ getUrgencyLabel(doc.expiryDate!) }}
+            </div>
+          </div>
+
+          <div class="document-details">
+            <div class="detail-item">
+              <i class="fas fa-user"></i>
+              <span>User: {{ doc.username || 'N/A' }}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-calendar"></i>
+              <span>Expires: {{ doc.expiryDate | date: 'short' }}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-history"></i>
+              <span>Uploaded: {{ doc.uploadDate | date: 'short' }}</span>
+            </div>
+            <div class="detail-item" *ngIf="doc.status">
+              <i class="fas fa-tag"></i>
+              <span class="status-badge" [ngClass]="'status-' + doc.status.toLowerCase()">
+                {{ doc.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="document-actions">
+          <button
+            class="action-btn view-btn"
+            title="View Document"
+            [disabled]="!canDownloadDocument(doc)"
+            (click)="viewDocument(doc)">
+            <i class="fas fa-eye"></i>
+            <span class="tooltip">View</span>
+          </button>
+          <button
+            class="action-btn download-btn"
+            title="Download Document"
+            [disabled]="!canDownloadDocument(doc)"
+            (click)="downloadDocument(doc)">
+            <i class="fas fa-download"></i>
+            <span class="tooltip">Download</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

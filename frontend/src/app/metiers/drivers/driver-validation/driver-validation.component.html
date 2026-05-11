@@ -1,0 +1,83 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold">
+      <i class="bi bi-shield-check me-2 text-warning"></i>
+      License Validations
+    </h4>
+    <a routerLink="/admin/drivers" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Drivers
+    </a>
+  </div>
+  
+  <div *ngIf="message" class="alert alert-{{messageType}} alert-dismissible">
+    {{ message }}
+    <button type="button" class="btn-close" (click)="message=''"></button>
+  </div>
+  
+  <div *ngIf="pending.length === 0"
+       class="alert alert-success d-flex align-items-center gap-2">
+    <i class="bi bi-check-circle-fill"></i>
+    No pending license validations.
+  </div>
+  
+  <div class="row g-3">
+    <div class="col-md-6" *ngFor="let d of pending">
+      <div class="card border-0 shadow-sm border-start border-warning
+                  border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <h6 class="fw-bold mb-0">
+              {{ d.firstName }} {{ d.lastName }}
+            </h6>
+            <span class="badge bg-warning text-dark">PENDING</span>
+          </div>
+  
+          <div class="mb-3" style="font-size:13px">
+            <div class="row g-1">
+              <div class="col-6">
+                <span class="text-muted">License:</span>
+                {{ d.licenseNumber }}
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Type:</span>
+                <span class="badge bg-info text-dark ms-1">
+                  {{ d.licenseType }}
+                </span>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Expiry:</span>
+                {{ d.licenseExpiryDate }}
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Experience:</span>
+                {{ d.experienceYears }} years
+              </div>
+              <div class="col-12">
+                <span class="text-muted">Phone:</span>
+                {{ d.phone }}
+              </div>
+            </div>
+          </div>
+  
+          <div class="mb-3">
+            <label class="form-label" style="font-size:12px">
+              Rejection reason (required to reject)
+            </label>
+            <input class="form-control form-control-sm"
+                   [(ngModel)]="rejectionReasons[d.id!]"
+                   placeholder="e.g. License document not legible">
+          </div>
+  
+          <div class="d-flex gap-2">
+            <button class="btn btn-success btn-sm flex-grow-1"
+                    (click)="approve(d.id!)">
+              <i class="bi bi-check-lg me-1"></i>Approve
+            </button>
+            <button class="btn btn-danger btn-sm flex-grow-1"
+                    (click)="reject(d.id!)">
+              <i class="bi bi-x-lg me-1"></i>Reject
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

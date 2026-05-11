@@ -1,0 +1,152 @@
+<div class="pred-page">
+
+  <!-- Header -->
+  <div class="pred-header">
+    <div>
+      <h4 class="fw-bold mb-0">
+        <i class="bi bi-cpu me-2 text-primary"></i>Smart Parts Prediction
+      </h4>
+      <small class="text-muted">AI + frequency analysis · predictions sorted by urgency</small>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      <select class="form-select form-select-sm w-auto" [(ngModel)]="scope"
+              (ngModelChange)="onScopeChange()">
+        <option value="fleet">Fleet-wide</option>
+        <option *ngFor="let v of vehicles" [value]="v.id">{{ v.plateNumber }}</option>
+      </select>
+      <button class="btn btn-sm btn-outline-primary" (click)="load()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+    <p class="text-muted mt-3">Running prediction engine...</p>
+  </div>
+
+  <ng-container *ngIf="!loading">
+
+    <!-- Summary pills -->
+    <div class="summary-row">
+      <div class="sum-pill pill-urgent">
+        <span class="sum-num">{{ countByUrgency('URGENT') }}</span>
+        <span class="sum-label">URGENT (&lt;7 days)</span>
+      </div>
+      <div class="sum-pill pill-soon">
+        <span class="sum-num">{{ countByUrgency('SOON') }}</span>
+        <span class="sum-label">SOON (&lt;30 days)</span>
+      </div>
+      <div class="sum-pill pill-monitor">
+        <span class="sum-num">{{ countByUrgency('MONITOR') }}</span>
+        <span class="sum-label">MONITOR</span>
+      </div>
+      <div class="sum-pill pill-ai">
+        <span class="sum-num">{{ countByMethod('LINEAR_REGRESSION') }}</span>
+        <span class="sum-label">AI predictions</span>
+      </div>
+      <div class="sum-pill pill-freq">
+        <span class="sum-num">{{ countByMethod('FREQUENCY_ANALYSIS') }}</span>
+        <span class="sum-label">Frequency-based</span>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="d-flex gap-2 mb-3 flex-wrap">
+      <select class="form-select form-select-sm w-auto" [(ngModel)]="filterUrgency">
+        <option value="">All urgency levels</option>
+        <option value="URGENT">URGENT</option>
+        <option value="SOON">SOON</option>
+        <option value="MONITOR">MONITOR</option>
+      </select>
+      <select class="form-select form-select-sm w-auto" [(ngModel)]="filterMethod">
+        <option value="">All methods</option>
+        <option value="LINEAR_REGRESSION">AI (Regression)</option>
+        <option value="FREQUENCY_ANALYSIS">Frequency Analysis</option>
+      </select>
+      <input class="form-control form-control-sm w-auto"
+             [(ngModel)]="filterPart" placeholder="Search part name...">
+    </div>
+
+    <!-- Prediction cards -->
+    <div class="pred-grid">
+      <div class="pred-card"
+           *ngFor="let p of filtered()"
+           [ngClass]="'card-' + p.urgency.toLowerCase()">
+
+        <!-- Top row -->
+        <div class="pred-card-top">
+          <div>
+            <span class="pred-part-name">{{ p.partName }}</span>
+            <code class="pred-ref">{{ p.referenceCode }}</code>
+          </div>
+          <div class="d-flex flex-column align-items-end gap-1">
+            <span class="urgency-badge"
+              [ngClass]="'badge-' + p.urgency.toLowerCase()">
+              {{ p.urgency }}
+            </span>
+            <span class="method-badge"
+              [ngClass]="p.method === 'LINEAR_REGRESSION' ? 'method-ai' : 'method-freq'">
+              {{ p.method === 'LINEAR_REGRESSION' ? '🤖 AI' : '📊 Freq' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Main prediction -->
+        <div class="pred-main">
+          <span class="pred-days"
+            [class.text-danger]="p.daysUntilNeeded <= 7"
+            [class.text-warning]="p.daysUntilNeeded > 7 && p.daysUntilNeeded <= 30"
+            [class.text-success]="p.daysUntilNeeded > 30">
+            {{ p.daysUntilNeeded <= 0 ? 'OVERDUE' :
+               'in ' + p.daysUntilNeeded + ' day' + (p.daysUntilNeeded === 1 ? '' : 's') }}
+          </span>
+          <span class="pred-date text-muted">{{ p.predictedDateNeeded | date:'mediumDate' }}</span>
+        </div>
+
+        <!-- Confidence bar -->
+        <div class="conf-row">
+          <span class="conf-label">Confidence</span>
+          <div class="conf-bar-bg">
+            <div class="conf-bar"
+                 [style.width.%]="p.confidenceScore * 100"
+                 [ngClass]="confClass(p.confidenceScore)"></div>
+          </div>
+          <span class="conf-pct">{{ (p.confidenceScore * 100) | number:'1.0-0' }}%</span>
+        </div>
+
+        <!-- Details -->
+        <div class="pred-details">
+          <div class="pred-detail-row">
+            <span>📦 Stock</span>
+            <span [class.text-danger]="p.currentStock < p.predictedQuantityNeeded"
+                  [class.fw-bold]="p.currentStock < p.predictedQuantityNeeded">
+              {{ p.currentStock }} (need ~{{ p.predictedQuantityNeeded }})
+              <i *ngIf="p.currentStock < p.predictedQuantityNeeded"
+                 class="bi bi-exclamation-triangle-fill text-danger ms-1"></i>
+            </span>
+          </div>
+          <div class="pred-detail-row" *ngIf="p.affectedVehicles?.length">
+            <span>🚍 Vehicles</span>
+            <span>{{ p.affectedVehicles.join(', ') }}</span>
+          </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="pred-explanation">
+          <i class="bi bi-info-circle me-1"></i>{{ p.explanation }}
+        </div>
+
+      </div>
+    </div>
+
+    <div *ngIf="filtered().length === 0" class="empty-pred">
+      <i class="bi bi-cpu"></i>
+      <p>No predictions available yet.<br>
+        <small>Add maintenance records and part usages to enable predictions.</small>
+      </p>
+    </div>
+
+  </ng-container>
+</div>

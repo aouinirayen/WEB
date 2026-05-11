@@ -1,0 +1,57 @@
+<nav class="navbar navbar-expand-lg sticky-top"
+     style="background:#1a1a2e">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/"
+       style="color:#00b4d8">
+      <i class="bi bi-bus-front me-2"></i>TransitTN
+    </a>
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-2">
+        <li class="nav-item">
+          <a routerLink="/public/lines" routerLinkActive="active"
+             class="nav-link text-white">
+            <i class="bi bi-map me-1"></i>Lines
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/public/schedules" routerLinkActive="active"
+             class="nav-link text-white">
+            <i class="bi bi-calendar3 me-1"></i>Schedules
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/public/trips" routerLinkActive="active"
+             class="nav-link text-white">
+            <i class="bi bi-search me-1"></i>Search Trips
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/public/alerts" routerLinkActive="active"
+             class="nav-link text-white">
+            <i class="bi bi-exclamation-triangle me-1"></i>Alerts
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/dashboard"
+             class="btn btn-sm ms-2"
+             style="background:#00b4d8;color:white">
+            Admin
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div style="min-height:100vh;background:#f8f9fa">
+  <router-outlet></router-outlet>
+</div>
+
+<footer style="background:#1a1a2e;color:#adb5bd"
+        class="text-center py-4 mt-4">
+  <small>© 2026 TransitTN — Tunisia's Smart Public Transportation</small>
+</footer>

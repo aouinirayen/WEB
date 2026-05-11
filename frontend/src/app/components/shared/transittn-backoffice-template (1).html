@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransitTN — Backoffice Template</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* ============================================================
+       DESIGN TOKENS — TransitTN Backoffice Template
+       ============================================================ */
+    :root {
+      /* Brand */
+      --brand-primary:   #1a237e;
+      --brand-mid:       #283593;
+      --brand-light:     #3949ab;
+      --brand-blue:      #1a73e8;
+      --brand-blue-dark: #0d47a1;
+
+      /* Semantic */
+      --color-success:   #2e7d32;
+      --color-warning:   #f57f17;
+      --color-danger:    #c62828;
+      --color-purple:    #7b1fa2;
+
+      /* Backgrounds */
+      --bg-page:         #f0f2f5;
+      --bg-surface:      #ffffff;
+      --bg-header:       #f8f9ff;
+
+      /* Text */
+      --text-primary:    #1a237e;
+      --text-body:       #333333;
+      --text-muted:      #666666;
+      --text-hint:       #999999;
+
+      /* Borders */
+      --border-light:    #f0f2f5;
+      --border-mid:      #e8ecf0;
+
+      /* Layout */
+      --sidebar-width:   250px;
+      --topbar-height:   60px;
+      --radius-sm:       8px;
+      --radius-md:       12px;
+      --radius-lg:       16px;
+      --radius-pill:     20px;
+
+      /* Shadows */
+      --shadow-card:     0 2px 20px rgba(0,0,0,0.07);
+      --shadow-btn-blue: 0 4px 12px rgba(26,115,232,0.3);
+    }
+
+    /* ============================================================
+       RESET & BASE
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      color: var(--text-body);
+      background: var(--bg-page);
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    button { cursor: pointer; font-family: inherit; border: none; background: none; }
+
+    /* ============================================================
+       LAYOUT WRAPPER
+       ============================================================ */
+    .wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ============================================================
+       SIDEBAR
+       ============================================================ */
+    .sidebar {
+      width: var(--sidebar-width);
+      min-height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 200;
+      background: linear-gradient(180deg, var(--brand-primary) 0%, var(--brand-mid) 50%, var(--brand-light) 100%);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-brand-icon {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.2);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sidebar-brand-icon i { color: #fff; font-size: 18px; }
+    .sidebar-brand-text {
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .sidebar-section-label {
+      padding: 18px 20px 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+    }
+
+    .sidebar-nav { padding: 0 12px; }
+    .sidebar-nav li + li { margin-top: 2px; }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      color: rgba(255,255,255,0.75);
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-link i { width: 18px; text-align: center; font-size: 14px; }
+    .sidebar-link:hover,
+    .sidebar-link.active {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    .sidebar-link .badge-count {
+      margin-left: auto;
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    /* ============================================================
+       TOPBAR
+       ============================================================ */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      height: var(--topbar-height);
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-mid);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      z-index: 100;
+    }
+    .topbar-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--brand-primary);
+    }
+    .topbar-actions { display: flex; align-items: center; gap: 16px; }
+    .topbar-icon-btn {
+      width: 34px; height: 34px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-header);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      font-size: 14px;
+      transition: background 0.15s;
+      position: relative;
+    }
+    .topbar-icon-btn:hover { background: var(--border-mid); }
+    .topbar-badge {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 8px; height: 8px;
+      background: var(--color-danger);
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+    .topbar-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .topbar-user { display: flex; align-items: center; gap: 8px; }
+    .topbar-user-name { font-size: 0.85rem; font-weight: 600; color: var(--text-body); }
+    .topbar-user-role { font-size: 0.75rem; color: var(--text-hint); }
+
+    /* ============================================================
+       MAIN CONTENT
+       ============================================================ */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      margin-top: var(--topbar-height);
+      padding: 25px;
+      min-height: calc(100vh - var(--topbar-height));
+      flex: 1;
+    }
+
+    /* ============================================================
+       PAGE HEADER
+       ============================================================ */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .page-title { font-size: 1.4rem; font-weight: 700; color: var(--brand-primary); }
+    .page-subtitle { font-size: 0.82rem; color: var(--text-hint); margin-top: 2px; }
+    .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-hint); margin-bottom: 4px; }
+    .breadcrumb a { color: var(--brand-blue); }
+    .breadcrumb span { color: var(--text-hint); }
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: opacity 0.15s, transform 0.1s;
+      cursor: pointer;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-dark));
+      color: #fff;
+      box-shadow: var(--shadow-btn-blue);
+      border: none;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 12px rgba(46,125,50,0.3);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #c62828, #b71c1c);
+      color: #fff;
+      border: none;
+    }
+    .btn-outline {
+      background: var(--bg-surface);
+      color: var(--text-body);
+      border: 1px solid var(--border-mid);
+    }
+    .btn-outline:hover { background: var(--bg-header); }
+    .btn-sm { padding: 6px 14px; font-size: 0.82rem; }
+    .btn-icon {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      transition: all 0.15s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-icon-edit { background: #fff8e1; color: #f57f17; }
+    .btn-icon-edit:hover { background: #f57f17; color: #fff; }
+    .btn-icon-delete { background: #fce4ec; color: var(--color-danger); }
+    .btn-icon-delete:hover { background: var(--color-danger); color: #fff; }
+    .btn-icon-view { background: #e3f2fd; color: var(--brand-blue); }
+    .btn-icon-view:hover { background: var(--brand-blue); color: #fff; }
+
+    /* ============================================================
+       STAT CARDS
+       ============================================================ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      border-radius: var(--radius-md);
+      padding: 20px;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    .stat-card-blue   { background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-dark)); box-shadow: 0 4px 15px rgba(26,115,232,0.3); }
+    .stat-card-green  { background: linear-gradient(135deg, #2e7d32, #1b5e20);  box-shadow: 0 4px 15px rgba(46,125,50,0.3); }
+    .stat-card-orange { background: linear-gradient(135deg, #f57f17, #e65100);  box-shadow: 0 4px 15px rgba(245,127,23,0.3); }
+    .stat-card-purple { background: linear-gradient(135deg, #7b1fa2, #4a148c);  box-shadow: 0 4px 15px rgba(123,31,162,0.3); }
+    .stat-card-teal   { background: linear-gradient(135deg, #00838f, #006064);  box-shadow: 0 4px 15px rgba(0,131,143,0.3); }
+    .stat-card-red    { background: linear-gradient(135deg, #c62828, #b71c1c);  box-shadow: 0 4px 15px rgba(198,40,40,0.3); }
+
+    .stat-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .stat-card-value  { font-size: 2.4rem; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .stat-card-label  { font-size: 0.88rem; opacity: 0.85; }
+    .stat-card-sub    { font-size: 0.75rem; opacity: 0.7; margin-top: 2px; }
+    .stat-card-icon   { font-size: 2.5rem; opacity: 0.25; }
+    .stat-card-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 0.82rem; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 6px; }
+    .stat-card-footer i { font-size: 11px; }
+
+    /* ============================================================
+       CARDS (generic surface)
+       ============================================================ */
+    .card {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brand-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title i { font-size: 15px; }
+    .card-subtitle { font-size: 0.78rem; color: var(--text-hint); margin-top: 2px; }
+    .card-body { padding: 20px 24px; }
+    .card-footer { padding: 12px 24px; border-top: 1px solid var(--border-light); background: var(--bg-surface); }
+
+    /* ============================================================
+       DATA TABLE
+       ============================================================ */
+    .table-wrapper { overflow-x: auto; }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table thead tr { background: var(--bg-header); }
+    .data-table th {
+      padding: 12px 18px;
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--brand-primary);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      border-bottom: 2px solid var(--border-mid);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+      font-size: 0.88rem;
+    }
+    .data-table tbody tr {
+      transition: background 0.12s;
+    }
+    .data-table tbody tr:hover { background: #f8f9ff; }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+
+    /* Cell: entity with icon */
+    .cell-entity { display: flex; align-items: center; gap: 10px; }
+    .cell-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+    .cell-avatar-purple { background: #f3e5f5; color: #7b1fa2; border: 2px solid #e1bee7; }
+    .cell-avatar-blue   { background: #e3f2fd; color: var(--brand-blue);  border: 2px solid #bbdefb; }
+    .cell-avatar-green  { background: #e8f5e9; color: #2e7d32; border: 2px solid #c8e6c9; }
+    .cell-avatar-orange { background: #fff8e1; color: #f57f17; border: 2px solid #ffe082; }
+    .cell-avatar-teal   { background: #e0f7fa; color: #00838f; border: 2px solid #b2ebf2; }
+
+    .cell-entity-name { font-weight: 600; color: var(--brand-primary); }
+
+    /* Cell: date */
+    .cell-date { color: var(--text-muted); }
+    .cell-date i { margin-right: 5px; font-size: 11px; }
+
+    /* Cell: badge/tag */
+    .cell-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .cell-tag-blue   { background: #e3f2fd; color: var(--brand-blue); }
+    .cell-tag-green  { background: #e8f5e9; color: #2e7d32; }
+    .cell-tag-orange { background: #fff8e1; color: #f57f17; }
+    .cell-tag-purple { background: #f3e5f5; color: #7b1fa2; }
+
+    /* Cell: actions */
+    .cell-actions { display: flex; gap: 6px; }
+
+    /* Cell: empty state */
+    .cell-muted { color: #bbb; font-style: italic; font-size: 0.85rem; }
+
+    /* Empty state row */
+    .table-empty {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-hint);
+    }
+    .table-empty i { font-size: 2.5rem; display: block; margin-bottom: 12px; color: #ddd; }
+    .table-empty-title { font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
+    .table-empty-sub { font-size: 0.82rem; }
+
+    /* ============================================================
+       STATUS BADGES
+       ============================================================ */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    /* Status: ACTIVE */
+    .status-active { background: #e8f5e9; color: #2e7d32; }
+    .status-active .status-dot { background: #2e7d32; }
+    /* Status: DRAFT */
+    .status-draft  { background: #fff8e1; color: #f57f17; }
+    .status-draft  .status-dot { background: #f57f17; }
+    /* Status: PENDING */
+    .status-pending { background: #fff3e0; color: #e65100; }
+    .status-pending .status-dot { background: #e65100; }
+    /* Status: EXPIRED */
+    .status-expired { background: #fce4ec; color: var(--color-danger); }
+    .status-expired .status-dot { background: var(--color-danger); }
+    /* Status: SUSPENDED */
+    .status-suspended { background: #fce4ec; color: var(--color-danger); }
+    .status-suspended .status-dot { background: var(--color-danger); }
+    /* Status: INACTIVE */
+    .status-inactive { background: #f5f5f5; color: #666; }
+    .status-inactive .status-dot { background: #999; }
+
+    /* ============================================================
+       FILTERS BAR
+       ============================================================ */
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .filter-input {
+      height: 36px;
+      padding: 0 12px 0 34px;
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      font-size: 0.85rem;
+      color: var(--text-body);
+      outline: none;
+      position: relative;
+    }
+    .filter-input:focus { border-color: var(--brand-blue); }
+    .filter-search-wrap { position: relative; }
+    .filter-search-wrap i {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-hint);
+      font-size: 12px;
+      pointer-events: none;
+    }
+    .filter-select {
+      height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      font-size: 0.85rem;
+      color: var(--text-body);
+      outline: none;
+      cursor: pointer;
+    }
+    .filter-select:focus { border-color: var(--brand-blue); }
+
+    /* ============================================================
+       PAGINATION
+       ============================================================ */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      border-top: 1px solid var(--border-light);
+    }
+    .pagination-info { font-size: 0.8rem; color: var(--text-hint); }
+    .pagination-controls { display: flex; align-items: center; gap: 4px; }
+    .page-btn {
+      width: 30px; height: 30px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.12s;
+      background: none;
+      color: var(--text-body);
+    }
+    .page-btn:hover { background: var(--bg-header); border-color: var(--border-mid); }
+    .page-btn.active { background: var(--brand-blue); color: #fff; border-color: var(--brand-blue); }
+    .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ============================================================
+       FORM COMPONENTS
+       ============================================================ */
+    .form-grid { display: grid; gap: 18px; }
+    .form-grid-2 { grid-template-columns: 1fr 1fr; }
+    .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-label .required { color: var(--color-danger); margin-left: 2px; }
+
+    .form-control {
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      font-size: 0.88rem;
+      color: var(--text-body);
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+    .form-control:focus { border-color: var(--brand-blue); box-shadow: 0 0 0 3px rgba(26,115,232,0.12); }
+    .form-control.error { border-color: var(--color-danger); }
+
+    textarea.form-control { height: auto; padding: 10px 12px; resize: vertical; }
+    select.form-control { cursor: pointer; }
+
+    .form-hint { font-size: 0.76rem; color: var(--text-hint); margin-top: 3px; }
+    .form-error { font-size: 0.76rem; color: var(--color-danger); margin-top: 3px; }
+
+    /* ============================================================
+       DETAIL VIEW (key-value pairs)
+       ============================================================ */
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+    .detail-field {}
+    .detail-label { font-size: 0.73rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-hint); margin-bottom: 4px; }
+    .detail-value { font-size: 0.9rem; color: var(--text-body); font-weight: 500; }
+
+    /* ============================================================
+       PROGRESS BAR
+       ============================================================ */
+    .progress-bar-wrap { background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden; }
+    .progress-bar { height: 8px; border-radius: 10px; transition: width 0.5s ease; }
+    .progress-bar-blue   { background: linear-gradient(90deg, var(--brand-blue), var(--brand-blue-dark)); }
+    .progress-bar-green  { background: linear-gradient(90deg, #2e7d32, #1b5e20); }
+    .progress-bar-orange { background: linear-gradient(90deg, #f57f17, #e65100); }
+    .progress-bar-purple { background: linear-gradient(90deg, #7b1fa2, #4a148c); }
+
+    /* ============================================================
+       MINI STAT GRID (for card body)
+       ============================================================ */
+    .mini-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .mini-stat-box {
+      text-align: center;
+      padding: 14px 10px;
+      border-radius: var(--radius-sm);
+    }
+    .mini-stat-box-green  { background: #e8f5e9; }
+    .mini-stat-box-yellow { background: #fff8e1; }
+    .mini-stat-box-red    { background: #fce4ec; }
+    .mini-stat-box-blue   { background: #e3f2fd; }
+    .mini-stat-value { font-size: 1.7rem; font-weight: 700; }
+    .mini-stat-value-green  { color: #2e7d32; }
+    .mini-stat-value-yellow { color: #f57f17; }
+    .mini-stat-value-red    { color: var(--color-danger); }
+    .mini-stat-value-blue   { color: var(--brand-blue); }
+    .mini-stat-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; color: #555; margin-top: 2px; }
+
+    /* ============================================================
+       QUICK ACTIONS LIST
+       ============================================================ */
+    .quick-actions { display: flex; flex-direction: column; gap: 10px; }
+    .quick-action-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-weight: 500;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .quick-action-btn:hover { opacity: 0.88; }
+    .quick-action-btn i { width: 16px; text-align: center; }
+    .qa-blue   { background: linear-gradient(135deg, var(--brand-blue),  var(--brand-blue-dark)); }
+    .qa-green  { background: linear-gradient(135deg, #2e7d32, #1b5e20); }
+    .qa-orange { background: linear-gradient(135deg, #f57f17, #e65100); }
+    .qa-purple { background: linear-gradient(135deg, #7b1fa2, #4a148c); }
+
+    /* ============================================================
+       RECENT LIST (in cards)
+       ============================================================ */
+    .recent-item {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.12s;
+    }
+    .recent-item:hover { background: var(--bg-header); }
+    .recent-item:last-child { border-bottom: none; }
+    .recent-item-main { font-weight: 600; color: var(--text-body); font-size: 0.88rem; }
+    .recent-item-sub  { font-size: 0.78rem; color: var(--text-hint); margin-top: 2px; }
+
+    /* ============================================================
+       TYPOGRAPHY UTILITIES
+       ============================================================ */
+    .text-blue   { color: var(--brand-blue); }
+    .text-green  { color: #2e7d32; }
+    .text-orange { color: #f57f17; }
+    .text-purple { color: #7b1fa2; }
+    .text-red    { color: var(--color-danger); }
+    .text-muted  { color: var(--text-muted); }
+    .text-hint   { color: var(--text-hint); }
+    .fw-bold     { font-weight: 700; }
+    .fw-600      { font-weight: 600; }
+    .fs-sm       { font-size: 0.82rem; }
+
+    /* ============================================================
+       LAYOUT UTILITIES
+       ============================================================ */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .flex-center  { display: flex; align-items: center; gap: 8px; }
+    .mt-4  { margin-top: 16px; }
+    .mt-6  { margin-top: 24px; }
+    .mb-4  { margin-bottom: 16px; }
+    .mb-6  { margin-bottom: 24px; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+
+    /* ============================================================
+       DEMO NAVIGATION TABS
+       ============================================================ */
+    .demo-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-header);
+      padding: 6px;
+      border-radius: var(--radius-md);
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .demo-tab {
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      transition: all 0.15s;
+    }
+    .demo-tab.active { background: #fff; color: var(--brand-primary); box-shadow: 0 1px 6px rgba(0,0,0,0.1); }
+    .demo-tab:hover:not(.active) { color: var(--text-body); }
+
+    .demo-section { display: none; }
+    .demo-section.active { display: block; }
+
+    /* ============================================================
+       ALERT / TOAST
+       ============================================================ */
+    .alert {
+      padding: 13px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .alert-success { background: #e8f5e9; color: #1b5e20; border-left: 4px solid #2e7d32; }
+    .alert-warning { background: #fff8e1; color: #e65100; border-left: 4px solid #f57f17; }
+    .alert-danger  { background: #fce4ec; color: #b71c1c; border-left: 4px solid var(--color-danger); }
+    .alert-info    { background: #e3f2fd; color: #0d47a1; border-left: 4px solid var(--brand-blue); }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title { font-size: 1.05rem; font-weight: 700; color: var(--brand-primary); }
+    .modal-close {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      background: var(--bg-header);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      transition: background 0.12s;
+    }
+    .modal-close:hover { background: var(--border-mid); }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-light); display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .topbar  { left: 0; }
+      .main-content { margin-left: 0; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 500px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon">
+      <i class="fas fa-bus-alt"></i>
+    </div>
+    <span class="sidebar-brand-text">TransitTN</span>
+  </div>
+
+  <!-- Main nav -->
+  <div class="sidebar-section-label">Main</div>
+  <ul class="sidebar-nav">
+    <li>
+      <a href="#" class="sidebar-link active">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+    </li>
+  </ul>
+
+  <!-- Admin section -->
+  <div class="sidebar-section-label">Admin</div>
+  <ul class="sidebar-nav">
+    <li>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-building"></i> Organizations
+        <span class="badge-count">12</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-handshake"></i> Partners
+        <span class="badge-count">8</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-file-contract"></i> Contracts
+        <span class="badge-count">3</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- User section (optionnel) -->
+  <div class="sidebar-section-label">Users</div>
+  <ul class="sidebar-nav">
+    <li>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-bus"></i> Operators
+      </a>
+    </li>
+    <li>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-users"></i> Partners View
+      </a>
+    </li>
+  </ul>
+</aside>
+
+<!-- ============================================================
+     TOPBAR
+     ============================================================ -->
+<nav class="topbar">
+  <div class="topbar-title">
+    <i class="fas fa-th-large" style="color:#1a73e8;margin-right:8px;"></i>
+    Backoffice Template
+  </div>
+  <div class="topbar-actions">
+    <div class="topbar-icon-btn">
+      <i class="fas fa-bell"></i>
+      <span class="topbar-badge"></span>
+    </div>
+    <div class="topbar-icon-btn">
+      <i class="fas fa-cog"></i>
+    </div>
+    <div class="topbar-user">
+      <div class="topbar-avatar">AD</div>
+      <div>
+        <div class="topbar-user-name">Admin</div>
+        <div class="topbar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main-content">
+
+  <!-- Demo navigation -->
+  <div class="demo-tabs">
+    <button class="demo-tab active" onclick="showSection('dashboard')">Dashboard</button>
+    <button class="demo-tab" onclick="showSection('list')">Data Table (List)</button>
+    <button class="demo-tab" onclick="showSection('form')">Form (Add/Edit)</button>
+    <button class="demo-tab" onclick="showSection('detail')">Detail View</button>
+    <button class="demo-tab" onclick="showSection('components')">UI Components</button>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SECTION: DASHBOARD                                       -->
+  <!-- ======================================================== -->
+  <div id="section-dashboard" class="demo-section active">
+
+    <!-- Page header -->
+    <div class="page-header mb-6">
+      <div>
+        <div class="breadcrumb"><a href="#">Home</a> <span>/</span> Dashboard</div>
+        <h1 class="page-title">🚌 Dashboard</h1>
+        <p class="page-subtitle">Vue d'ensemble de la plateforme TransitTN</p>
+      </div>
+      <div class="flex-center">
+        <span class="fs-sm text-hint"><i class="fas fa-clock"></i> Mis à jour à l'instant</span>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stats-grid">
+      <div class="stat-card stat-card-blue">
+        <div class="stat-card-header">
+          <div>
+            <div class="stat-card-value">12</div>
+            <div class="stat-card-label">Organizations</div>
+            <div class="stat-card-sub">10 active</div>
+          </div>
+          <i class="fas fa-building stat-card-icon"></i>
+        </div>
+        <div class="stat-card-footer">
+          <i class="fas fa-arrow-right"></i> View all
+        </div>
+      </div>
+
+      <div class="stat-card stat-card-green">
+        <div class="stat-card-header">
+          <div>
+            <div class="stat-card-value">8</div>
+            <div class="stat-card-label">Partners</div>
+            <div class="stat-card-sub">5 active · 2 pending</div>
+          </div>
+          <i class="fas fa-handshake stat-card-icon"></i>
+        </div>
+        <div class="stat-card-footer">
+          <i class="fas fa-arrow-right"></i> View all
+        </div>
+      </div>
+
+      <div class="stat-card stat-card-orange">
+        <div class="stat-card-header">
+          <div>
+            <div class="stat-card-value">24</div>
+            <div class="stat-card-label">Total Contracts</div>
+            <div class="stat-card-sub">6 draft</div>
+          </div>
+          <i class="fas fa-file-contract stat-card-icon"></i>
+        </div>
+        <div class="stat-card-footer">
+          <i class="fas fa-arrow-right"></i> View all
+        </div>
+      </div>
+
+      <div class="stat-card stat-card-purple">
+        <div class="stat-card-header">
+          <div>
+            <div class="stat-card-value">18</div>
+            <div class="stat-card-label">Active Contracts</div>
+            <div class="stat-card-sub">2 expired</div>
+          </div>
+          <i class="fas fa-check-circle stat-card-icon"></i>
+        </div>
+        <div class="stat-card-footer">
+          <i class="fas fa-arrow-right"></i> View all
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: detail cards -->
+    <div class="grid-3 mt-6">
+
+      <!-- Organizations breakdown -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fas fa-building text-blue"></i> Organizations by Type</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="margin-bottom:14px;">
+            <div class="flex-between mb-4"><span>PUBLIC</span><span class="fw-bold text-blue">7</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar progress-bar-blue" style="width:58%"></div></div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div class="flex-between mb-4"><span>PRIVATE</span><span class="fw-bold text-orange">4</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar progress-bar-orange" style="width:33%"></div></div>
+          </div>
+          <div>
+            <div class="flex-between mb-4"><span>MIXED</span><span class="fw-bold text-purple">1</span></div>
+            <div class="progress-bar-wrap"><div class="progress-bar progress-bar-purple" style="width:9%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Partners status -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-handshake text-green"></i> Partners by Status</div>
+        </div>
+        <div class="card-body">
+          <div class="mini-stats-grid">
+            <div class="mini-stat-box mini-stat-box-green">
+              <div class="mini-stat-value mini-stat-value-green">5</div>
+              <div class="mini-stat-label">ACTIVE</div>
+            </div>
+            <div class="mini-stat-box mini-stat-box-yellow">
+              <div class="mini-stat-value mini-stat-value-yellow">2</div>
+              <div class="mini-stat-label">PENDING</div>
+            </div>
+            <div class="mini-stat-box mini-stat-box-red">
+              <div class="mini-stat-value mini-stat-value-red">1</div>
+              <div class="mini-stat-label">SUSPENDED</div>
+            </div>
+            <div class="mini-stat-box mini-stat-box-blue">
+              <div class="mini-stat-value mini-stat-value-blue">8</div>
+              <div class="mini-stat-label">TOTAL</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-bolt text-orange"></i> Quick Actions</div>
+        </div>
+        <div class="card-body">
+          <div class="quick-actions">
+            <a href="#" class="quick-action-btn qa-blue">
+              <i class="fas fa-plus-circle"></i> New Organization
+            </a>
+            <a href="#" class="quick-action-btn qa-green">
+              <i class="fas fa-plus-circle"></i> New Partner
+            </a>
+            <a href="#" class="quick-action-btn qa-orange">
+              <i class="fas fa-plus-circle"></i> New Contract
+            </a>
+            <a href="#" class="quick-action-btn qa-purple">
+              <i class="fas fa-eye"></i> User View
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Recent contracts -->
+    <div class="card mt-6">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-clock text-purple"></i> Recent Contracts</div>
+        <a href="#" class="btn btn-outline btn-sm">View all <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div class="recent-item">
+        <div>
+          <div class="recent-item-main">#001 — INSTITUTIONAL</div>
+          <div class="recent-item-sub">Partner: Municipalité de Sfax</div>
+        </div>
+        <span class="status-badge status-active"><span class="status-dot"></span>ACTIVE</span>
+      </div>
+      <div class="recent-item">
+        <div>
+          <div class="recent-item-main">#002 — COMMERCIAL</div>
+          <div class="recent-item-sub">Partner: SICAME</div>
+        </div>
+        <span class="status-badge status-draft"><span class="status-dot"></span>DRAFT</span>
+      </div>
+      <div class="recent-item">
+        <div>
+          <div class="recent-item-main">#003 — COMMERCIAL</div>
+          <div class="recent-item-sub">Partner: Dokhan</div>
+        </div>
+        <span class="status-badge status-draft"><span class="status-dot"></span>DRAFT</span>
+      </div>
+    </div>
+
+  </div><!-- /section-dashboard -->
+
+
+  <!-- ======================================================== -->
+  <!-- SECTION: DATA TABLE (List)                               -->
+  <!-- ======================================================== -->
+  <div id="section-list" class="demo-section">
+
+    <div class="page-header mb-6">
+      <div>
+        <div class="breadcrumb"><a href="#">Admin</a> <span>/</span> Contracts</div>
+        <h1 class="page-title"><i class="fas fa-file-contract"></i> Contracts</h1>
+        <p class="page-subtitle">8 contracts total</p>
+      </div>
+      <a href="#" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Contract
+      </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="filter-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="filter-input" placeholder="Search..." style="width:220px;">
+      </div>
+      <select class="filter-select">
+        <option>All Types</option>
+        <option>COMMERCIAL</option>
+        <option>INSTITUTIONAL</option>
+        <option>TECHNICAL</option>
+      </select>
+      <select class="filter-select">
+        <option>All Statuses</option>
+        <option>ACTIVE</option>
+        <option>DRAFT</option>
+        <option>EXPIRED</option>
+      </select>
+      <button class="btn btn-outline btn-sm">
+        <i class="fas fa-filter"></i> More Filters
+      </button>
+    </div>
+
+    <!-- Table card -->
+    <div class="card">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>TYPE</th>
+              <th>STATUS</th>
+              <th>START DATE</th>
+              <th>END DATE</th>
+              <th>ORGANIZATION</th>
+              <th>PARTNER</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="cell-entity">
+                  <div class="cell-avatar cell-avatar-purple"><i class="fas fa-file-contract"></i></div>
+                  <span class="cell-entity-name">INSTITUTIONAL</span>
+                </div>
+              </td>
+              <td><span class="status-badge status-active"><span class="status-dot"></span>ACTIVE</span></td>
+              <td class="cell-date"><i class="fas fa-calendar-alt text-blue"></i>01/01/2025</td>
+              <td class="cell-date"><i class="fas fa-calendar-check text-green"></i>31/12/2026</td>
+              <td><span class="cell-tag cell-tag-blue"><i class="fas fa-building"></i> SNTRI</span></td>
+              <td><span class="cell-tag cell-tag-green"><i class="fas fa-handshake"></i> Municipalité de Sfax</span></td>
+              <td>
+                <div class="cell-actions">
+                  <button class="btn-icon btn-icon-view" title="View"><i class="fas fa-eye"></i></button>
+                  <button class="btn-icon btn-icon-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                  <button class="btn-icon btn-icon-delete" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="cell-entity">
+                  <div class="cell-avatar cell-avatar-purple"><i class="fas fa-file-contract"></i></div>
+                  <span class="cell-entity-name">INSTITUTIONAL</span>
+                </div>
+              </td>
+              <td><span class="status-badge status-active"><span class="status-dot"></span>ACTIVE</span></td>
+              <td class="cell-date"><i class="fas fa-calendar-alt text-blue"></i>01/01/2025</td>
+              <td class="cell-date"><i class="fas fa-calendar-check text-green"></i>31/12/2026</td>
+              <td><span class="cell-tag cell-tag-blue"><i class="fas fa-building"></i> SNTRI</span></td>
+              <td><span class="cell-tag cell-tag-green"><i class="fas fa-handshake"></i> Municipalité de Sfax</span></td>
+              <td>
+                <div class="cell-actions">
+                  <button class="btn-icon btn-icon-view" title="View"><i class="fas fa-eye"></i></button>
+                  <button class="btn-icon btn-icon-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                  <button class="btn-icon btn-icon-delete" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="cell-entity">
+                  <div class="cell-avatar cell-avatar-blue"><i class="fas fa-file-contract"></i></div>
+                  <span class="cell-entity-name">COMMERCIAL</span>
+                </div>
+              </td>
+              <td><span class="status-badge status-draft"><span class="status-dot"></span>DRAFT</span></td>
+              <td class="cell-date"><i class="fas fa-calendar-alt text-blue"></i>08/04/2026</td>
+              <td class="cell-date"><i class="fas fa-calendar-check text-green"></i>08/04/2027</td>
+              <td><span class="cell-tag cell-tag-blue"><i class="fas fa-building"></i> SNTRI</span></td>
+              <td><span class="cell-tag cell-tag-green"><i class="fas fa-handshake"></i> SICAME</span></td>
+              <td>
+                <div class="cell-actions">
+                  <button class="btn-icon btn-icon-view" title="View"><i class="fas fa-eye"></i></button>
+                  <button class="btn-icon btn-icon-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                  <button class="btn-icon btn-icon-delete" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="cell-entity">
+                  <div class="cell-avatar cell-avatar-blue"><i class="fas fa-file-contract"></i></div>
+                  <span class="cell-entity-name">COMMERCIAL</span>
+                </div>
+              </td>
+              <td><span class="status-badge status-draft"><span class="status-dot"></span>DRAFT</span></td>
+              <td class="cell-date"><i class="fas fa-calendar-alt text-blue"></i>10/04/2026</td>
+              <td class="cell-date"><i class="fas fa-calendar-check text-green"></i>10/04/2027</td>
+              <td><span class="cell-tag cell-tag-blue"><i class="fas fa-building"></i> SNTRI</span></td>
+              <td><span class="cell-tag cell-tag-green"><i class="fas fa-handshake"></i> Dokhan</span></td>
+              <td>
+                <div class="cell-actions">
+                  <button class="btn-icon btn-icon-view" title="View"><i class="fas fa-eye"></i></button>
+                  <button class="btn-icon btn-icon-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                  <button class="btn-icon btn-icon-delete" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="cell-entity">
+                  <div class="cell-avatar cell-avatar-blue"><i class="fas fa-file-contract"></i></div>
+                  <span class="cell-entity-name">COMMERCIAL</span>
+                </div>
+              </td>
+              <td><span class="status-badge status-expired"><span class="status-dot"></span>EXPIRED</span></td>
+              <td class="cell-date"><i class="fas fa-calendar-alt text-blue"></i>10/04/2024</td>
+              <td class="cell-date"><i class="fas fa-calendar-check text-green"></i>10/04/2025</td>
+              <td><span class="cell-muted">—</span></td>
+              <td><span class="cell-tag cell-tag-green"><i class="fas fa-handshake"></i> STEG</span></td>
+              <td>
+                <div class="cell-actions">
+                  <button class="btn-icon btn-icon-view" title="View"><i class="fas fa-eye"></i></button>
+                  <button class="btn-icon btn-icon-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                  <button class="btn-icon btn-icon-delete" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <div class="pagination-info">Page 1 of 2 — 8 items</div>
+        <div class="pagination-controls">
+          <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section-list -->
+
+
+  <!-- ======================================================== -->
+  <!-- SECTION: FORM                                            -->
+  <!-- ======================================================== -->
+  <div id="section-form" class="demo-section">
+
+    <div class="page-header mb-6">
+      <div>
+        <div class="breadcrumb"><a href="#">Admin</a> <span>/</span> <a href="#">Contracts</a> <span>/</span> New</div>
+        <h1 class="page-title"><i class="fas fa-plus-circle text-blue"></i> Add Contract</h1>
+      </div>
+      <div class="flex-center">
+        <button class="btn btn-outline"><i class="fas fa-times"></i> Cancel</button>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle"></i>
+      Fill all required fields before submitting. Fields marked with <strong>*</strong> are mandatory.
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-file-contract text-blue"></i> Contract Information</div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Contract Type <span class="required">*</span></label>
+            <select class="form-control">
+              <option value="">— Select type —</option>
+              <option>COMMERCIAL</option>
+              <option>INSTITUTIONAL</option>
+              <option>TECHNICAL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status <span class="required">*</span></label>
+            <select class="form-control">
+              <option>DRAFT</option>
+              <option>ACTIVE</option>
+              <option>EXPIRED</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Start Date <span class="required">*</span></label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date <span class="required">*</span></label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Organization</label>
+            <select class="form-control">
+              <option value="">— Select organization —</option>
+              <option>SNTRI</option>
+              <option>TRANSTU</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Partner</label>
+            <select class="form-control">
+              <option value="">— Select partner —</option>
+              <option>Municipalité de Sfax</option>
+              <option>SICAME</option>
+              <option>Dokhan</option>
+              <option>STEG</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group mt-6">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" rows="4" placeholder="Optional notes about this contract..."></textarea>
+          <div class="form-hint">Max 500 characters.</div>
+        </div>
+      </div>
+      <div class="card-footer" style="display:flex;gap:12px;justify-content:flex-end;">
+        <button class="btn btn-outline"><i class="fas fa-times"></i> Cancel</button>
+        <button class="btn btn-primary"><i class="fas fa-save"></i> Save Contract</button>
+      </div>
+    </div>
+
+    <!-- Example: form with validation errors -->
+    <div class="card mt-6">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-exclamation-triangle text-orange"></i> Form Validation Example</div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Email <span class="required">*</span></label>
+            <input type="text" class="form-control error" value="invalid-email">
+            <div class="form-error"><i class="fas fa-exclamation-circle"></i> Please enter a valid email address.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-control" placeholder="+216 XX XXX XXX">
+            <div class="form-hint">Format: +216 followed by 8 digits.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section-form -->
+
+
+  <!-- ======================================================== -->
+  <!-- SECTION: DETAIL VIEW                                     -->
+  <!-- ======================================================== -->
+  <div id="section-detail" class="demo-section">
+
+    <div class="page-header mb-6">
+      <div>
+        <div class="breadcrumb"><a href="#">Admin</a> <span>/</span> <a href="#">Organizations</a> <span>/</span> SNTRI</div>
+        <h1 class="page-title"><i class="fas fa-building text-blue"></i> SNTRI</h1>
+        <p class="page-subtitle">Société Nationale de Transport Interurbain</p>
+      </div>
+      <div class="flex-center">
+        <button class="btn btn-outline"><i class="fas fa-edit"></i> Edit</button>
+        <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-info-circle text-blue"></i> General Info</div>
+          <span class="status-badge status-active"><span class="status-dot"></span>ACTIVE</span>
+        </div>
+        <div class="card-body">
+          <div class="detail-grid">
+            <div class="detail-field">
+              <div class="detail-label">Organization Name</div>
+              <div class="detail-value">SNTRI</div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Type</div>
+              <div class="detail-value"><span class="cell-tag cell-tag-blue">PUBLIC</span></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Coverage</div>
+              <div class="detail-value">🚌 BUS · 🚂 TRAIN</div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Region</div>
+              <div class="detail-value">National</div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Created</div>
+              <div class="detail-value">01/01/2024</div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Updated</div>
+              <div class="detail-value">10/04/2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-chart-bar text-purple"></i> Statistics</div>
+        </div>
+        <div class="card-body">
+          <div class="mini-stats-grid">
+            <div class="mini-stat-box mini-stat-box-blue">
+              <div class="mini-stat-value mini-stat-value-blue">24</div>
+              <div class="mini-stat-label">CONTRACTS</div>
+            </div>
+            <div class="mini-stat-box mini-stat-box-green">
+              <div class="mini-stat-value mini-stat-value-green">18</div>
+              <div class="mini-stat-label">ACTIVE</div>
+            </div>
+            <div class="mini-stat-box mini-stat-box-yellow">
+              <div class="mini-stat-value mini-stat-value-yellow">4</div>
+              <div class="mini-stat-label">DRAFT</div>
+            </div>
+            <div class="mini-stat-box mini-stat-box-red">
+              <div class="mini-stat-value mini-stat-value-red">2</div>
+              <div class="mini-stat-label">EXPIRED</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section-detail -->
+
+
+  <!-- ======================================================== -->
+  <!-- SECTION: UI COMPONENTS                                   -->
+  <!-- ======================================================== -->
+  <div id="section-components" class="demo-section">
+
+    <div class="page-header mb-6">
+      <h1 class="page-title">UI Components Reference</h1>
+      <p class="page-subtitle">All components reusable from template</p>
+    </div>
+
+    <!-- Buttons -->
+    <div class="card mb-6">
+      <div class="card-header"><div class="card-title">Buttons</div></div>
+      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Primary</button>
+        <button class="btn btn-success"><i class="fas fa-check"></i> Success</button>
+        <button class="btn btn-danger"><i class="fas fa-trash"></i> Danger</button>
+        <button class="btn btn-outline"><i class="fas fa-times"></i> Outline</button>
+        <button class="btn btn-primary btn-sm">Small Primary</button>
+        <button class="btn btn-outline btn-sm">Small Outline</button>
+        <button class="btn-icon btn-icon-edit"><i class="fas fa-edit"></i></button>
+        <button class="btn-icon btn-icon-delete"><i class="fas fa-trash"></i></button>
+        <button class="btn-icon btn-icon-view"><i class="fas fa-eye"></i></button>
+      </div>
+    </div>
+
+    <!-- Status badges -->
+    <div class="card mb-6">
+      <div class="card-header"><div class="card-title">Status Badges</div></div>
+      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+        <span class="status-badge status-active"><span class="status-dot"></span>ACTIVE</span>
+        <span class="status-badge status-draft"><span class="status-dot"></span>DRAFT</span>
+        <span class="status-badge status-pending"><span class="status-dot"></span>PENDING</span>
+        <span class="status-badge status-expired"><span class="status-dot"></span>EXPIRED</span>
+        <span class="status-badge status-suspended"><span class="status-dot"></span>SUSPENDED</span>
+        <span class="status-badge status-inactive"><span class="status-dot"></span>INACTIVE</span>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="card mb-6">
+      <div class="card-header"><div class="card-title">Cell Tags</div></div>
+      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+        <span class="cell-tag cell-tag-blue"><i class="fas fa-building"></i> Organization</span>
+        <span class="cell-tag cell-tag-green"><i class="fas fa-handshake"></i> Partner</span>
+        <span class="cell-tag cell-tag-orange"><i class="fas fa-file-contract"></i> Contract</span>
+        <span class="cell-tag cell-tag-purple"><i class="fas fa-bus"></i> Operator</span>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="card mb-6">
+      <div class="card-header"><div class="card-title">Alerts</div></div>
+      <div class="card-body">
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> Operation completed successfully!</div>
+        <div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> This action may have unintended consequences.</div>
+        <div class="alert alert-danger"><i class="fas fa-times-circle"></i> An error occurred. Please try again.</div>
+        <div class="alert alert-info" style="margin-bottom:0;"><i class="fas fa-info-circle"></i> Some information for the user.</div>
+      </div>
+    </div>
+
+    <!-- Stat cards mini -->
+    <div class="card mb-6">
+      <div class="card-header"><div class="card-title">Stat Cards (all variants)</div></div>
+      <div class="card-body">
+        <div class="stats-grid">
+          <div class="stat-card stat-card-blue">
+            <div class="stat-card-header">
+              <div><div class="stat-card-value">12</div><div class="stat-card-label">Blue</div></div>
+              <i class="fas fa-building stat-card-icon"></i>
+            </div>
+          </div>
+          <div class="stat-card stat-card-green">
+            <div class="stat-card-header">
+              <div><div class="stat-card-value">8</div><div class="stat-card-label">Green</div></div>
+              <i class="fas fa-handshake stat-card-icon"></i>
+            </div>
+          </div>
+          <div class="stat-card stat-card-orange">
+            <div class="stat-card-header">
+              <div><div class="stat-card-value">24</div><div class="stat-card-label">Orange</div></div>
+              <i class="fas fa-file-contract stat-card-icon"></i>
+            </div>
+          </div>
+          <div class="stat-card stat-card-purple">
+            <div class="stat-card-header">
+              <div><div class="stat-card-value">5</div><div class="stat-card-label">Purple</div></div>
+              <i class="fas fa-check-circle stat-card-icon"></i>
+            </div>
+          </div>
+          <div class="stat-card stat-card-teal">
+            <div class="stat-card-header">
+              <div><div class="stat-card-value">3</div><div class="stat-card-label">Teal</div></div>
+              <i class="fas fa-map-marker-alt stat-card-icon"></i>
+            </div>
+          </div>
+          <div class="stat-card stat-card-red">
+            <div class="stat-card-header">
+              <div><div class="stat-card-value">1</div><div class="stat-card-label">Red</div></div>
+              <i class="fas fa-times-circle stat-card-icon"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal example (static) -->
+    <div class="card mb-6">
+      <div class="card-header"><div class="card-title">Modal (static preview)</div></div>
+      <div class="card-body" style="background:#f0f2f5;border-radius:8px;padding:20px;">
+        <div class="modal" style="position:relative;z-index:1;">
+          <div class="modal-header">
+            <div class="modal-title"><i class="fas fa-trash text-red"></i> Confirm Delete</div>
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this contract? This action cannot be undone.</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline">Cancel</button>
+            <button class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section-components -->
+
+</main>
+
+<script>
+  function showSection(name) {
+    document.querySelectorAll('.demo-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+</script>
+</body>
+</html>

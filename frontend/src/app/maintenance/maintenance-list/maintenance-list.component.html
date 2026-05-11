@@ -1,0 +1,56 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold">Maintenance Orders</h4>
+    <a routerLink="/admin/maintenance/new" class="btn btn-warning btn-sm">
+      <i class="bi bi-plus"></i> Add Order
+    </a>
+  </div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Vehicle</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Scheduled Date</th>
+            <th>Technician</th>
+            <th>Cost</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let o of orders">
+            <td>{{ o.vehicle.plateNumber }} - {{ o.vehicle.brand }}</td>
+            <td>
+              <span class="badge"
+                [class.bg-primary]="o.type==='PREVENTIVE'"
+                [class.bg-danger]="o.type==='CORRECTIVE'">
+                {{ o.type }}
+              </span>
+            </td>
+            <td>
+              <span class="badge"
+                [class.bg-warning]="o.status==='PENDING'"
+                [class.bg-info]="o.status==='IN_PROGRESS'"
+                [class.bg-success]="o.status==='DONE'">
+                {{ o.status }}
+              </span>
+            </td>
+            <td>{{ o.scheduledDate }}</td>
+            <td>{{ o.technicianName }}</td>
+            <td>{{ o.cost }} TND</td>
+            <td>
+              <a [routerLink]="['/admin/maintenance/edit', o.id]"
+                 class="btn btn-sm btn-outline-primary me-1">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button (click)="delete(o.id!)"
+                      class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>

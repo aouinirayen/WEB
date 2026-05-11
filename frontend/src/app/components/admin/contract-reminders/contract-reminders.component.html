@@ -1,0 +1,236 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 style="color:#1a237e; font-weight:700;">
+        <i class="fas fa-bell mr-2"></i> Contract Reminders
+      </h3>
+      <p class="text-muted">Monitoring contracts expiring soon</p>
+    </div>
+    <button class="btn btn-primary" (click)="openConfirmModal()" [disabled]="triggerLoading">
+      <i class="fas fa-paper-plane mr-2"></i>
+      {{ triggerLoading ? 'Sending...' : 'Send Email Reminders' }}
+    </button>
+  </div>
+
+  <!-- Trigger Result -->
+  <div *ngIf="triggerResult" class="alert alert-success mb-4">
+    <i class="fas fa-check-circle mr-2"></i>
+    {{ triggerResult.message }} - {{ triggerResult.timestamp | date:'dd/MM/yyyy HH:mm' }}
+  </div>
+
+  <!-- Filter -->
+  <div class="card mb-4">
+    <div class="card-body d-flex align-items-center gap-3">
+      <label class="mb-0 font-weight-bold">Show contracts expiring in:</label>
+      <select class="form-control" style="width:150px" [(ngModel)]="days" (change)="loadExpiringContracts()">
+        <option [value]="7">7 days</option>
+        <option [value]="15">15 days</option>
+        <option [value]="30">30 days</option>
+        <option [value]="90">90 days</option>
+        <option [value]="365">365 days</option>
+      </select>
+      <button class="btn btn-outline-primary btn-sm" (click)="loadExpiringContracts()">
+        <i class="fas fa-sync mr-1"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4" *ngIf="data">
+    <div class="col-md-3">
+      <div class="card text-center" style="border-left:4px solid #1a73e8;">
+        <div class="card-body">
+          <h2 style="color:#1a73e8; font-weight:700;">{{ data.total }}</h2>
+          <p class="text-muted mb-0">Total contracts</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center" style="border-left:4px solid #d32f2f;">
+        <div class="card-body">
+          <h2 style="color:#d32f2f; font-weight:700;">{{ data.high }}</h2>
+          <p class="text-muted mb-0">Urgent (=7d)</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center" style="border-left:4px solid #f57c00;">
+        <div class="card-body">
+          <h2 style="color:#f57c00; font-weight:700;">{{ data.medium }}</h2>
+          <p class="text-muted mb-0">Important (=15d)</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center" style="border-left:4px solid #2e7d32;">
+        <div class="card-body">
+          <h2 style="color:#2e7d32; font-weight:700;">{{ data.low }}</h2>
+          <p class="text-muted mb-0">Normal (=30d)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:#1a73e8;"></i>
+    <p class="mt-2 text-muted">Loading...</p>
+  </div>
+
+  <!-- Contracts List -->
+  <div class="card" *ngIf="data && !loading">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-list mr-2"></i>
+        Contracts expiring in the next {{ days }} days
+        <span class="badge badge-primary ml-2">{{ data.total }}</span>
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      <div *ngIf="data.contracts?.length === 0" class="text-center py-5 text-muted">
+        <i class="fas fa-check-circle" style="font-size:3rem; color:#2e7d32;"></i>
+        <p class="mt-3">No contracts expire within the next {{ days }} days!</p>
+      </div>
+      <table class="table table-hover mb-0" *ngIf="data.contracts?.length > 0">
+        <thead style="background:#f8f9ff;">
+          <tr>
+            <th>URGENCY</th>
+            <th>PARTNER</th>
+            <th>ORGANIZATION</th>
+            <th>EXPIRATION DATE</th>
+            <th>DAYS LEFT</th>
+            <th>STATUS</th>
+            <th>EMAIL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let contract of data.contracts">
+            <td>
+              <span class="badge" 
+                [style.background]="getUrgencyBg(contract.urgency)"
+                [style.color]="getUrgencyColor(contract.urgency)"
+                style="padding:6px 12px; border-radius:20px; font-weight:600;">
+                
+                {{ contract.urgency }}
+              </span>
+            </td>
+            <td><strong>{{ contract.partnerName }}</strong></td>
+            <td>{{ contract.organizationName }}</td>
+            <td>{{ contract.endDate | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <strong [style.color]="getUrgencyColor(contract.urgency)">
+                {{ contract.daysLeft }} days
+              </strong>
+            </td>
+            <td>
+              <span class="badge" 
+                [class.badge-success]="contract.status === 'ACTIVE'"
+                [class.badge-warning]="contract.status === 'DRAFT'">
+                {{ contract.status }}
+              </span>
+            </td>
+            <td>
+              <small class="text-muted">{{ contract.partnerEmail }}</small>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<!-- Confirm Send Modal -->
+<div *ngIf="showConfirmModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:500px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#1a237e,#1a73e8); border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="font-size:2.5rem; margin-bottom:8px;"><i class="fas fa-envelope" style="color:white;"></i></div>
+      <h4 style="color:white; margin:0; font-weight:700;">Send Email Reminders</h4>
+      <p style="color:rgba(255,255,255,0.8); margin:5px 0 0; font-size:0.9rem;">Confirmation required</p>
+    </div>
+
+    <div style="background:#e3f2fd; border:1px solid #90caf9; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p style="color:#1a237e; margin:0; font-weight:600; text-align:center;">
+        Are you sure you want to send reminder emails to all partners with expiring contracts?
+      </p>
+      <p style="color:#555; margin:10px 0 0; font-size:0.85rem; text-align:center;">
+        <strong>{{ data?.high || 0 }} urgent</strong> +
+        <strong>{{ data?.medium || 0 }} important</strong> +
+        <strong>{{ data?.low || 0 }} normal</strong> reminders will be sent
+      </p>
+    </div>
+
+    <div style="background:#fff3e0; border:1px solid #ffcc80; border-radius:8px; padding:12px; margin-bottom:20px;">
+      <p style="color:#e65100; margin:0; font-size:0.85rem;">
+        <i class="fas fa-info-circle mr-1"></i>
+        Emails will be sent via Gmail SMTP. This may take a few seconds depending on the number of recipients.
+      </p>
+    </div>
+
+    <div style="display:flex; gap:10px;">
+      <button (click)="showConfirmModal=false" class="btn btn-secondary" style="flex:1;">
+        <i class="fas fa-times mr-1"></i> Cancel
+      </button>
+      <button (click)="confirmSendReminders()" class="btn btn-primary" style="flex:1;">
+        <i class="fas fa-paper-plane mr-1"></i> Send Emails
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div *ngIf="showSuccessModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:500px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#1b5e20,#2e7d32); border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="font-size:2.5rem; margin-bottom:8px;"><i class="fas fa-check-circle" style="color:white;"></i></div>
+      <h4 style="color:white; margin:0; font-weight:700;">Emails Sent Successfully</h4>
+    </div>
+
+    <div style="background:#e8f5e9; border:1px solid #c8e6c9; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p style="color:#1b5e20; margin:0; font-weight:600; text-align:center;">
+        <i class="fas fa-paper-plane mr-2"></i>{{ successMessage }}
+      </p>
+    </div>
+
+    <button (click)="showSuccessModal=false" class="btn btn-success w-100">
+      <i class="fas fa-check mr-2"></i> Close
+    </button>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div *ngIf="showErrorModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:500px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#b71c1c,#d32f2f); border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="font-size:2.5rem; margin-bottom:8px;"><i class="fas fa-times-circle" style="color:white;"></i></div>
+      <h4 style="color:white; margin:0; font-weight:700;">Error Sending Emails</h4>
+    </div>
+
+    <div style="background:#ffebee; border:1px solid #ffcdd2; border-radius:8px; padding:15px; margin-bottom:20px;">
+      <p style="color:#c62828; margin:0; font-weight:600;">
+        <i class="fas fa-exclamation-circle mr-2"></i>{{ errorMessage }}
+      </p>
+    </div>
+
+    <button (click)="showErrorModal=false" class="btn btn-danger w-100">
+      <i class="fas fa-times mr-2"></i> Close
+    </button>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div *ngIf="triggerLoading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:40px; text-align:center;">
+    <div class="spinner-border text-primary" style="width:3rem; height:3rem;" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <h5 style="color:#1a237e; margin-top:20px;">Sending reminder emails...</h5>
+    <p class="text-muted mb-0">Please wait, this may take a moment</p>
+  </div>
+</div>

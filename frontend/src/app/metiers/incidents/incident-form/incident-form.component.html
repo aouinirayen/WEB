@@ -1,0 +1,88 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold">{{ isEdit ? 'Edit' : 'Report' }} Incident</h4>
+  <a routerLink="/incidents" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
+</div>
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form (ngSubmit)="save()">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Vehicle</label>
+          <select class="form-select" [(ngModel)]="incident.vehicle" name="vehicle"
+                  required [compareWith]="compareById">
+            <option *ngFor="let v of vehicles" [ngValue]="v">
+              {{ v.plateNumber }} — {{ v.brand }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Line (optional)</label>
+          <select class="form-select" [(ngModel)]="incident.line" name="line"
+                  [compareWith]="compareById">
+            <option [ngValue]="null">— None —</option>
+            <option *ngFor="let l of lines" [ngValue]="l">
+              {{ l.code }} — {{ l.name }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Incident Type</label>
+          <select class="form-select" [(ngModel)]="incident.type" name="type">
+            <option>BREAKDOWN</option>
+            <option>ACCIDENT</option>
+            <option>DELAY</option>
+            <option>PASSENGER_ISSUE</option>
+            <option>OTHER</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Severity</label>
+          <select class="form-select" [(ngModel)]="incident.severity" name="severity">
+            <option>LOW</option>
+            <option>MEDIUM</option>
+            <option>HIGH</option>
+            <option>CRITICAL</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="incident.status" name="status">
+            <option>OPEN</option>
+            <option>IN_PROGRESS</option>
+            <option>RESOLVED</option>
+            <option>CLOSED</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Reported By</label>
+          <input class="form-control" [(ngModel)]="incident.reportedBy"
+                 name="reportedBy" required placeholder="ex: Mohamed Trabelsi">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Reported At</label>
+          <input type="datetime-local" class="form-control"
+                 [(ngModel)]="incident.reportedAt" name="reportedAt" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Resolved At (optional)</label>
+          <input type="datetime-local" class="form-control"
+                 [(ngModel)]="incident.resolvedAt" name="resolvedAt">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" [(ngModel)]="incident.description"
+                    name="description" rows="3" required
+                    placeholder="Describe what happened..."></textarea>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-danger me-2">
+          {{ isEdit ? 'Update' : 'Submit Report' }}
+        </button>
+        <a routerLink="/incidents" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

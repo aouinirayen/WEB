@@ -1,0 +1,34 @@
+<div style="border-radius:12px; overflow:hidden; border:2px solid #e3f2fd;">
+  <div style="padding:15px; background:#f8f9ff;">
+    <label style="font-weight:600; color:#1a237e; margin-bottom:10px; display:block;">
+      Select a Governorate
+    </label>
+    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+      <button *ngFor="let gov of governorates"
+              (click)="selectGovernorate(gov)"
+              [style.background]="selectedGovernorate === gov ? '#1a73e8' : '#e3f2fd'"
+              [style.color]="selectedGovernorate === gov ? 'white' : '#1a73e8'"
+              style="padding:5px 12px; border-radius:20px; font-size:0.8rem;
+                     border:none; cursor:pointer; font-weight:500;">
+        {{ gov }}
+      </button>
+    </div>
+  </div>
+  <div style="width:100%; height:400px; position:relative; background:#f0f0f0;">
+    <a *ngIf="mapImageUrl" [href]="mapLink" target="_blank" style="display:block; width:100%; height:100%;">
+      <img [src]="mapImageUrl" 
+           style="width:100%; height:100%; object-fit:cover;" 
+           alt="Map of {{selectedGovernorate}}" />
+    </a>
+    <div *ngIf="!mapImageUrl"
+         style="height:100%; display:flex; align-items:center;
+                justify-content:center; color:#999; font-size:0.9rem;">
+      Select a governorate to see the map
+    </div>
+  </div>
+  <div *ngIf="selectedGovernorate" 
+       style="padding:10px 15px; background:#f8f9ff; font-size:0.85rem; color:#555; border-top:1px solid #e3f2fd;">
+    <i class="fas fa-map-marker-alt" style="color:#1a73e8;"></i>
+    Cliquez sur la carte pour selectionner &mdash; <strong>{{ selectedCoords }}</strong>
+  </div>
+</div>

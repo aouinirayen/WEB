@@ -1,0 +1,141 @@
+<div class="topbar">
+  <div class="topbar-left">
+    <h4 class="page-title">Dashboard</h4>
+    <p class="page-sub">{{ today }} — Network overview</p>
+  </div>
+  <div class="topbar-right">
+    <a routerLink="/vehicles/new" class="btn btn-dark btn-sm">
+      <i class="bi bi-plus me-1"></i>Add Vehicle
+    </a>
+  </div>
+</div>
+
+<div class="stats-grid mb-3">
+  <div class="stat-card blue">
+    <div class="stat-label">Total Vehicles</div>
+    <div class="stat-value">{{ stats.totalVehicles }}</div>
+    <div class="stat-sub up"><i class="bi bi-arrow-up-short"></i>{{ stats.activeVehicles }} active</div>
+    <i class="bi bi-bus-front stat-icon"></i>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">Active Lines</div>
+    <div class="stat-value">{{ stats.activeLines }}</div>
+    <div class="stat-sub info">of {{ stats.totalLines }} total</div>
+    <i class="bi bi-map stat-icon"></i>
+  </div>
+  <div class="stat-card amber">
+    <div class="stat-label">Pending Maintenance</div>
+    <div class="stat-value">{{ stats.pendingMaintenance }}</div>
+    <div class="stat-sub warn"><i class="bi bi-exclamation-triangle"></i> needs attention</div>
+    <i class="bi bi-tools stat-icon"></i>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-label">Total Trips</div>
+    <div class="stat-value">{{ stats.totalTrips }}</div>
+    <div class="stat-sub info">all time</div>
+    <i class="bi bi-arrow-left-right stat-icon"></i>
+  </div>
+</div>
+
+<div class="bottom-grid">
+  <div class="dash-card">
+    <div class="dash-card-header">
+      <span class="dash-card-title">Quick Actions</span>
+    </div>
+    <div class="dash-card-body">
+      <div class="actions-grid">
+        <a routerLink="/vehicles/new" class="action-btn">
+          <div class="action-icon" style="background:#eff6ff"><i class="bi bi-bus-front text-primary"></i></div>
+          <div class="action-text">
+            <div class="label">Add Vehicle</div>
+            <div class="desc">Register new fleet</div>
+          </div>
+        </a>
+        <a routerLink="/maintenance/new" class="action-btn">
+          <div class="action-icon" style="background:#fef9c3"><i class="bi bi-tools text-warning"></i></div>
+          <div class="action-text">
+            <div class="label">Maintenance</div>
+            <div class="desc">Schedule order</div>
+          </div>
+        </a>
+        <a routerLink="/lines/new" class="action-btn">
+          <div class="action-icon" style="background:#f0fdf4"><i class="bi bi-map text-success"></i></div>
+          <div class="action-text">
+            <div class="label">Add Line</div>
+            <div class="desc">New route</div>
+          </div>
+        </a>
+        <a routerLink="/drivers/new" class="action-btn">
+          <div class="action-icon" style="background:#fdf4ff"><i class="bi bi-person-badge" style="color:#8b5cf6"></i></div>
+          <div class="action-text">
+            <div class="label">Add Driver</div>
+            <div class="desc">Register driver</div>
+          </div>
+        </a>
+        <a routerLink="/fuel-logs/new" class="action-btn">
+          <div class="action-icon" style="background:#fff7ed"><i class="bi bi-fuel-pump text-warning"></i></div>
+          <div class="action-text">
+            <div class="label">Fuel Log</div>
+            <div class="desc">Log a fill-up</div>
+          </div>
+        </a>
+        <a routerLink="/incidents/new" class="action-btn">
+          <div class="action-icon" style="background:#fef2f2"><i class="bi bi-exclamation-triangle text-danger"></i></div>
+          <div class="action-text">
+            <div class="label">Report Incident</div>
+            <div class="desc">New report</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <span class="dash-card-title">Recent Vehicles</span>
+        <a routerLink="/vehicles" class="see-all">See all →</a>
+      </div>
+      <div class="dash-card-body">
+        <div class="vehicle-list">
+          <div class="vehicle-row" *ngFor="let v of recentVehicles">
+            <div class="vehicle-info">
+              <span class="vehicle-plate">{{ v.plateNumber }}</span>
+              <span class="vehicle-brand">{{ v.brand }} {{ v.type }}</span>
+            </div>
+            <span
+              class="status-pill"
+              [class.pill-active]="v.status === 'ACTIVE'"
+              [class.pill-maint]="v.status === 'IN_MAINTENANCE'"
+              [class.pill-inactive]="v.status === 'INACTIVE'"
+            >
+              {{ v.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-card mt-3">
+      <div class="dash-card-header">
+        <span class="dash-card-title">Maintenance Alerts</span>
+        <a routerLink="/maintenance" class="see-all">See all →</a>
+      </div>
+      <div class="dash-card-body py-0">
+        <div class="alert-list">
+          <div class="alert-item" *ngFor="let m of pendingMaintenances">
+            <div class="alert-dot" [class.dot-red]="m.type === 'CORRECTIVE'" [class.dot-amber]="m.type === 'PREVENTIVE'"></div>
+            <div class="alert-text">
+              <div class="title">{{ m.type }} — {{ m.vehicle?.plateNumber }}</div>
+              <div class="time">{{ m.scheduledDate | date:'mediumDate' }} · {{ m.technicianName }}</div>
+            </div>
+          </div>
+          <div *ngIf="pendingMaintenances.length === 0" class="py-2 text-muted" style="font-size:13px">
+            No pending maintenance orders.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,113 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-box-header">
+      <div class="modal-box-title">
+        <i class="fas" [ngClass]="mode === 'create' ? 'fa-user-plus' : 'fa-user-edit'"></i>
+        {{ mode === 'create' ? 'Add New User' : 'Edit User' }}
+      </div>
+      <button type="button" class="modal-close-btn" (click)="closeModal()" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-box-body">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <!-- Avatar Upload -->
+        <div class="form-group">
+          <label class="form-label">Profile Photo</label>
+          <div style="display: grid; grid-template-columns: 100px 1fr; gap: 20px;">
+            <div style="width: 100px; height: 100px; border-radius: 8px; background: linear-gradient(135deg, #e3f2fd, #bbdefb); display: flex; align-items: center; justify-content: center; overflow: hidden;"
+                 [ngStyle]="{ 'background-image': avatarPreview ? 'url(' + avatarPreview + ')' : 'none', 'background-size': 'cover', 'background-position': 'center' }">
+              <i *ngIf="!avatarPreview" class="fas fa-user" style="font-size: 2rem; color: #1a73e8; opacity: 0.5;"></i>
+            </div>
+            <div>
+              <label class="btn btn-primary btn-sm" for="photoUpload" style="margin-bottom: 8px;">
+                <i class="fas fa-cloud-upload-alt"></i>
+                Upload Photo
+              </label>
+              <input id="photoUpload" type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+              <p style="font-size: 0.82rem; color: #999; margin-top: 8px;">JPG, PNG or GIF (Max 5MB)</p>
+              <small class="form-error" *ngIf="fileError">{{ fileError }}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+          <!-- Username -->
+          <div class="form-group">
+            <label for="username" class="form-label">Username <span class="required">*</span></label>
+            <input id="username" type="text" class="form-control" formControlName="username" placeholder="Enter username" />
+            <small class="form-error" *ngIf="form.get('username')?.invalid && form.get('username')?.touched">
+              Username is required and must be at least 3 characters.
+            </small>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email <span class="required">*</span></label>
+            <input id="email" type="email" class="form-control" formControlName="email" placeholder="user@example.com" />
+            <small class="form-error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+              Please enter a valid email address.
+            </small>
+          </div>
+
+          <!-- Full Name -->
+          <div class="form-group">
+            <label for="name" class="form-label">Full Name <span class="required">*</span></label>
+            <input id="name" type="text" class="form-control" formControlName="name" placeholder="John Doe" />
+            <small class="form-error" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+              Full name is required.
+            </small>
+          </div>
+
+          <!-- CIN -->
+          <div class="form-group">
+            <label for="cin" class="form-label">CIN (National ID)</label>
+            <input id="cin" type="text" class="form-control" formControlName="cin" placeholder="12345678" />
+          </div>
+
+          <!-- Role -->
+          <div class="form-group">
+            <label for="role" class="form-label">Role <span class="required">*</span></label>
+            <select id="role" class="form-control" formControlName="role">
+              <option value="">Select a role</option>
+              <option value="ADMIN">Administrator</option>
+              <option value="AGENT">Agent</option>
+              <option value="OPERATOR">Operator</option>
+              <option value="PASSENGER">Passenger</option>
+            </select>
+          </div>
+
+          <!-- Password (only for create) -->
+          <div class="form-group" *ngIf="passwordFieldVisible">
+            <label for="password" class="form-label">Password <span class="required">*</span></label>
+            <input id="password" type="password" class="form-control" formControlName="password" placeholder="Enter password" (input)="onPasswordInput($any($event.target).value)" />
+            <small class="form-hint">Minimum 8 characters required</small>
+          </div>
+        </div>
+
+        <!-- Status Toggle -->
+        <div class="form-group" style="margin-top: 16px;">
+          <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+            <input type="checkbox" class="form-check-input" formControlName="enabled" style="width: 18px; height: 18px; cursor: pointer;" />
+            <span class="form-label" style="margin: 0;">Account Active</span>
+          </label>
+        </div>
+      </form>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-box-footer">
+      <button type="button" class="btn btn-outline" (click)="closeModal()" [disabled]="loading">
+        Cancel
+      </button>
+      <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="loading || form.invalid">
+        <i class="fas fa-spinner fa-spin" *ngIf="loading" style="margin-right: 8px;"></i>
+        {{ mode === 'create' ? 'Create User' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>

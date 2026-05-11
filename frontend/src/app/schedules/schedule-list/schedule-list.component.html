@@ -1,0 +1,49 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold">Schedules</h4>
+    <a routerLink="/admin/schedules/new" class="btn btn-info btn-sm">
+      <i class="bi bi-plus"></i> Add Schedule
+    </a>
+  </div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Line</th>
+            <th>Vehicle</th>
+            <th>Day Type</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Frequency</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+            <tbody *ngIf="schedules?.length">
+                <tr *ngFor="let s of schedules">            <td>{{ s.line.code }} - {{ s.line.name }}</td>
+<td>{{ s.vehicle.plateNumber }}</td>
+            <td>
+              <span class="badge"
+                [class.bg-primary]="s.dayType==='WEEKDAY'"
+                [class.bg-success]="s.dayType==='WEEKEND'"
+                [class.bg-warning]="s.dayType==='HOLIDAY'">
+                {{ s.dayType }}
+              </span>
+            </td>
+            <td>{{ s.startTime }}</td>
+            <td>{{ s.endTime }}</td>
+            <td>every {{ s.frequencyMinutes }} min</td>
+            <td>
+              <a [routerLink]="['/admin/schedules/edit', s.id]"
+                 class="btn btn-sm btn-outline-primary me-1">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button (click)="delete(s.id!)"
+                      class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>

@@ -1,0 +1,169 @@
+<div class="incident-shell">
+  <aside class="template-sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><i class="fas fa-bus-alt"></i></div>
+      <span class="sidebar-brand-text">TransitTN</span>
+    </div>
+
+    <div class="sidebar-section-label">Main</div>
+    <ul class="sidebar-nav">
+      <li>
+        <a class="sidebar-link" routerLink="/agent-dhasbord">
+          <i class="fas fa-th-large"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-section-label">Incidents</div>
+    <ul class="sidebar-nav">
+      <li>
+        <a class="sidebar-link active" routerLink="/incidents/create">
+          <i class="fas fa-plus-circle"></i>
+          <span>Create Incident</span>
+        </a>
+      </li>
+      <li>
+        <a class="sidebar-link" routerLink="/incidents/list">
+          <i class="fas fa-list"></i>
+          <span>Incidents List</span>
+        </a>
+      </li>
+      <li>
+        <a class="sidebar-link" routerLink="/notifications">
+          <i class="fas fa-bell"></i>
+          <span>Notifications</span>
+        </a>
+      </li>
+    </ul>
+  </aside>
+
+  <nav class="template-topbar">
+    <div class="topbar-title">
+      <i class="fas fa-th-large"></i>
+      <span>Backoffice Template</span>
+    </div>
+  </nav>
+
+  <main class="template-main-content">
+    <div class="incident-create-page">
+      <div class="page-header mb-6">
+        <div>
+          <div class="breadcrumb"><a routerLink="/home">Home</a> <span>/</span> Incident Management</div>
+          <h1 class="page-title"><i class="fas fa-plus-circle text-blue"></i> Add Incident</h1>
+          <p class="page-subtitle">Report a new incident — AI will automatically classify severity and estimate delay</p>
+        </div>
+        <div class="flex-center">
+          <button type="button" class="btn btn-outline" (click)="goToIncidentsList()">
+            <i class="fas fa-list"></i> View Incidents List
+          </button>
+        </div>
+      </div>
+
+      <div class="alert" [class.alert-danger]="feedbackType === 'error'" [class.alert-success]="feedbackType === 'success'" *ngIf="feedbackMessage">
+        <i class="fas" [class.fa-check-circle]="feedbackType === 'success'" [class.fa-exclamation-circle]="feedbackType === 'error'"></i>
+        {{ feedbackMessage }}
+      </div>
+
+      <!-- ===== AI ANALYSIS RESULT CARD ===== -->
+      <section class="ai-result-card" *ngIf="aiResult">
+        <div class="ai-result-header">
+          <div class="ai-result-title">
+            <i class="fas fa-robot"></i> AI Analysis Result
+          </div>
+          <button class="ai-dismiss-btn" (click)="dismissAiResult()" title="Dismiss">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="ai-result-body">
+          <div class="ai-metrics-grid">
+            <div class="ai-metric">
+              <span class="ai-metric-label">Severity</span>
+              <span class="ai-metric-value severity-badge"
+                    [class.severity-high]="aiResult.severity === 'HIGH'"
+                    [class.severity-medium]="aiResult.severity === 'MEDIUM'"
+                    [class.severity-low]="aiResult.severity === 'LOW'">
+                {{ aiResult.severity }}
+              </span>
+            </div>
+            <div class="ai-metric">
+              <span class="ai-metric-label">Estimated Delay</span>
+              <span class="ai-metric-value delay-value">
+                <i class="fas fa-clock"></i> {{ aiResult.estimatedDelayMinutes }} min
+              </span>
+            </div>
+            <div class="ai-metric">
+              <span class="ai-metric-label">Incident Type</span>
+              <span class="ai-metric-value type-badge">{{ aiResult.incidentType }}</span>
+            </div>
+            <div class="ai-metric">
+              <span class="ai-metric-label">AI Confidence</span>
+              <span class="ai-metric-value confidence-value">{{ aiResult.confidencePercent }}%</span>
+            </div>
+          </div>
+
+          <div class="ai-messages">
+            <div class="ai-message-block" *ngIf="aiResult.agentMessage">
+              <h4><i class="fas fa-user-shield"></i> Agent Notification</h4>
+              <p>{{ aiResult.agentMessage }}</p>
+            </div>
+            <div class="ai-message-block passenger" *ngIf="aiResult.passengerMessage">
+              <h4><i class="fas fa-users"></i> Passenger Notification</h4>
+              <p>{{ aiResult.passengerMessage }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="alert alert-info">
+        <i class="fas fa-robot"></i>
+        Submit the incident details below — <strong>AI will automatically determine severity and estimated delay</strong>.
+      </div>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fas fa-file-contract text-blue"></i> Incident Information</div>
+          </div>
+        </div>
+
+        <form id="incident-create-form" class="card-body" [formGroup]="incidentForm" (ngSubmit)="submitIncident()">
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Title <span class="required">*</span></label>
+              <input type="text" class="form-control" formControlName="title" placeholder="3 to 100 characters" />
+              <small class="form-error" *ngIf="hasError('title', 'required')">Title is required.</small>
+              <small class="form-error" *ngIf="hasError('title', 'minlength')">Minimum 3 characters.</small>
+              <small class="form-error" *ngIf="hasError('title', 'maxlength')">Maximum 100 characters.</small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Location <span class="required">*</span></label>
+              <input type="text" class="form-control" formControlName="location" placeholder="Max 255 characters" />
+              <small class="form-error" *ngIf="hasError('location', 'required')">Location is required.</small>
+              <small class="form-error" *ngIf="hasError('location', 'maxlength')">Maximum 255 characters.</small>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label">Description <span class="required">*</span></label>
+            <textarea class="form-control" rows="4" formControlName="description" placeholder="10 to 500 characters"></textarea>
+            <small class="form-error" *ngIf="hasError('description', 'required')">Description is required.</small>
+            <small class="form-error" *ngIf="hasError('description', 'minlength')">Minimum 10 characters.</small>
+            <small class="form-error" *ngIf="hasError('description', 'maxlength')">Maximum 500 characters.</small>
+            <div class="form-hint">Max 500 characters.</div>
+          </div>
+        </form>
+        <div class="card-footer">
+          <button type="button" class="btn btn-outline" (click)="incidentForm.reset()">
+            <i class="fas fa-rotate-left"></i> Reset
+          </button>
+          <button type="submit" class="btn btn-primary" form="incident-create-form" [disabled]="isSubmitting">
+            <i class="fas" [class.fa-save]="!isSubmitting" [class.fa-spinner]="isSubmitting" [class.fa-spin]="isSubmitting"></i>
+            {{ isSubmitting ? 'Analyzing & Saving...' : 'Submit Incident' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

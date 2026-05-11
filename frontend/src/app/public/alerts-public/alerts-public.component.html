@@ -1,0 +1,81 @@
+<div class="container py-5">
+    <h2 class="fw-bold mb-1">Service Alerts</h2>
+    <p class="text-muted mb-4">
+      Current maintenance and service disruptions
+    </p>
+  
+    <!-- Upcoming alerts -->
+    <div class="mb-5" *ngIf="alerts.length > 0">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
+        <h5 class="fw-bold mb-0">Upcoming this week</h5>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-6" *ngFor="let a of alerts">
+          <div class="card border-warning border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="badge bg-warning text-dark">
+                  {{ a.type }}
+                </span>
+                <small class="text-muted">{{ a.scheduledDate }}</small>
+              </div>
+              <h6 class="fw-bold">
+                {{ a.vehicle.brand }} — {{ a.vehicle.plateNumber }}
+              </h6>
+              <p class="text-muted mb-0" style="font-size:13px">
+                {{ a.description }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div *ngIf="alerts.length === 0"
+         class="alert alert-success d-flex align-items-center gap-2">
+      <i class="bi bi-check-circle-fill"></i>
+      No upcoming maintenance alerts this week.
+    </div>
+  
+    <!-- All active orders -->
+    <div *ngIf="allOrders.length > 0">
+      <h5 class="fw-bold mb-3">Active maintenance orders</h5>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Vehicle</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Scheduled</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let o of allOrders">
+                <td>{{ o.vehicle.brand }} — {{ o.vehicle.plateNumber }}</td>
+                <td>
+                  <span class="badge"
+                    [class.bg-primary]="o.type==='PREVENTIVE'"
+                    [class.bg-danger]="o.type==='CORRECTIVE'">
+                    {{ o.type }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge"
+                    [class.bg-warning]="o.status==='PENDING'"
+                    [class.bg-info]="o.status==='IN_PROGRESS'">
+                    {{ o.status }}
+                  </span>
+                </td>
+                <td>{{ o.scheduledDate }}</td>
+                <td>{{ o.description }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>

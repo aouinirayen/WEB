@@ -1,0 +1,19 @@
+<div class="toast-notification-wrapper" aria-live="polite" aria-atomic="true">
+  <div *ngFor="let toast of toasts" class="toast-notification" [ngClass]="toast.type">
+    <div class="toast-icon">
+      <i class="bi" [ngClass]="{
+        'bi-check-circle-fill': toast.type === 'success',
+        'bi-x-circle-fill': toast.type === 'error',
+        'bi-exclamation-triangle-fill': toast.type === 'warning',
+        'bi-info-circle-fill': toast.type === 'info'
+      }"></i>
+    </div>
+    <div class="toast-text">
+      <strong>{{ toast.title }}</strong>
+      <p>{{ toast.message }}</p>
+    </div>
+    <button type="button" class="toast-close" aria-label="Close" (click)="dismiss(toast.id)">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+</div>

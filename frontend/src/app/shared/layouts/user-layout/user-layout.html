@@ -1,0 +1,41 @@
+<!-- User Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #1a237e 0%, #5c2d91 100%);">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/ticket/tickets">
+      <i class="fas fa-bus-alt mr-2" style="color: #ffc107;"></i>
+      TicketApp
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#userNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="userNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a routerLink="/ticket/tickets" routerLinkActive="active" class="nav-link">
+            <i class="fas fa-ticket-alt mr-1"></i> Tickets
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/ticket/covoiturages" routerLinkActive="active" class="nav-link">
+            <i class="fas fa-car mr-1"></i> Covoiturages
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/ticket/my-covoiturages" routerLinkActive="active" class="nav-link">
+            <i class="fas fa-tasks mr-1"></i> Mes Covoiturages
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/ticket/reservations" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+            <i class="fas fa-list mr-1"></i> Mes Reservations
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- User Content -->
+<div class="container mt-4">
+  <router-outlet />
+</div>

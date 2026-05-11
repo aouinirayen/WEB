@@ -1,0 +1,75 @@
+<div class="container py-5">
+    <h2 class="fw-bold mb-1">Search Trips</h2>
+    <p class="text-muted mb-4">Find trips by line and schedule</p>
+  
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Line</label>
+            <select class="form-select" [(ngModel)]="selectedLineId"
+                    (change)="onLineSelect()">
+              <option [value]="null">-- Choose a line --</option>
+              <option *ngFor="let l of lines" [value]="l.id">
+                {{ l.code }} — {{ l.name }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Schedule</label>
+            <select class="form-select" [(ngModel)]="selectedScheduleId"
+                    (change)="onScheduleSelect()"
+                    [disabled]="schedules.length === 0">
+              <option [value]="null">-- Choose a schedule --</option>
+              <option *ngFor="let s of schedules" [value]="s.id">
+                {{ s.dayType }} — {{ s.startTime }} to {{ s.endTime }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div *ngIf="trips.length > 0">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Delay</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let t of trips">
+                <td>{{ t.departureTime | date:'HH:mm' }}</td>
+                <td>{{ t.arrivalTime | date:'HH:mm' }}</td>
+                <td>
+                  <span [class.text-danger]="t.delayMinutes > 0"
+                        [class.text-success]="t.delayMinutes === 0">
+                    {{ t.delayMinutes === 0 ? 'On time' :
+                       '+' + t.delayMinutes + ' min' }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge"
+                    [class.bg-success]="t.completed"
+                    [class.bg-warning]="!t.completed">
+                    {{ t.completed ? 'Completed' : 'In progress' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+    <div *ngIf="selectedScheduleId && trips.length === 0"
+         class="text-center text-muted py-5">
+      <i class="bi bi-search fs-1"></i>
+      <p class="mt-2">No trips found for this schedule</p>
+    </div>
+  </div>

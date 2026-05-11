@@ -1,0 +1,32 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Operator Dashboard</h1>
+    <p class="subtitle">Welcome, operator. Monitor operations and review system activity.</p>
+  </div>
+
+  <div class="user-info-card" *ngIf="currentUser$ | async as user">
+    <div class="card-header">
+      <h2>Your Information</h2>
+    </div>
+    <div class="card-body">
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Name:</label>
+          <p class="value">{{ user.name }}</p>
+        </div>
+        <div class="info-item">
+          <label>Username:</label>
+          <p class="value">{{ user.username }}</p>
+        </div>
+        <div class="info-item">
+          <label>Email:</label>
+          <p class="value">{{ user.email }}</p>
+        </div>
+        <div class="info-item">
+          <label>Role:</label>
+          <p class="value badge">{{ user.role }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

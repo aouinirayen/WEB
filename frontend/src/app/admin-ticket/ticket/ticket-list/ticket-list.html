@@ -1,0 +1,104 @@
+<div class="theme-ticket">
+  <div class="page-header d-flex justify-content-between align-items-center">
+    <h2 class="mb-0"><i class="fas fa-ticket-alt mr-2"></i> Ticket Management</h2>
+    <a routerLink="/admin/ticket/tickets/new" class="btn btn-light" style="color:#1a237e;font-weight:600;border-radius:8px;">
+      <i class="fas fa-plus mr-1"></i> Add
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover text-nowrap mb-0">
+        <thead>
+          <tr>
+            <th>TYPE</th>
+            <th>TRANSPORT</th>
+            <th>ROUTE</th>
+            <th>TIME</th>
+            <th>PRICE</th>
+            <th>QUANTITY</th>
+            <th>VALIDITY</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (tickets.length === 0) {
+            <tr><td colspan="8" class="text-center text-muted py-4">No ticket found</td></tr>
+          }
+          @for (ticket of pagedTickets; track ticket.id) {
+            <tr>
+              <td>
+                <span class="status-pill"
+                  [class.status-confirmed]="ticket.type === 'Standard'"
+                  [style.background]="ticket.type === 'VIP' ? '#fff3e0' : ''"
+                  [style.color]="ticket.type === 'VIP' ? '#e65100' : ''">
+                  {{ ticket.type }}
+                </span>
+              </td>
+              <td>
+                <span style="font-weight:600;">
+                  @switch (ticket.transportType) {
+                    @case ('BUS') { <i class="fas fa-bus mr-1" style="color:#1565c0;"></i> Bus }
+                    @case ('METRO') { <i class="fas fa-subway mr-1" style="color:#6a1b9a;"></i> Metro }
+                    @case ('TRAIN') { <i class="fas fa-train mr-1" style="color:#2e7d32;"></i> Train }
+                    @case ('LOUAGE') { <i class="fas fa-shuttle-van mr-1" style="color:#e65100;"></i> Louage }
+                    @case ('BATEAU') { <i class="fas fa-ship mr-1" style="color:#00838f;"></i> Bateau }
+                    @default { {{ ticket.transportType }} }
+                  }
+                </span>
+              </td>
+              <td>
+                <strong>{{ ticket.lieuDepart }}</strong> <i class="fas fa-arrow-right mx-1" style="color:#888;font-size:0.75rem;"></i> <strong>{{ ticket.destination }}</strong>
+              </td>
+              <td>
+                <i class="fas fa-clock mr-1" style="color:#e65100;"></i> {{ ticket.heureDepart }}
+              </td>
+              <td><strong>{{ ticket.price }} TND</strong></td>
+              <td>
+                @if ((ticket.quantiteDisponible ?? 0) > 0) {
+                  <span style="background:#e8f5e9;color:#2e7d32;padding:3px 10px;border-radius:20px;font-size:0.8rem;font-weight:600;">
+                    {{ ticket.quantiteDisponible }} avail.
+                  </span>
+                } @else {
+                  <span style="background:#ffebee;color:#c62828;padding:3px 10px;border-radius:20px;font-size:0.8rem;font-weight:600;">
+                    Sold out
+                  </span>
+                }
+              </td>
+              <td><small>{{ ticket.validity }}</small></td>
+              <td>
+                <a [routerLink]="['/admin/ticket/tickets/edit', ticket.id]" class="btn btn-themed btn-sm mr-1">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <button (click)="deleteTicket(ticket.id!)" class="btn btn-danger btn-sm" style="border-radius:8px;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="card-footer d-flex justify-content-between align-items-center py-2" style="background:#f8f9fa;">
+        <small class="text-muted">{{ tickets.length }} ticket(s) — Page {{ currentPage }}/{{ totalPages }}</small>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="goToPage(currentPage - 1)">&laquo;</button>
+            </li>
+            @for (p of getPages(); track p) {
+              <li class="page-item" [class.active]="p === currentPage">
+                <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+              </li>
+            }
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="goToPage(currentPage + 1)">&raquo;</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    }
+  </div>
+</div>

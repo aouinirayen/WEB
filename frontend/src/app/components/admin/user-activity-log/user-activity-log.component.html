@@ -1,0 +1,78 @@
+<div class="activity-log-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-spinner">
+    <i class="fas fa-spinner fa-spin"></i>
+    <span>Loading activity logs...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-banner">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && activityLogs.length === 0" class="empty-state">
+    <i class="fas fa-inbox"></i>
+    <p>No activity logs found</p>
+  </div>
+
+  <!-- Activity Logs List -->
+  <div *ngIf="!loading && !error && activityLogs.length > 0" class="activity-list">
+    <div *ngFor="let log of activityLogs" class="activity-item" [ngClass]="getStatusClass(log.status)">
+      <div class="activity-icon">
+        <i [ngClass]="getActionIcon(log.actionType)"></i>
+      </div>
+
+      <div class="activity-content">
+        <div class="activity-header">
+          <span class="activity-action">{{ getActionLabel(log.actionType) }}</span>
+          <span class="activity-status" [ngClass]="log.status === 'SUCCESS' ? 'success' : 'failed'">
+            {{ log.status }}
+          </span>
+        </div>
+
+        <div class="activity-details">
+          <p class="activity-description">{{ log.description }}</p>
+          <div class="activity-meta">
+            <span class="meta-item" *ngIf="log.resourceName">
+              <i class="fas fa-tag"></i>
+              {{ log.resourceName }}
+            </span>
+            <span class="meta-item">
+              <i class="fas fa-map-marker-alt"></i>
+              {{ log.ipAddress }}
+            </span>
+            <span class="meta-item">
+              <i class="fas fa-clock"></i>
+              {{ formatDate(log.timestamp) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div *ngIf="showPagination && totalPages > 1" class="pagination-controls">
+    <button
+      class="btn btn-sm"
+      [disabled]="!canGoPrevious()"
+      (click)="previousPage()">
+      <i class="fas fa-chevron-left"></i>
+      Previous
+    </button>
+
+    <div class="pagination-info">
+      Page {{ currentPage + 1 }} of {{ totalPages }} ({{ totalElements }} total)
+    </div>
+
+    <button
+      class="btn btn-sm"
+      [disabled]="!canGoNext()"
+      (click)="nextPage()">
+      Next
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</div>

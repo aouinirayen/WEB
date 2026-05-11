@@ -1,0 +1,271 @@
+<div style="background:white; border-radius:16px; box-shadow:0 2px 20px rgba(0,0,0,0.07); overflow:hidden;">
+
+  <!-- Header -->
+  <div style="padding:20px 25px; display:flex; justify-content:space-between; align-items:center;
+              border-bottom:1px solid #f0f2f5;">
+    <div>
+      <h3 style="margin:0; font-weight:700; color:#1a237e; font-size:1.2rem;">
+        <i class="fas fa-building mr-2"></i> Organizations
+      </h3>
+      <small style="color:#999;">
+        {{ filteredOrganizations.length }} of {{ organizations.length }} organizations
+      </small>
+    </div>
+    <a routerLink="/admin/organizations/new"
+       style="background:linear-gradient(135deg,#1a73e8,#0d47a1); color:white;
+              padding:9px 20px; border-radius:10px; text-decoration:none;
+              font-weight:600; font-size:0.9rem; display:inline-flex;
+              align-items:center; gap:8px; box-shadow:0 4px 12px rgba(26,115,232,0.3);
+              transition:opacity 0.2s;"
+       onmouseover="this.style.opacity='0.85'"
+       onmouseout="this.style.opacity='1'">
+      <i class="fas fa-plus"></i> Add Organization
+    </a>
+  </div>
+
+  <!-- Search & Filters -->
+  <div style="padding:16px 25px; background:#f8f9ff; border-bottom:1px solid #f0f2f5;">
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+
+      <!-- Search -->
+      <div style="position:relative; flex:3; min-width:220px;">
+        <i class="fas fa-search"
+           style="position:absolute; left:14px; top:50%; transform:translateY(-50%);
+                  color:#aaa; font-size:0.85rem; pointer-events:none;"></i>
+        <input type="text"
+               [(ngModel)]="searchTerm"
+               (ngModelChange)="applyFilters()"
+               placeholder="Search by name, email, acronyme..."
+               style="width:100%; height:40px; border:1.5px solid #e0e4ef;
+                      border-radius:10px; padding:0 14px 0 40px;
+                      font-size:0.9rem; color:#333; outline:none;
+                      background:white; transition:border 0.2s;"
+               onfocus="this.style.border='1.5px solid #1a73e8'"
+               onblur="this.style.border='1.5px solid #e0e4ef'">
+      </div>
+
+      <!-- Status Filter -->
+      <div style="flex:1; min-width:140px; position:relative;">
+        <i class="fas fa-circle"
+           style="position:absolute; left:12px; top:50%; transform:translateY(-50%);
+                  color:#aaa; font-size:0.6rem; pointer-events:none;"></i>
+        <select [(ngModel)]="filterStatus"
+                (ngModelChange)="applyFilters()"
+                style="width:100%; height:40px; border:1.5px solid #e0e4ef;
+                       border-radius:10px; padding:0 14px 0 30px;
+                       font-size:0.9rem; color:#333; outline:none;
+                       background:white; appearance:none; cursor:pointer;
+                       transition:border 0.2s;"
+                onfocus="this.style.border='1.5px solid #1a73e8'"
+                onblur="this.style.border='1.5px solid #e0e4ef'">
+          <option value="">All Status</option>
+          <option value="ACTIVE">✅ ACTIVE</option>
+          <option value="INACTIVE">❌ INACTIVE</option>
+          <option value="SUSPENDED">⚠️ SUSPENDED</option>
+        </select>
+      </div>
+
+      <!-- Type Filter -->
+      <div style="flex:1; min-width:140px; position:relative;">
+        <i class="fas fa-building"
+           style="position:absolute; left:12px; top:50%; transform:translateY(-50%);
+                  color:#aaa; font-size:0.75rem; pointer-events:none;"></i>
+        <select [(ngModel)]="filterType"
+                (ngModelChange)="applyFilters()"
+                style="width:100%; height:40px; border:1.5px solid #e0e4ef;
+                       border-radius:10px; padding:0 14px 0 32px;
+                       font-size:0.9rem; color:#333; outline:none;
+                       background:white; appearance:none; cursor:pointer;
+                       transition:border 0.2s;"
+                onfocus="this.style.border='1.5px solid #1a73e8'"
+                onblur="this.style.border='1.5px solid #e0e4ef'">
+          <option value="">All Types</option>
+          <option value="PUBLIC">🏛️ PUBLIC</option>
+          <option value="PRIVATE">🏢 PRIVATE</option>
+          <option value="MIXED">🔀 MIXED</option>
+        </select>
+      </div>
+
+      <!-- Clear Button -->
+      <button (click)="clearFilters()"
+              title="Clear filters"
+              style="height:40px; width:40px; border:1.5px solid #e0e4ef;
+                     background:white; border-radius:10px; cursor:pointer;
+                     display:flex; align-items:center; justify-content:center;
+                     color:#888; flex-shrink:0; transition:all 0.2s;"
+              onmouseover="this.style.background='#fee2e2'; this.style.color='#dc2626'; this.style.borderColor='#fca5a5'"
+              onmouseout="this.style.background='white'; this.style.color='#888'; this.style.borderColor='#e0e4ef'">
+        <i class="fas fa-times"></i>
+      </button>
+
+    </div>
+
+    <!-- Active filters badges -->
+    <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;"
+         *ngIf="searchTerm || filterStatus || filterType">
+      <span *ngIf="searchTerm"
+            style="background:#e3f2fd; color:#1a73e8; padding:3px 12px;
+                   border-radius:20px; font-size:0.78rem; font-weight:600;
+                   display:inline-flex; align-items:center; gap:6px;">
+        <i class="fas fa-search"></i> "{{ searchTerm }}"
+        <i class="fas fa-times" style="cursor:pointer;"
+           (click)="searchTerm=''; applyFilters()"></i>
+      </span>
+      <span *ngIf="filterStatus"
+            style="background:#e8f5e9; color:#2e7d32; padding:3px 12px;
+                   border-radius:20px; font-size:0.78rem; font-weight:600;
+                   display:inline-flex; align-items:center; gap:6px;">
+        <i class="fas fa-circle" style="font-size:0.5rem;"></i> {{ filterStatus }}
+        <i class="fas fa-times" style="cursor:pointer;"
+           (click)="filterStatus=''; applyFilters()"></i>
+      </span>
+      <span *ngIf="filterType"
+            style="background:#f3e5f5; color:#7b1fa2; padding:3px 12px;
+                   border-radius:20px; font-size:0.78rem; font-weight:600;
+                   display:inline-flex; align-items:center; gap:6px;">
+        <i class="fas fa-building" style="font-size:0.7rem;"></i> {{ filterType }}
+        <i class="fas fa-times" style="cursor:pointer;"
+           (click)="filterType=''; applyFilters()"></i>
+      </span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+      <tr style="background:#f8f9ff;">
+        <th style="padding:13px 20px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0; white-space:nowrap;">
+          <i class="fas fa-building mr-1"></i> NAME
+        </th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">ACRONYME</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">EMAIL</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">TYPE</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">STATUS</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">COVERAGE</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">ACTIONS</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let org of paginatedOrganizations"
+          style="border-bottom:1px solid #f5f5f5; transition:background 0.15s;"
+          onmouseover="this.style.background='#f8f9ff'"
+          onmouseout="this.style.background='white'">
+
+        <!-- Name + Logo -->
+        <td style="padding:14px 20px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px; border-radius:50%;
+                          background:#e3f2fd; overflow:hidden; flex-shrink:0;
+                          display:flex; align-items:center; justify-content:center;
+                          border:2px solid #bbdefb;">
+              <img *ngIf="org.logo" [src]="org.logo"
+                   style="width:100%; height:100%; object-fit:contain; padding:3px;">
+              <i *ngIf="!org.logo" class="fas fa-bus"
+                 style="color:#1a73e8; font-size:0.85rem;"></i>
+            </div>
+            <span style="font-weight:600; color:#1a237e;">{{ org.name }}</span>
+          </div>
+        </td>
+
+        <td style="padding:14px 15px; color:#666; font-size:0.9rem;">{{ org.acronyme }}</td>
+        <td style="padding:14px 15px; color:#666; font-size:0.9rem;">{{ org.email }}</td>
+
+        <!-- Type Badge -->
+        <td style="padding:14px 15px;">
+            <span style="padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;"
+                  [style.background]="org.type === 'PUBLIC' ? '#e3f2fd' : org.type === 'PRIVATE' ? '#fff8e1' : '#f3e5f5'"
+                  [style.color]="org.type === 'PUBLIC' ? '#1a73e8' : org.type === 'PRIVATE' ? '#f57f17' : '#7b1fa2'">
+              {{ org.type }}
+            </span>
+        </td>
+
+        <!-- Status Badge -->
+        <td style="padding:14px 15px;">
+            <span style="padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;
+                         display:inline-flex; align-items:center; gap:5px;"
+                  [style.background]="org.status === 'ACTIVE' ? '#e8f5e9' : org.status === 'INACTIVE' ? '#fce4ec' : '#fff3e0'"
+                  [style.color]="org.status === 'ACTIVE' ? '#2e7d32' : org.status === 'INACTIVE' ? '#c62828' : '#e65100'">
+              <span style="width:6px; height:6px; border-radius:50%; display:inline-block;"
+                    [style.background]="org.status === 'ACTIVE' ? '#2e7d32' : org.status === 'INACTIVE' ? '#c62828' : '#e65100'">
+              </span>
+              {{ org.status }}
+            </span>
+        </td>
+
+        <td style="padding:14px 15px; color:#666; font-size:0.9rem;">{{ org.coverageType }}</td>
+
+        <!-- Actions -->
+        <td style="padding:14px 15px;">
+          <div style="display:flex; gap:6px;">
+            <a [routerLink]="['/admin/organizations/edit', org.id]"
+               style="width:32px; height:32px; border-radius:8px; background:#fff8e1;
+                        color:#f57f17; display:flex; align-items:center; justify-content:center;
+                        text-decoration:none; transition:all 0.2s;"
+               title="Edit"
+               onmouseover="this.style.background='#f57f17'; this.style.color='white'"
+               onmouseout="this.style.background='#fff8e1'; this.style.color='#f57f17'">
+              <i class="fas fa-edit" style="font-size:0.8rem;"></i>
+            </a>
+            <a [routerLink]="['/admin/organizations', org.id]"
+               style="width:32px; height:32px; border-radius:8px; background:#e3f2fd;
+                        color:#1a73e8; display:flex; align-items:center; justify-content:center;
+                        text-decoration:none; transition:all 0.2s;"
+               title="View Details"
+               onmouseover="this.style.background='#1a73e8'; this.style.color='white'"
+               onmouseout="this.style.background='#e3f2fd'; this.style.color='#1a73e8'">
+              <i class="fas fa-eye" style="font-size:0.8rem;"></i>
+            </a>
+            <button (click)="delete(org.id!)"
+                    style="width:32px; height:32px; border-radius:8px; background:#fce4ec;
+                             color:#c62828; border:none; cursor:pointer;
+                             display:flex; align-items:center; justify-content:center;
+                             transition:all 0.2s;"
+                    title="Delete"
+                    onmouseover="this.style.background='#c62828'; this.style.color='white'"
+                    onmouseout="this.style.background='#fce4ec'; this.style.color='#c62828'">
+              <i class="fas fa-trash" style="font-size:0.8rem;"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      <tr *ngIf="paginatedOrganizations.length === 0">
+        <td colspan="7" style="text-align:center; padding:40px; color:#999;">
+          <i class="fas fa-search" style="font-size:2.5rem; display:block;
+               margin-bottom:12px; color:#ddd;"></i>
+          <div style="font-weight:600; margin-bottom:5px;">No organizations found</div>
+          <small>Try adjusting your search or filters</small>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer Pagination -->
+  <div style="padding:12px 20px; border-top:1px solid #f0f2f5; background:white;">
+    <app-pagination
+      [pageNumber]="currentPage - 1"
+      [totalElements]="filteredOrganizations.length"
+      [pageSize]="itemsPerPage"
+      [totalPages]="Math.ceil(filteredOrganizations.length / itemsPerPage)"
+      (pageChanged)="updatePage($event + 1)">
+    </app-pagination>
+  </div>
+
+</div>
+

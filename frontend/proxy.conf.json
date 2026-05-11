@@ -1,0 +1,94 @@
+{
+  "/api/v1": {
+    "target": "http://127.0.0.1:5000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": "/api"
+    }
+  },
+  "/pricing-plans": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/subscriptions": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/reductions": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/loyalty-accounts": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/point-transactions": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/payment": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/ml": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/webhooks": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/incidents": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/notifications": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/pidev-uploads": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/uploads": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/health": {
+    "target": "http://127.0.0.1:5000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/groq-api": {
+    "target": "https://api.groq.com",
+    "changeOrigin": true,
+    "pathRewrite": { "^/groq-api": "" },
+    "secure": true
+  },
+  "/urlscan": {
+    "target": "https://urlscan.io",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/urlscan": ""
+    }
+  }
+}

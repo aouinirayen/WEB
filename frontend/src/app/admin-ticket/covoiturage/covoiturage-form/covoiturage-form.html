@@ -1,0 +1,153 @@
+<div class="theme-covoiturage">
+  <div class="page-header">
+    <h2><i class="fas fa-car mr-2"></i> {{ isEdit ? 'Edit Carpool' : 'Add Carpool' }}</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form #covForm="ngForm" (ngSubmit)="save()" class="themed-form">
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="driverName">Driver Name</label>
+            <input type="text" id="driverName" class="form-control" [(ngModel)]="covoiturage.driverName" name="driverName"
+              #driverNameRef="ngModel" required minlength="3" maxlength="50" pattern="[A-Za-zÀ-ÿ\s\-]+"
+              [class.is-invalid]="driverNameRef.invalid && driverNameRef.touched">
+            <div class="invalid-feedback">
+              @if (driverNameRef.errors?.['required']) { Driver name is required. }
+              @if (driverNameRef.errors?.['minlength']) { Name must be at least 3 characters. }
+              @if (driverNameRef.errors?.['pattern']) { Name must contain only letters. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="vehicle">Vehicle</label>
+            <input type="text" id="vehicle" class="form-control" [(ngModel)]="covoiturage.vehicle" name="vehicle"
+              #vehicleRef="ngModel" required minlength="2" maxlength="30"
+              [class.is-invalid]="vehicleRef.invalid && vehicleRef.touched">
+            <div class="invalid-feedback">
+              @if (vehicleRef.errors?.['required']) { Vehicle is required. }
+              @if (vehicleRef.errors?.['minlength']) { Vehicle name must be at least 2 characters. }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="departure">Departure</label>
+            <input type="text" id="departure" class="form-control" [(ngModel)]="covoiturage.departure" name="departure"
+              #departureRef="ngModel" required minlength="3" maxlength="50" pattern="[A-Za-zÀ-ÿ\s\-]+"
+              [class.is-invalid]="departureRef.invalid && departureRef.touched">
+            <div class="invalid-feedback">
+              @if (departureRef.errors?.['required']) { Departure location is required. }
+              @if (departureRef.errors?.['minlength']) { Departure must be at least 3 characters. }
+              @if (departureRef.errors?.['pattern']) { Location must contain only letters. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="destination">Destination</label>
+            <input type="text" id="destination" class="form-control" [(ngModel)]="covoiturage.destination" name="destination"
+              #destinationRef="ngModel" required minlength="3" maxlength="50" pattern="[A-Za-zÀ-ÿ\s\-]+"
+              [class.is-invalid]="destinationRef.invalid && destinationRef.touched">
+            <div class="invalid-feedback">
+              @if (destinationRef.errors?.['required']) { Destination is required. }
+              @if (destinationRef.errors?.['minlength']) { Destination must be at least 3 characters. }
+              @if (destinationRef.errors?.['pattern']) { Destination must contain only letters. }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" class="form-control" [(ngModel)]="covoiturage.date" name="date"
+              #dateRef="ngModel" required [min]="today"
+              [class.is-invalid]="dateRef.invalid && dateRef.touched">
+            <div class="invalid-feedback">
+              @if (dateRef.errors?.['required']) { Date is required. }
+              @if (dateRef.errors?.['min']) { Date cannot be in the past. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="heureDepart">Departure Time</label>
+            <input type="time" id="heureDepart" class="form-control" [(ngModel)]="covoiturage.heureDepart" name="heureDepart"
+              #heureDepartRef="ngModel" required
+              [class.is-invalid]="(heureDepartRef.invalid && heureDepartRef.touched) || isHeureDepartInvalid">
+            @if (heureDepartRef.errors?.['required'] && heureDepartRef.touched) {
+              <div class="text-danger small">Departure time is required.</div>
+            }
+            @if (isHeureDepartInvalid) {
+              <div class="text-danger small">Departure time must be at least 30 min after current time (min {{ minTime }}).</div>
+            }
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="heureArrivee">Arrival Time (estimated)</label>
+            <input type="time" id="heureArrivee" class="form-control" [(ngModel)]="covoiturage.heureArrivee" name="heureArrivee"
+              #heureArriveeRef="ngModel" required
+              [class.is-invalid]="heureArriveeRef.invalid && heureArriveeRef.touched">
+            <div class="invalid-feedback">Estimated arrival time is required.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="price">Price (TND)</label>
+            <input type="number" id="price" class="form-control" [(ngModel)]="covoiturage.price" name="price"
+              #priceRef="ngModel" required min="1" max="500"
+              [class.is-invalid]="priceRef.invalid && priceRef.touched">
+            <div class="invalid-feedback">
+              @if (priceRef.errors?.['required']) { Price is required. }
+              @if (priceRef.errors?.['min']) { Price must be at least 1 TND. }
+              @if (priceRef.errors?.['max']) { Price cannot exceed 500 TND. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="availableSeats">Available Seats</label>
+            <input type="number" id="availableSeats" class="form-control" [(ngModel)]="covoiturage.availableSeats" name="availableSeats"
+              #seatsRef="ngModel" required min="1" max="8"
+              [class.is-invalid]="seatsRef.invalid && seatsRef.touched">
+            <div class="invalid-feedback">
+              @if (seatsRef.errors?.['required']) { Number of seats is required. }
+              @if (seatsRef.errors?.['min']) { At least 1 seat must be available. }
+              @if (seatsRef.errors?.['max']) { Maximum 8 seats per carpool. }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-map-marker-alt mr-1"></i> Departure Location</label>
+        <small class="text-muted d-block mb-2"><i class="fas fa-info-circle mr-1"></i> The map updates automatically with the departure location.</small>
+        <app-map-picker mapId="adminDepartureMap"
+          [lat]="covoiturage.departureLat || 36.8065"
+          [lng]="covoiturage.departureLng || 10.1815"
+          [searchQuery]="covoiturage.departure"
+          (locationSelected)="onDepartureLocationSelected($event)"></app-map-picker>
+      </div>
+
+      <button type="submit" class="btn btn-themed mr-2" [disabled]="covForm.invalid || isHeureDepartInvalid">
+        <i class="fas fa-save mr-1"></i> {{ isEdit ? 'Update' : 'Create' }}
+      </button>
+      <a routerLink="/admin/ticket/covoiturages" class="btn btn-themed-outline">
+        <i class="fas fa-arrow-left mr-1"></i> Cancel
+      </a>
+    </form>
+  </div>
+</div>
+</div>

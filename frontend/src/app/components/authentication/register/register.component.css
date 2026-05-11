@@ -1,0 +1,421 @@
+/* ============================================================
+   AUTH REGISTER – Same split-screen design as Login
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── Page shell ── */
+.auth-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  background: #0a0f1e;
+}
+
+/* ── LEFT: Visual panel ── */
+.auth-visual {
+  position: relative;
+  flex: 1;
+  min-height: 100vh;
+  overflow: hidden;
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .auth-visual { display: block; }
+}
+
+.visual-slider {
+  position: absolute;
+  inset: 0;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 1s ease, transform 8s ease;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.visual-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 15, 30, 0.75) 0%,
+    rgba(26, 115, 232, 0.25) 50%,
+    rgba(10, 15, 30, 0.85) 100%
+  );
+  z-index: 1;
+}
+
+.visual-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem 3rem;
+}
+
+.visual-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fff;
+  font-family: 'Syne', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.visual-logo svg {
+  width: 28px;
+  height: 28px;
+  color: #4a9af5;
+}
+
+.visual-text h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.visual-text p {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.slide-dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  cursor: pointer;
+  transition: background 0.3s, width 0.3s;
+}
+
+.dot.active {
+  background: #1a73e8;
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ── RIGHT: Form panel ── */
+.auth-form-panel {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  background: #fff;
+  overflow-y: auto;
+}
+
+@media (min-width: 900px) {
+  .auth-form-panel {
+    min-height: 100vh;
+    max-width: 580px;
+    padding: 2.5rem 3.5rem;
+    margin: 0;
+    align-items: center;
+  }
+}
+
+.form-inner {
+  width: 100%;
+  max-width: 440px;
+  padding: 1rem 0;
+}
+
+/* ── Form header ── */
+.form-header {
+  text-align: center;
+  margin-bottom: 1.6rem;
+}
+
+.form-logo {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1a73e8, #1a237e);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 8px 24px rgba(26,115,232,0.3);
+}
+
+.form-logo svg {
+  width: 26px;
+  height: 26px;
+  color: #fff;
+}
+
+.form-header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #0a0f1e;
+  margin: 0 0 0.3rem;
+}
+
+.form-header p {
+  color: #6b7280;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+/* ── Alerts ── */
+.alert-error, .alert-success {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  margin-bottom: 1rem;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.alert-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+}
+
+.alert-error svg, .alert-success svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* ── Form layout ── */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.field-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.02em;
+}
+
+.field-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-icon {
+  position: absolute;
+  left: 0.8rem;
+  width: 15px;
+  height: 15px;
+  color: #9ca3af;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.field-input-wrapper input,
+.field-input-wrapper select {
+  width: 100%;
+  padding: 0.68rem 0.9rem 0.68rem 2.4rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-family: 'DM Sans', sans-serif;
+  color: #0a0f1e;
+  background: #f9fafb;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  outline: none;
+  appearance: none;
+}
+
+.field-input-wrapper input:focus,
+.field-input-wrapper select:focus {
+  border-color: #1a73e8;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(26,115,232,0.12);
+}
+
+.field-input-wrapper input.invalid,
+.field-input-wrapper select.invalid {
+  border-color: #dc2626;
+}
+
+.field-input-wrapper input::placeholder { color: #d1d5db; }
+
+/* Select arrow */
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 0.85rem;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #9ca3af;
+  pointer-events: none;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 0.85rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.eye-btn svg { width: 17px; height: 17px; }
+.eye-btn:hover { color: #1a73e8; }
+
+.field-error {
+  font-size: 0.75rem;
+  color: #dc2626;
+}
+
+/* ── Password strength ── */
+.strength-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.2rem;
+}
+
+.strength-track {
+  flex: 1;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.strength-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Submit button ── */
+.btn-submit {
+  width: 100%;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, #1a73e8, #1a237e);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(26,115,232,0.35);
+  margin-top: 0.3rem;
+}
+
+.btn-submit:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(26,115,232,0.45);
+}
+
+.btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.btn-spinner svg {
+  width: 18px;
+  height: 18px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Divider ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.divider span { color: #9ca3af; }
+
+/* ── Switch link ── */
+.switch-link {
+  text-align: center;
+  font-size: 0.87rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.switch-link a {
+  color: #1a73e8;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 0.25rem;
+}
+
+.switch-link a:hover { text-decoration: underline; }

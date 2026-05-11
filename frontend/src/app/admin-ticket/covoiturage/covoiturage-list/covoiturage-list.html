@@ -1,0 +1,183 @@
+<div class="theme-covoiturage">
+  <div class="page-header d-flex justify-content-between align-items-center">
+    <h2 class="mb-0"><i class="fas fa-car mr-2"></i> Carpool Management</h2>
+    <div>
+      <input type="text" placeholder="Search driver..." [(ngModel)]="searchQuery" (input)="onSearchChange($event)" 
+             class="form-control mr-2" style="width:250px;display:inline-block;border-radius:8px;">
+      <button (click)="toggleSortByPoints()" class="btn btn-info btn-sm mr-2" style="border-radius:8px;">
+        <i class="fas fa-sort-numeric-down mr-1"></i> Sort by points
+      </button>
+      <a routerLink="/admin/ticket/covoiturages/new" class="btn btn-light" style="color:#004d40;font-weight:600;border-radius:8px;">
+        <i class="fas fa-plus mr-1"></i> Add
+      </a>
+    </div>
+  </div>
+
+  <!-- Confiance Panel -->
+  @if (selectedDriverConfiance) {
+    <div class="card mb-3" style="border:2px solid #004d40;">
+      <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,#004d40,#00695c);color:#fff;">
+        <h5 class="mb-0">
+          <i class="fas fa-shield-alt mr-2"></i> Trust: {{ selectedDriverConfiance.driverName }}
+        </h5>
+        <button (click)="closeConfiancePanel()" class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:6px;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <!-- Points Badge -->
+        <div class="d-flex align-items-center mb-3">
+          <div style="width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:#fff;"
+               [style.background]="getConfianceColor(selectedDriverConfiance.pointsConfiance)">
+            {{ selectedDriverConfiance.pointsConfiance }}
+          </div>
+          <div class="ml-3">
+            <div style="font-size:1.2rem;font-weight:700;color:#004d40;">
+              @if (selectedDriverConfiance.conducteurDeConfiance) {
+                <span>&#127875; Trusted driver!</span>
+              } @else {
+                <span>Trust points</span>
+              }
+            </div>
+            <small style="color:#666;">Auto-confirmation: {{ selectedDriverConfiance.autoConfirmation ? 'Yes' : 'No' }}</small>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div style="background:#eee;border-radius:10px;height:12px;margin-top:8px;overflow:hidden;">
+          <div style="height:100%;border-radius:10px;transition:width 0.5s;"
+               [style.width]="selectedDriverConfiance.pointsConfiance + '%'"
+               [style.background]="getConfianceColor(selectedDriverConfiance.pointsConfiance)">
+          </div>
+        </div>
+
+        <!-- 3 conditions -->
+        <div class="row mt-3">
+          <div class="col-md-4 mb-2">
+            <div style="background:#f8f9fa;border-radius:10px;padding:14px;text-align:center;"
+                 [style.border]="selectedDriverConfiance.conditionCovoiturages ? '2px solid #2e7d32' : '2px solid #e0e0e0'">
+              <div style="font-size:0.85rem;color:#666;margin-bottom:6px;">Confirmed carpools</div>
+              <div style="font-size:1.4rem;font-weight:700;" [style.color]="selectedDriverConfiance.conditionCovoiturages ? '#2e7d32' : '#c62828'">
+                {{ selectedDriverConfiance.nombreCovoituragesConfirmes }}/{{ selectedDriverConfiance.seuilCovoiturages }}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-2">
+            <div style="background:#f8f9fa;border-radius:10px;padding:14px;text-align:center;"
+                 [style.border]="selectedDriverConfiance.conditionAvis ? '2px solid #2e7d32' : '2px solid #e0e0e0'">
+              <div style="font-size:0.85rem;color:#666;margin-bottom:6px;">Customer reviews</div>
+              <div style="font-size:1.4rem;font-weight:700;" [style.color]="selectedDriverConfiance.conditionAvis ? '#2e7d32' : '#c62828'">
+                {{ selectedDriverConfiance.nombreAvis }}/{{ selectedDriverConfiance.seuilAvis }}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-2">
+            <div style="background:#f8f9fa;border-radius:10px;padding:14px;text-align:center;"
+                 [style.border]="selectedDriverConfiance.conditionMoyenne ? '2px solid #2e7d32' : '2px solid #e0e0e0'">
+              <div style="font-size:0.85rem;color:#666;margin-bottom:6px;">Average stars</div>
+              <div style="font-size:1.4rem;font-weight:700;" [style.color]="selectedDriverConfiance.conditionMoyenne ? '#2e7d32' : '#c62828'">
+                {{ selectedDriverConfiance.moyenneEtoiles.toFixed(1) }}/{{ selectedDriverConfiance.seuilMoyenneEtoiles }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="card">
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover text-nowrap mb-0">
+        <thead>
+          <tr>
+            <th>DRIVER</th>
+            <th>DEPARTURE</th>
+            <th>DESTINATION</th>
+            <th>DATE</th>
+            <th>DEP. TIME</th>
+            <th>ARR. TIME</th>
+            <th>PRICE</th>
+            <th>SEATS</th>
+            <th>VEHICLE</th>
+            <th>STATUS</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (pagedCovoiturages.length === 0) {
+            <tr><td colspan="11" class="text-center text-muted py-4">No carpool found</td></tr>
+          }
+          @for (c of pagedCovoiturages; track c.id) {
+            <tr>
+              <td>
+                <i class="fas fa-user mr-1" style="color:#00897b;"></i>
+                <span (click)="selectDriverConfiance(c.driverName)" style="cursor:pointer;text-decoration:underline;color:#004d40;">
+                  {{ c.driverName }}
+                </span>
+              </td>
+              <td>{{ c.departure }}</td>
+              <td>{{ c.destination }}</td>
+              <td>{{ c.date }}</td>
+              <td>{{ c.heureDepart || '--:--' }}</td>
+              <td>{{ c.heureArrivee || '--:--' }}</td>
+              <td><strong>{{ c.price }} TND</strong></td>
+              <td>{{ c.availableSeats }}</td>
+              <td>{{ c.vehicle }}</td>
+              <td>
+                @if (c.status === 'PENDING') {
+                  <span class="status-pill status-pending"><i class="fas fa-clock"></i> Pending</span>
+                }
+                @if (c.status === 'CONFIRMED') {
+                  <span class="status-pill status-confirmed"><i class="fas fa-check-circle"></i> Confirmed</span>
+                }
+                @if (c.status === 'REJECTED') {
+                  <span class="status-pill status-rejected"><i class="fas fa-times-circle"></i> Rejected</span>
+                }
+                @if (!c.status) {
+                  <span class="status-pill" style="background:#f5f5f5;color:#757575;">N/A</span>
+                }
+              </td>
+              <td>
+                @if (c.status === 'PENDING') {
+                  <button (click)="confirmCov(c)" class="btn btn-success btn-sm mr-1" title="Confirm" style="border-radius:6px;">
+                    <i class="fas fa-check"></i>
+                  </button>
+                  <button (click)="rejectCov(c)" class="btn btn-warning btn-sm mr-1" title="Reject" style="border-radius:6px;">
+                    <i class="fas fa-ban"></i>
+                  </button>
+                }
+                <a [routerLink]="['/admin/ticket/covoiturages/edit', c.id]" class="btn btn-themed btn-sm mr-1">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <button (click)="delete(c.id!)" class="btn btn-danger btn-sm" style="border-radius:6px;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="card-footer d-flex justify-content-between align-items-center py-2" style="background:#f8f9fa;">
+        <small class="text-muted">{{ filteredCovoiturages.length }} result(s) — Page {{ currentPage }}/{{ totalPages }}</small>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="goToPage(currentPage - 1)">&laquo;</button>
+            </li>
+            @for (p of getPages(); track p) {
+              <li class="page-item" [class.active]="p === currentPage">
+                <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+              </li>
+            }
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="goToPage(currentPage + 1)">&raquo;</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    }
+  </div>
+</div>

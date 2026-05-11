@@ -1,0 +1,28 @@
+<aside class="backoffice-sidebar">
+  <div class="backoffice-sidebar-brand">
+    <div class="backoffice-sidebar-brand-icon">
+      <i class="fa fa-building"></i>
+    </div>
+    <span class="backoffice-sidebar-brand-text">TransitTN</span>
+  </div>
+
+  <ng-container *ngFor="let section of sidebarSections">
+    <div class="backoffice-sidebar-section-label">{{ section.label }}</div>
+    <ul class="backoffice-sidebar-nav">
+      <li *ngFor="let item of section.items">
+        <a (click)="navigateTo(item.path)"
+           [class.active]="isActive(item.path)"
+           class="backoffice-sidebar-link">
+          <i [class]="'fa ' + item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </ng-container>
+</aside>
+
+<style>
+:host ::ng-deep {
+  /* Styles are in global styles.css */
+}
+</style>

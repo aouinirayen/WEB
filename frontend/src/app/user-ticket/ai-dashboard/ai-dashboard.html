@@ -1,0 +1,277 @@
+<div class="ai-dashboard">
+  <!-- Header -->
+  <div class="ai-header">
+    <div class="ai-title">
+      <span class="ai-icon">🤖</span>
+      <h2>Artificial Intelligence - Carpooling</h2>
+    </div>
+    <div class="health-badge" *ngIf="health">
+      <span class="dot" [class.green]="health.status === 'READY'" [class.red]="health.status !== 'READY'"></span>
+      {{ health.status === 'READY' ? 'Models ready' : 'Models loading...' }}
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'matching'" (click)="switchTab('matching')">
+      <span class="tab-icon">🎯</span> AI Matching
+    </button>
+    <button class="tab" [class.active]="activeTab === 'cancellation'" (click)="switchTab('cancellation')">
+      <span class="tab-icon">⚠️</span> Cancellation Prediction
+    </button>
+    <button class="tab" [class.active]="activeTab === 'satisfaction'" (click)="switchTab('satisfaction')">
+      <span class="tab-icon">⭐</span> Satisfaction Prediction
+    </button>
+  </div>
+
+  <!-- ==================== MATCHING TAB ==================== -->
+  <div class="tab-content" *ngIf="activeTab === 'matching'">
+    <div class="card">
+      <h3>Find the best carpools</h3>
+      <p class="subtitle">Select your departure and arrival city. The AI will analyze available carpools and suggest the best matches.</p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Departure city</label>
+          <select [(ngModel)]="selectedDeparture" (ngModelChange)="onCityChange()">
+            <option *ngFor="let c of cities" [value]="c.name">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Arrival city</label>
+          <select [(ngModel)]="selectedDestination" (ngModelChange)="onCityChange()">
+            <option *ngFor="let c of cities" [value]="c.name">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preferred time</label>
+          <input type="time" [(ngModel)]="matchRequest.heureVoulue">
+        </div>
+        <div class="form-group">
+          <label>Max budget (TND)</label>
+          <input type="number" [(ngModel)]="matchRequest.budgetMax" min="1">
+        </div>
+      </div>
+
+      <button class="btn-primary" (click)="findMatches()" [disabled]="matchLoading || selectedDeparture === selectedDestination">
+        {{ matchLoading ? 'Searching...' : 'Find AI matches' }}
+      </button>
+      <span class="error-hint" *ngIf="selectedDeparture === selectedDestination">Choose two different cities</span>
+    </div>
+
+    <!-- Match Results -->
+    <div class="results" *ngIf="matchResults.length > 0">
+      <h3>Results ({{ matchResults.length }} carpools found)</h3>
+      <div class="match-cards">
+        <div class="match-card" *ngFor="let m of matchResults; let i = index">
+          <div class="match-rank">#{{ i + 1 }}</div>
+          <div class="match-info">
+            <div class="match-route">
+              <strong>{{ m.departure }}</strong> → <strong>{{ m.destination }}</strong>
+            </div>
+            <div class="match-details">
+              <span>🚗 {{ m.driverName }}</span>
+              <span>📅 {{ m.date }}</span>
+              <span>🕐 {{ m.heureDepart }} → {{ m.heureArrivee }}</span>
+              <span>💰 {{ m.price }} TND</span>
+              <span>💺 {{ m.availableSeats }} seats</span>
+              <span *ngIf="m.vehicle">🚙 {{ m.vehicle }}</span>
+            </div>
+            <div class="match-distances">
+              <span>📍 Departure: {{ m.distanceToDeparture }} km</span>
+              <span>🏁 Arrival: {{ m.distanceToDestination }} km</span>
+            </div>
+          </div>
+          <div class="match-score">
+            <div class="score-circle" [style.border-color]="getScoreColor(m.score)">
+              {{ (m.score * 100).toFixed(0) }}%
+            </div>
+            <span class="recommendation" [style.color]="getScoreColor(m.score)">{{ m.recommendation }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="no-results" *ngIf="!matchLoading && matchResults.length === 0 && matchRequest.passengerLat">
+      <p>Click "Find AI matches" to start searching.</p>
+    </div>
+  </div>
+
+  <!-- ==================== CANCELLATION TAB ==================== -->
+  <div class="tab-content" *ngIf="activeTab === 'cancellation'">
+    <div class="card">
+      <h3>Is my trip at risk of cancellation?</h3>
+      <p class="subtitle">Describe your carpool and the AI will estimate the cancellation risk.</p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Departure city</label>
+          <select [(ngModel)]="cancelDeparture" (ngModelChange)="onCancelCityChange()">
+            <option *ngFor="let c of cities" [value]="c.name">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Arrival city</label>
+          <select [(ngModel)]="cancelDestination" (ngModelChange)="onCancelCityChange()">
+            <option *ngFor="let c of cities" [value]="c.name">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Trip price (TND)</label>
+          <input type="number" [(ngModel)]="cancelPrix" min="1" placeholder="Ex: 15">
+        </div>
+        <div class="form-group">
+          <label>Departure date</label>
+          <input type="date" [(ngModel)]="cancelDate">
+        </div>
+        <div class="form-group">
+          <label>Departure time</label>
+          <input type="time" [(ngModel)]="cancelHeure">
+        </div>
+        <div class="form-group">
+          <label>Seats reserved</label>
+          <select [(ngModel)]="cancelNbPlaces">
+            <option [value]="1">1 seat</option>
+            <option [value]="2">2 seats</option>
+            <option [value]="3">3 seats</option>
+            <option [value]="4">4 seats</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="distance-info" *ngIf="cancelDistanceDisplay > 0">
+        Estimated distance: <strong>{{ cancelDistanceDisplay }} km</strong>
+      </div>
+
+      <button class="btn-primary" (click)="predictCancellation()" [disabled]="cancelLoading || cancelDeparture === cancelDestination">
+        {{ cancelLoading ? 'Analyzing...' : 'Analyze risk' }}
+      </button>
+      <span class="error-hint" *ngIf="cancelDeparture === cancelDestination">Choose two different cities</span>
+    </div>
+
+    <!-- Cancel Result -->
+    <div class="result-card" *ngIf="cancelResponse">
+      <div class="result-header" [style.border-left-color]="getRiskColor(cancelResponse.riskLevel)">
+        <div class="result-main">
+          <span class="result-label">Cancellation probability</span>
+          <span class="result-value" [style.color]="getRiskColor(cancelResponse.riskLevel)">
+            {{ (cancelResponse.probability * 100).toFixed(1) }}%
+          </span>
+        </div>
+        <div class="risk-badge" [style.background-color]="getRiskColor(cancelResponse.riskLevel)">
+          {{ cancelResponse.riskLevel }}
+        </div>
+      </div>
+      <p class="result-message">{{ cancelResponse.message }}</p>
+      <div class="prob-bar">
+        <div class="prob-fill" [style.width.%]="cancelResponse.probability * 100"
+             [style.background-color]="getRiskColor(cancelResponse.riskLevel)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SATISFACTION TAB ==================== -->
+  <div class="tab-content" *ngIf="activeTab === 'satisfaction'">
+    <div class="card">
+      <h3>What will the passenger satisfaction be?</h3>
+      <p class="subtitle">Select a carpool, answer the questions and the AI will rate the driver.</p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Completed carpool</label>
+          <select [(ngModel)]="selectedCovoiturageId" (ngModelChange)="checkRatingEligibility()">
+            <option [ngValue]="null" disabled>-- Choose a completed trip --</option>
+            <option *ngFor="let c of covoiturageOptions" [ngValue]="c.id">{{ c.label }}</option>
+          </select>
+          <small *ngIf="covoiturageOptions.length === 0" style="color:#e65100;">Trips must be completed (past date) to appear here.</small>
+        </div>
+        <div class="form-group">
+          <label>How was the trip?</label>
+          <select [(ngModel)]="satTrajetQuality">
+            <option value="excellent">Excellent - Perfect trip</option>
+            <option value="bon">Good - Overall fine</option>
+            <option value="moyen">Average - Some issues</option>
+            <option value="mauvais">Bad - Many problems</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>The price was...</label>
+          <select [(ngModel)]="satPrixFeeling">
+            <option value="tres_bon_marche">Very affordable</option>
+            <option value="correct">Fair, right price</option>
+            <option value="un_peu_cher">A bit expensive</option>
+            <option value="trop_cher">Too expensive</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>The driver was...</label>
+          <select [(ngModel)]="satPonctualite">
+            <option value="tres_ponctuel">Very punctual - Early</option>
+            <option value="a_lheure">On time</option>
+            <option value="un_peu_en_retard">Slightly late (5-15 min)</option>
+            <option value="tres_en_retard">Very late (30+ min)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>The car was...</label>
+          <select [(ngModel)]="satRemplissage">
+            <option value="vide">Almost empty (1 passenger)</option>
+            <option value="peu_remplie">Lightly filled (2 passengers)</option>
+            <option value="bien_remplie">Well filled (3 passengers)</option>
+            <option value="pleine">Full (4+ passengers)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Was there a detour?</label>
+          <select [(ngModel)]="satDetour">
+            <option value="non">No, direct route</option>
+            <option value="petit">Small detour (5 min)</option>
+            <option value="moyen">Medium detour (15 min)</option>
+            <option value="grand">Large detour (30+ min)</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-primary" (click)="predictSatisfaction()" [disabled]="satLoading || !selectedCovoiturageId || ratingBlocked">
+        {{ satLoading ? 'Analyzing...' : 'Predict satisfaction' }}
+      </button>
+      <div *ngIf="ratingBlocked && ratingBlockMessage" style="margin-top:10px;padding:12px;background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;color:#e65100;font-size:0.9rem;">
+        <span style="margin-right:6px;">&#9888;</span> {{ ratingBlockMessage }}
+      </div>
+    </div>
+
+    <!-- Satisfaction Result -->
+    <div class="result-card" *ngIf="satResponse">
+      <div class="sat-result">
+        <div class="driver-info" *ngIf="satResponse.driverName">
+          <strong>{{ satResponse.driverName }}</strong>
+          <span class="route-badge">{{ satResponse.route }}</span>
+        </div>
+        <div class="stars-display">
+          <span class="stars">{{ getStars(satResponse.stars) }}</span>
+          <span class="score-text">{{ satResponse.predictedScore }}/5</span>
+        </div>
+        <p class="result-message">{{ satResponse.message }}</p>
+        <div class="driver-avg" *ngIf="satResponse.driverTotalRatings > 0">
+          Driver average: <strong>{{ satResponse.driverAvgScore }}/5</strong>
+          ({{ satResponse.driverTotalRatings }} review{{ satResponse.driverTotalRatings > 1 ? 's' : '' }})
+        </div>
+      </div>
+    </div>
+
+    <!-- Classement des conducteurs -->
+    <div class="card" *ngIf="driverRatings.length > 0" style="margin-top: 20px;">
+      <h3>Driver Rankings</h3>
+      <div class="driver-ranking">
+        <div class="rank-row" *ngFor="let d of driverRatings; let i = index">
+          <span class="rank-pos">{{ i + 1 }}</span>
+          <span class="rank-name">{{ d.driverName }}</span>
+          <span class="rank-stars">{{ getStars(Math.round(d.avgScore)) }}</span>
+          <span class="rank-score">{{ d.avgScore }}/5</span>
+          <span class="rank-count">({{ d.totalRatings }} reviews)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

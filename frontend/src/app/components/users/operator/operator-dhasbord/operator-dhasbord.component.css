@@ -1,0 +1,97 @@
+﻿.dashboard-container {
+  padding: 3rem 2rem;
+  background-color: var(--bg);
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-header {
+  margin-bottom: 3rem;
+  border-bottom: 2px solid #1a73e8;
+  padding-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #1a73e8;
+  text-transform: uppercase;
+}
+
+.dashboard-header .subtitle {
+  margin: 0.5rem 0 0 0;
+  color: var(--muted-text);
+  font-size: 1.1rem;
+}
+
+.user-info-card {
+  background: var(--surface);
+  border: 2px solid #1a73e8;
+  border-radius: 0;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+}
+
+.card-header {
+  border-bottom: 2px solid #1a73e8;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #1a73e8;
+  text-transform: uppercase;
+}
+
+.info-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.info-item label {
+  display: block;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+  color: #1a73e8;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.value {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.badge {
+  color: #1a73e8;
+  background-color: rgba(26, 115, 232, 0.15);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0;
+  border: 1px solid #1a73e8;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+html[data-theme='dark'] .badge {
+  color: #666;
+  background-color: rgba(200, 155, 60, 0.15);
+  border: 1px solid #666;
+}
+
+html[data-theme='light'] .badge {
+  color: #c41e3a;
+  background-color: rgba(196, 30, 58, 0.1);
+  border: 1px solid #c41e3a;
+}
+
+
+

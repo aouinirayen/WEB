@@ -1,0 +1,76 @@
+<div class="incident-page">
+  <div class="page-header">
+    <div>
+      <h1>Incidents List</h1>
+      <p>Consult and filter existing incidents — severity and delay are determined by AI.</p>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="goToCreateIncident()" *ngIf="isAgent()">Create Incident</button>
+  </div>
+
+  <div class="feedback" [class.error]="feedbackType === 'error'" *ngIf="feedbackMessage">
+    {{ feedbackMessage }}
+  </div>
+
+  <section class="card">
+    <div class="card-header">
+      <h2>Incidents List</h2>
+    </div>
+
+    <div class="card-body filters-card">
+      <div class="filters-bar">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by title, location, or reporter..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+        />
+        <select
+          class="filter-select"
+          [(ngModel)]="selectedSeverityFilter"
+          (change)="onSeverityFilterChange()"
+        >
+          <option value="ALL">All severities</option>
+          <option *ngFor="let item of severityOptions" [value]="item">{{ item }}</option>
+        </select>
+        <span class="total-count">Total: {{ filteredIncidents.length }}</span>
+      </div>
+    </div>
+
+    <p class="state" *ngIf="isLoading">Loading incidents...</p>
+    <p class="state" *ngIf="!isLoading && filteredIncidents.length === 0">No incidents available.</p>
+
+    <div class="list" *ngIf="!isLoading && filteredIncidents.length > 0">
+      <article class="incident-item" *ngFor="let incident of filteredIncidents">
+        <div class="incident-info">
+          <h3>{{ incident.title }}</h3>
+          <div class="incident-details">
+            <p>
+              <strong>Severity:</strong>
+              <span class="severity-badge"
+                    [class.severity-high]="incident.severity === 'HIGH'"
+                    [class.severity-medium]="incident.severity === 'MEDIUM'"
+                    [class.severity-low]="incident.severity === 'LOW'">
+                {{ incident.severity }}
+              </span>
+              <span class="ai-tag" title="Determined by AI"><i class="fas fa-robot"></i> AI</span>
+            </p>
+            <p><strong>Location:</strong> {{ incident.location }}</p>
+            <p><strong>Reported by:</strong> {{ incident.reportedByName || '-' }}</p>
+          </div>
+          <div class="incident-ai-meta" *ngIf="incident.estimatedDelayMinutes !== undefined || incident.incidentType">
+            <span class="meta-tag delay" *ngIf="incident.estimatedDelayMinutes !== undefined && incident.estimatedDelayMinutes > 0">
+              <i class="fas fa-clock"></i> Delay: {{ incident.estimatedDelayMinutes }} min
+            </span>
+            <span class="meta-tag type" *ngIf="incident.incidentType">
+              <i class="fas fa-tag"></i> {{ incident.incidentType }}
+            </span>
+            <span class="meta-tag confidence" *ngIf="incident.confidencePercent">
+              <i class="fas fa-brain"></i> {{ incident.confidencePercent }}% confidence
+            </span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>

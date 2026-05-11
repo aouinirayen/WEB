@@ -1,0 +1,113 @@
+<div class="card border-0 shadow-sm mt-4">
+  <div class="card-header bg-white d-flex align-items-center justify-content-between">
+    <h6 class="fw-bold mb-0">
+      <i class="bi bi-tools me-2"></i>Parts Used in this Maintenance Order
+    </h6>
+    <span class="badge bg-warning text-dark">
+      Total: {{ totalCost | number:'1.2-2' }} TND
+    </span>
+  </div>
+
+  <!-- Auto-suggestions -->
+  <div class="card-body border-bottom" *ngIf="suggestions.length > 0">
+    <p class="text-muted mb-2" style="font-size:12px">
+      <i class="bi bi-lightbulb-fill text-warning me-1"></i>
+      Suggested parts based on maintenance type:
+    </p>
+    <div class="d-flex flex-wrap gap-2">
+      <button *ngFor="let s of suggestions"
+              class="btn btn-sm"
+              [class.btn-outline-warning]="s.lowStock"
+              [class.btn-outline-secondary]="!s.lowStock"
+              (click)="selectSuggestion(s)"
+              [title]="s.reason">
+        <i *ngIf="s.lowStock" class="bi bi-exclamation-triangle text-warning me-1"></i>
+        {{ s.name }}
+        <span class="text-muted">({{ s.stockQuantity }} in stock)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Add usage form -->
+  <div class="card-body border-bottom">
+    <div *ngIf="errorMsg" class="alert alert-danger py-2 mb-2" style="font-size:13px">
+      {{ errorMsg }}
+    </div>
+    <div *ngIf="warnMsg" class="alert alert-warning py-2 mb-2" style="font-size:13px">
+      <i class="bi bi-exclamation-triangle me-1"></i>{{ warnMsg }}
+    </div>
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label" style="font-size:12px">Part</label>
+        <select class="form-select form-select-sm"
+                [(ngModel)]="newUsage.sparePartId" (ngModelChange)="onPartSelected($event)">
+          <option [ngValue]="0" disabled>— Select part —</option>
+          <option *ngFor="let p of allParts" [ngValue]="p.id">
+            {{ p.name }} ({{ p.referenceCode }}) — {{ p.stockQuantity }} in stock
+          </option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" style="font-size:12px">Quantity</label>
+        <input type="number" class="form-control form-control-sm" min="1"
+               [(ngModel)]="newUsage.quantityUsed" (ngModelChange)="onQtyChange()">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" style="font-size:12px">Unit Cost</label>
+        <input class="form-control form-control-sm bg-light"
+               [value]="selectedPartCost | number:'1.3-3'" readonly>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" style="font-size:12px">Line Total</label>
+        <input class="form-control form-control-sm bg-light fw-bold"
+               [value]="lineTotal() | number:'1.2-2'" readonly>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary btn-sm w-100"
+                (click)="addUsage()"
+                [disabled]="!newUsage.sparePartId || !newUsage.quantityUsed">
+          <i class="bi bi-plus"></i> Add
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Existing usages list -->
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Part</th>
+          <th>Reference</th>
+          <th>Qty Used</th>
+          <th>Unit Cost</th>
+          <th>Total</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of usages">
+          <td><strong>{{ u.sparePart.name }}</strong></td>
+          <td><code>{{ u.sparePart.referenceCode }}</code></td>
+          <td>{{ u.quantityUsed }}</td>
+          <td>{{ u.unitCostAtUsage | number:'1.3-3' }} TND</td>
+          <td><strong>{{ u.totalCost | number:'1.2-2' }} TND</strong></td>
+          <td>{{ u.usedDate | date:'mediumDate' }}</td>
+          <td>
+            <button (click)="deleteUsage(u.id!)"
+                    class="btn btn-sm btn-outline-danger"
+                    title="Remove (restores stock)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="usages.length === 0">
+          <td colspan="7" class="text-center text-muted py-3" style="font-size:13px">
+            No parts recorded yet.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

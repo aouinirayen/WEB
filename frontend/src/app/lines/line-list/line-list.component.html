@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold">Lines</h4>
+    <a routerLink="/admin/lines/new" class="btn btn-success btn-sm">
+      <i class="bi bi-plus"></i> Add Line
+    </a>
+  </div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Mode</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of lines">
+            <td><strong>{{ l.code }}</strong></td>
+            <td>{{ l.name }}</td>
+            <td>
+              <span class="badge bg-info text-dark">{{ l.mode }}</span>
+            </td>
+            <td>
+              <span class="badge"
+                [class.bg-success]="l.status==='ACTIVE'"
+                [class.bg-danger]="l.status==='INACTIVE'"
+                [class.bg-warning]="l.status==='SUSPENDED'">
+                {{ l.status }}
+              </span>
+            </td>
+            <td>
+              <a [routerLink]="['/admin/lines/edit', l.id]"
+                 class="btn btn-sm btn-outline-primary me-1">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button (click)="delete(l.id!)"
+                      class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>

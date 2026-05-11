@@ -1,0 +1,77 @@
+# ============================================================
+#  PIDEV — Backend (Spring Boot 3.2.4 / Java 17 / Maven)
+#  JAR produit : PIDEV-0.0.1-SNAPSHOT.jar
+#  Port         : 8081
+# ============================================================
+
+# ── STAGE 1 : Build Maven ──────────────────────────────────
+FROM eclipse-temurin:17-jdk-alpine AS builder
+
+WORKDIR /build
+
+# Installer Maven
+RUN apk add --no-cache maven
+
+# 1. Copier pom.xml seul → télécharger les dépendances
+#    Cette couche est mise en cache tant que pom.xml ne change pas
+COPY pom.xml .
+RUN mvn dependency:go-offline -B --no-transfer-progress
+
+# 2. Copier le source et builder
+COPY src ./src
+RUN mvn package -DskipTests -B --no-transfer-progress
+
+# Vérification : afficher le JAR produit (debug)
+RUN ls -lh target/*.jar
+
+# ── STAGE 2 : Runtime JRE minimal ──────────────────────────
+FROM eclipse-temurin:17-jre-alpine AS production
+
+LABEL app="pidev-backend"
+LABEL version="0.0.1-SNAPSHOT"
+
+# Utilisateur non-root (sécurité)
+RUN addgroup -S pidev && adduser -S pidev -G pidev
+
+WORKDIR /app
+
+# Copier le JAR (nom exact issu du pom.xml : artifactId-version)
+COPY --from=builder /build/target/PIDEV-0.0.1-SNAPSHOT.jar app.jar
+
+# Créer le dossier uploads (remplace C:/xampp/htdocs/pidev-uploads)
+# Monté via PersistentVolumeClaim Kubernetes en production
+RUN mkdir -p /app/uploads/licenses && \
+    chown -R pidev:pidev /app
+
+USER pidev
+
+# Port Spring Boot (server.port=8081)
+EXPOSE 8081
+
+# Health check sur Spring Boot Actuator
+# (si spring-boot-actuator est ajouté) sinon sur /api-docs
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+  CMD wget -qO- http://localhost:8081/actuator/health 2>/dev/null || \
+      wget -qO- http://localhost:8081/api-docs 2>/dev/null || exit 1
+
+# ── Variables d'environnement (injectées par K8s Secrets) ──
+# Toutes les valeurs sensibles sont VIDES ici
+# Elles seront fournies par les Secrets Kubernetes
+ENV SPRING_DATASOURCE_URL=""
+ENV SPRING_DATASOURCE_USERNAME=""
+ENV SPRING_DATASOURCE_PASSWORD=""
+ENV APP_JWT_SECRET=""
+ENV SPRING_MAIL_USERNAME=""
+ENV SPRING_MAIL_PASSWORD=""
+ENV STRIPE_SECRET_KEY=""
+ENV STRIPE_PUBLISHABLE_KEY=""
+ENV GEMINI_API_KEY=""
+ENV APP_FRONTEND_URL=""
+ENV FILE_UPLOAD_DIR="/app/uploads"
+
+# ── Options JVM pour conteneur K8s ─────────────────────────
+ENTRYPOINT ["java", \
+  "-XX:+UseContainerSupport", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", "app.jar"]

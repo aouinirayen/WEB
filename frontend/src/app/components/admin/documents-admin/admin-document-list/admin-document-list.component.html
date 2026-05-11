@@ -1,0 +1,371 @@
+<div class="documents-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Admin</span>
+        <span>/</span>
+        <span>Documents</span>
+      </div>
+      <h1 class="page-title">Document Management</h1>
+      <p class="page-subtitle">Manage legal documents and approvals</p>
+    </div>
+    <button class="btn btn-primary" (click)="openUploadModal()">
+      <i class="fas fa-cloud-upload-alt"></i>
+      Upload Document
+    </button>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="demo-tabs" style="margin-bottom: 24px;">
+    <a routerLink="/admin/documents" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="demo-tab">
+      <i class="fas fa-file-alt"></i> Documents
+    </a>
+    <a routerLink="/admin/documents/types" routerLinkActive="active" class="demo-tab">
+      <i class="fas fa-list"></i> Document Types
+    </a>
+  </div>
+
+  <!-- Stats Card -->
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-body">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+        <div style="border-right: 1px solid #f0f2f5;">
+          <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #999999; margin-bottom: 8px;">Total Documents</div>
+          <div style="font-size: 2rem; font-weight: 700; color: #1a237e;">{{ totalDocuments }}</div>
+        </div>
+        <div style="border-right: 1px solid #f0f2f5;">
+          <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #999999; margin-bottom: 8px;">Pending Review</div>
+          <div style="font-size: 2rem; font-weight: 700; color: #f57f17;">{{ pendingReview }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #999999; margin-bottom: 8px;">Approved</div>
+          <div style="font-size: 2rem; font-weight: 700; color: #2e7d32;">{{ approvedDocuments }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-filter"></i>
+        Filters
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="filters-bar">
+        <div class="filter-search-wrap">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            class="filter-input"
+            placeholder="Search documents..."
+            [(ngModel)]="searchFilter"
+            (change)="onSearchChange()"
+          />
+        </div>
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="onStatusFilterChange()">
+          <option value="">All Statuses</option>
+          <option value="PENDING">Pending</option>
+          <option value="VALID">Approved</option>
+          <option value="REJECTED">Rejected</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents Table -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-list"></i>
+        Documents List
+      </div>
+    </div>
+
+    <div *ngIf="loading$ | async" class="card-body">
+      <div style="text-align: center; padding: 40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #1a73e8;"></i>
+        <p style="margin-top: 16px; color: #999;">Loading documents...</p>
+      </div>
+    </div>
+
+    <div *ngIf="error$ | async as error" class="card-body">
+      <div style="background: #fce4ec; padding: 16px; border-radius: 8px; color: #c62828;">
+        <i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i>
+        {{ error }}
+      </div>
+    </div>
+
+    <div *ngIf="!(loading$ | async) && filteredDocuments.length === 0" class="card-body">
+      <div class="table-empty">
+        <i class="fas fa-folder-open"></i>
+        <div class="table-empty-title">No documents found</div>
+        <div class="table-empty-sub">Upload a document or adjust your filters</div>
+      </div>
+    </div>
+
+    <div *ngIf="!(loading$ | async) && filteredDocuments.length > 0" class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Document Type</th>
+            <th>User</th>
+            <th>Status</th>
+            <th>Upload Date</th>
+            <th>Expiry Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let doc of filteredDocuments">
+            <td>
+              <span class="fw-600">{{ doc.documentType.name || 'Unknown' }}</span>
+            </td>
+            <td>
+              <span class="cell-date">{{ doc.username || ('User #' + doc.userId) }}</span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(doc.status)">
+                <span class="status-dot"></span>
+                {{ doc.status }}
+              </span>
+            </td>
+            <td class="cell-date">
+              <i class="fas fa-calendar-alt"></i>
+              {{ doc.uploadDate | date: 'short' }}
+            </td>
+            <td class="cell-date">
+              <i class="fas fa-calendar-check"></i>
+              {{ doc.expiryDate ? (doc.expiryDate | date: 'short') : '—' }}
+            </td>
+            <td class="cell-actions">
+              <button class="btn-icon btn-icon-view" type="button" (click)="viewDocumentDetails(doc.id!)" title="View">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="btn-icon btn-icon-delete" type="button" (click)="deleteDocument(doc.id!)" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="!(loading$ | async) && totalElements > 0">
+      <div class="pagination-info">Showing {{ (currentPage * pageSize) + 1 }} to {{ Math.min((currentPage + 1) * pageSize, totalElements) }} of {{ totalElements }} results</div>
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="page-btn active">{{ currentPage + 1 }}</button>
+        <button class="page-btn" [disabled]="(currentPage + 1) * pageSize >= totalElements" (click)="onPageChange(currentPage + 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!(loading$ | async) && documents.length === 0 && !searchFilter" class="empty-state">
+    <p>No documents found</p>
+  </div>
+
+  <!-- Modal Form -->
+  <div *ngIf="showUploadForm" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content modal-upload" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2><i class="fas fa-cloud-upload-alt"></i> Upload Document</h2>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="uploadForm" class="modal-form">
+          <div class="form-group">
+            <label for="documentTypeId" class="form-label">
+              Document Type
+              <span class="required">*</span>
+            </label>
+            <select id="documentTypeId" formControlName="documentTypeId" class="form-select">
+              <option value="">{{ documentTypes.length > 0 ? 'Select document type...' : 'Loading document types...' }}</option>
+              <option *ngFor="let type of documentTypes" [value]="type.id">
+                {{ type.name }}
+              </option>
+            </select>
+            <div *ngIf="uploadForm.get('documentTypeId')?.invalid && uploadForm.get('documentTypeId')?.touched" class="error-message">
+              <i class="fas fa-exclamation-circle"></i>Document type is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description"
+                      formControlName="description"
+                      class="form-textarea"
+                      placeholder="Enter document description (optional)"
+                      rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="file" class="form-label">
+              Upload File
+              <span class="required">*</span>
+            </label>
+            <div class="file-upload-wrapper">
+              <input type="file"
+                     id="file"
+                     class="form-file-input"
+                     (change)="onFileSelected($event)"
+                     accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+              <label for="file" class="file-upload-label" [class.file-selected]="selectedFile">
+                <i class="fas" [class.fa-check-circle]="selectedFile" [class.fa-upload]="!selectedFile"></i>
+                <span *ngIf="!selectedFile">Choose File</span>
+                <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+              </label>
+            </div>
+            <p class="form-hint">Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG</p>
+            <div *ngIf="uploadForm.get('file')?.invalid && uploadForm.get('file')?.touched" class="error-message">
+              <i class="fas fa-exclamation-circle"></i>File is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="expiryDate" class="form-label">
+              Expiry Date
+              <span class="required" *ngIf="isExpiryRequired()">*</span>
+            </label>
+            <input type="date"
+                   id="expiryDate"
+                   formControlName="expiryDate"
+                   class="form-input">
+            <div *ngIf="uploadForm.get('expiryDate')?.invalid && uploadForm.get('expiryDate')?.touched && isExpiryRequired()" class="error-message">
+              <i class="fas fa-exclamation-circle"></i>Expiry date is required for this document type
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">
+            <i class="fas fa-times"></i>Cancel
+          </button>
+          <button type="button" class="btn btn-primary" (click)="uploadDocument()">
+            <i class="fas fa-upload"></i>Upload Document
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div *ngIf="showDeleteConfirm" class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fas fa-trash text-red"></i> Confirm Delete</div>
+        <button type="button" class="btn-close" (click)="cancelDelete()"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this document? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="cancelDelete()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document Detail Modal -->
+  <div *ngIf="showDetailModal && selectedDocument" class="modal-overlay" (click)="closeDetailModal()">
+    <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2><i class="fas fa-file-alt"></i> Document Details</h2>
+        <button type="button" class="btn-close" (click)="closeDetailModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Document Information -->
+        <div class="detail-section">
+          <h3 class="section-title">
+            <i class="fas fa-info-circle"></i>Information
+          </h3>
+          <div class="detail-content">
+            <div class="detail-row">
+              <label class="detail-label">Document Type:</label>
+              <span class="detail-value">{{ selectedDocument!.documentType.name }}</span>
+            </div>
+            <div class="detail-row">
+              <label class="detail-label">User ID:</label>
+              <span class="detail-value">{{ selectedDocument!.userId }}</span>
+            </div>
+            <div class="detail-row">
+              <label class="detail-label">Status:</label>
+              <span class="detail-value">
+                <span class="status-badge" [ngClass]="getStatusClass(selectedDocument!.status)">
+                  <span class="status-dot"></span>
+                  {{ selectedDocument!.status }}
+                </span>
+              </span>
+            </div>
+            <div class="detail-row">
+              <label class="detail-label">Upload Date:</label>
+              <span class="detail-value">
+                <i class="fas fa-calendar-alt"></i>
+                {{ selectedDocument!.uploadDate | date: 'medium' }}
+              </span>
+            </div>
+            <div class="detail-row" *ngIf="selectedDocument!.expiryDate">
+              <label class="detail-label">Expiry Date:</label>
+              <span class="detail-value">
+                <i class="fas fa-calendar-check"></i>
+                {{ selectedDocument!.expiryDate | date: 'medium' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Summary Section -->
+        <div class="detail-section">
+          <h3 class="section-title">
+            <i class="fas fa-robot"></i>AI Summary
+          </h3>
+          <p class="section-description">Generate a short AI summary of this document for the admin review flow.</p>
+          <app-text-generator [document]="selectedDocument"></app-text-generator>
+        </div>
+
+        <!-- Document Preview/File Section -->
+        <div class="detail-section">
+          <h3 class="section-title">
+            <i class="fas fa-file-download"></i>Document File
+          </h3>
+          <p class="section-description">Click the buttons below to view or download the actual document file.</p>
+          <div class="file-actions">
+            <button type="button" class="btn btn-primary btn-lg" (click)="viewDocumentFile()">
+              <i class="fas fa-eye"></i> View File
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg" (click)="downloadDocumentFile()">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDetailModal()">
+          <i class="fas fa-times"></i>Close
+        </button>
+        <button type="button" class="btn btn-danger" (click)="rejectDocument(selectedDocument!.id!)" *ngIf="selectedDocument!.status === 'PENDING' || selectedDocument!.status === 'VALID'">
+          <i class="fas fa-times-circle"></i> Reject
+        </button>
+        <button type="button" class="btn btn-success" (click)="approveDocument(selectedDocument!.id!)" *ngIf="selectedDocument!.status === 'PENDING' || selectedDocument!.status === 'REJECTED'">
+          <i class="fas fa-check-circle"></i> Approve
+        </button>
+      </div>
+    </div>
+  </div>

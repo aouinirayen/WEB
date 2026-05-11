@@ -1,0 +1,46 @@
+# ============================================================
+#  .dockerignore — Backend Spring Boot PIDEV
+# ============================================================
+
+# Build outputs (reconstruits dans le conteneur)
+target/
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Fichiers sensibles (NE JAMAIS inclure dans l'image)
+application-local.properties
+application-dev.properties
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.jks
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*
+
+# Logs
+logs/
+*.log
+
+# Uploads locaux (montés via PVC en K8s)
+uploads/
+C:/

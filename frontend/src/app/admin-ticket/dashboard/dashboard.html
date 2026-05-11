@@ -1,0 +1,47 @@
+<h2 class="mb-4"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard &mdash; TicketApp</h2>
+
+<div class="row">
+
+  <!-- Tickets -->
+  <div class="col-lg-4 col-sm-6">
+    <div class="small-box bg-info">
+      <div class="inner">
+        <h3>{{ ticketCount }}</h3>
+        <p>Tickets</p>
+      </div>
+      <div class="icon"><i class="fas fa-ticket-alt"></i></div>
+      <a routerLink="/admin/ticket/tickets" class="small-box-footer">
+        View all <i class="fas fa-arrow-circle-right"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Covoiturages -->
+  <div class="col-lg-4 col-sm-6">
+    <div class="small-box bg-success">
+      <div class="inner">
+        <h3>{{ covoiturageCount }}</h3>
+        <p>Carpools</p>
+      </div>
+      <div class="icon"><i class="fas fa-car"></i></div>
+      <a routerLink="/admin/ticket/covoiturages" class="small-box-footer">
+        View all <i class="fas fa-arrow-circle-right"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Reservations -->
+  <div class="col-lg-4 col-sm-6">
+    <div class="small-box bg-warning">
+      <div class="inner">
+        <h3>{{ reservationCount }}</h3>
+        <p>Reservations</p>
+      </div>
+      <div class="icon"><i class="fas fa-calendar-check"></i></div>
+      <a routerLink="/admin/ticket/reservations" class="small-box-footer">
+        View all <i class="fas fa-arrow-circle-right"></i>
+      </a>
+    </div>
+  </div>
+
+</div>

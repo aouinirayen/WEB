@@ -1,0 +1,161 @@
+<div class="documents-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Documents</span>
+      </div>
+      <h1 class="page-title">My Documents</h1>
+      <p class="page-subtitle">Manage and review your uploaded documents</p>
+    </div>
+    <a href="/documents/upload" class="btn btn-primary">
+      <i class="fas fa-cloud-upload-alt"></i>
+      Upload New Document
+    </a>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="(error$ | async) as error" class="alert alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    <div>
+      <strong>Error</strong>
+      <p>{{ error }}</p>
+    </div>
+    <button type="button" class="alert-close" (click)="documentService.clearError()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-filter"></i>
+        Filters
+      </div>
+    </div>
+    <div class="card-body" style="padding: 20px;">
+      <div class="filters-bar">
+        <input
+          type="text"
+          placeholder="Search by document type, ID, or filename..."
+          [(ngModel)]="searchFilter"
+          (input)="onSearchChange()"
+          class="search-input">
+        <select
+          class="filter-select"
+          [(ngModel)]="selectedStatus"
+          (change)="onStatusFilterChange()"
+          style="min-width: 200px; margin-left: 12px;">
+          <option value="">All Documents</option>
+          <option *ngFor="let status of statuses" [value]="status">
+            {{ getStatusLabel(status) }}
+          </option>
+        </select>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 16px;">
+          <span style="font-size: 0.88rem; color: #999;">
+            Total: <strong style="color: #1a237e;">{{ totalElements }}</strong>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="(loading$ | async)" class="card" style="margin-top: 24px;">
+    <div class="card-body">
+      <div style="text-align: center; padding: 40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #1a73e8;"></i>
+        <p style="margin-top: 16px; color: #999;">Loading documents...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!(loading$ | async) && getFilteredDocuments.length === 0" class="table-empty" style="margin-top: 24px;">
+    <i class="fas fa-inbox"></i>
+    <div class="table-empty-title">No documents found</div>
+    <div class="table-empty-sub">Start by uploading a new document</div>
+    <a href="/documents/upload" class="btn btn-primary" style="margin-top: 16px;">
+      <i class="fas fa-cloud-upload-alt"></i>
+      Upload Document
+    </a>
+  </div>
+
+  <!-- Documents Table -->
+  <div *ngIf="!(loading$ | async) && getFilteredDocuments.length > 0" class="card" style="margin-top: 24px;">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-list"></i>
+        Documents
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Document Type</th>
+            <th scope="col">Status</th>
+            <th scope="col">Upload Date</th>
+            <th scope="col">Expiry Date</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let doc of getFilteredDocuments; trackBy: trackByDocument">
+            <td>
+              <div class="cell-entity">
+                <div class="cell-icon">
+                  <i class="fas fa-file-pdf"></i>
+                </div>
+                <div>
+                  <div class="cell-name">{{ doc.documentType.name || 'Unknown' }}</div>
+                  <div class="cell-sub">ID: {{ doc.id }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="'status-' + (doc.status | lowercase)">
+                <span class="status-dot"></span>
+                {{ getStatusLabel(doc.status) }}
+              </span>
+            </td>
+            <td class="cell-date">
+              <i class="fas fa-calendar-alt"></i>
+              {{ doc.uploadDate | date: 'short' }}
+            </td>
+            <td class="cell-date">
+              {{ doc.expiryDate ? (doc.expiryDate | date: 'short') : 'No expiry' }}
+            </td>
+            <td class="cell-actions">
+              <button class="btn-icon btn-icon-view" type="button" (click)="viewDocument(doc.id)" title="View">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="btn-icon btn-icon-download" type="button" (click)="downloadDocument(doc)" title="Download">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="btn-icon btn-icon-edit" type="button" (click)="reuploadDocument(doc.id)"
+                *ngIf="canReupload(doc.status)" title="Re-upload">
+                <i class="fas fa-redo"></i>
+              </button>
+              <button class="btn-icon btn-icon-delete" type="button" (click)="deleteDocument(doc)"
+                *ngIf="canDelete(doc.status)" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination -->
+    <app-pagination
+      *ngIf="getFilteredDocuments.length > 0"
+      [pageNumber]="currentPage"
+      [pageSize]="pageSize"
+      [totalElements]="totalElements"
+      [totalPages]="totalPages"
+      (pageChanged)="onPageChanged($event)"
+      (pageSizeChanged)="onPageSizeChanged($event)">
+    </app-pagination>
+  </div>
+</div>

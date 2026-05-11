@@ -1,0 +1,288 @@
+<div class="theme-covoiturage">
+<div class="page-header">
+  <h2><i class="fas fa-plus-circle mr-2"></i> Offer a Carpool</h2>
+</div>
+
+@if (success) {
+  <div class="alert alert-success">
+    <i class="fas fa-check-circle mr-1"></i>
+    Your carpool has been submitted successfully! Status: <strong>PENDING</strong> - The admin will validate it.
+    <br>
+    <a routerLink="/ticket/covoiturages" class="btn btn-sm btn-outline-success mt-2">
+      <i class="fas fa-list mr-1"></i> View carpools
+    </a>
+  </div>
+}
+
+@if (error) {
+  <div class="alert alert-danger">
+    <i class="fas fa-times-circle mr-1"></i> Error during submission. Please try again.
+  </div>
+}
+
+@if (!success) {
+<div class="card">
+  <div class="card-body">
+    <form #covForm="ngForm" (ngSubmit)="submit()" class="themed-form">
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="driverName"><i class="fas fa-user mr-1"></i> Your Name</label>
+            <input type="text" id="driverName" class="form-control" [(ngModel)]="covoiturage.driverName" name="driverName"
+              #driverNameRef="ngModel" required minlength="3" maxlength="50" pattern="[A-Za-zÀ-ÿ\s\-]+"
+              [class.is-invalid]="driverNameRef.invalid && driverNameRef.touched">
+            <div class="invalid-feedback">
+              @if (driverNameRef.errors?.['required']) { Driver name is required. }
+              @if (driverNameRef.errors?.['minlength']) { Name must be at least 3 characters. }
+              @if (driverNameRef.errors?.['pattern']) { Name must contain only letters. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="vehicle"><i class="fas fa-car mr-1"></i> Vehicle</label>
+            <input type="text" id="vehicle" class="form-control" [(ngModel)]="covoiturage.vehicle" name="vehicle"
+              #vehicleRef="ngModel" required minlength="2" maxlength="30"
+              [class.is-invalid]="vehicleRef.invalid && vehicleRef.touched">
+            <div class="invalid-feedback">
+              @if (vehicleRef.errors?.['required']) { Vehicle is required. }
+              @if (vehicleRef.errors?.['minlength']) { Vehicle name must be at least 2 characters. }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="departure"><i class="fas fa-map-marker-alt mr-1"></i> Departure</label>
+            <input type="text" id="departure" class="form-control" [(ngModel)]="covoiturage.departure" name="departure"
+              #departureRef="ngModel" required minlength="3" maxlength="50" pattern="[A-Za-zÀ-ÿ\s\-]+"
+              (ngModelChange)="onDepartureChanged()"
+              [class.is-invalid]="departureRef.invalid && departureRef.touched">
+            <div class="invalid-feedback">
+              @if (departureRef.errors?.['required']) { Departure location is required. }
+              @if (departureRef.errors?.['minlength']) { Departure must be at least 3 characters. }
+              @if (departureRef.errors?.['pattern']) { Location must contain only letters. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="destination"><i class="fas fa-flag-checkered mr-1"></i> Destination</label>
+            <input type="text" id="destination" class="form-control" [(ngModel)]="covoiturage.destination" name="destination"
+              #destinationRef="ngModel" required minlength="3" maxlength="50" pattern="[A-Za-zÀ-ÿ\s\-]+"
+              (ngModelChange)="onDestinationChanged()"
+              [class.is-invalid]="destinationRef.invalid && destinationRef.touched">
+            <div class="invalid-feedback">
+              @if (destinationRef.errors?.['required']) { Destination is required. }
+              @if (destinationRef.errors?.['minlength']) { Destination must be at least 3 characters. }
+              @if (destinationRef.errors?.['pattern']) { Destination must contain only letters. }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="date"><i class="fas fa-calendar mr-1"></i> Date</label>
+            <input type="date" id="date" class="form-control" [(ngModel)]="covoiturage.date" name="date"
+              #dateRef="ngModel" required [min]="today"
+              (ngModelChange)="onDateTimeChanged()"
+              [class.is-invalid]="dateRef.invalid && dateRef.touched">
+            <div class="invalid-feedback">
+              @if (dateRef.errors?.['required']) { Date is required. }
+              @if (dateRef.errors?.['min']) { Date cannot be in the past. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="heureDepart"><i class="fas fa-clock mr-1"></i> Departure Time</label>
+            <input type="time" id="heureDepart" class="form-control" [(ngModel)]="covoiturage.heureDepart" name="heureDepart"
+              #heureDepartRef="ngModel" required
+              (ngModelChange)="onDateTimeChanged()"
+              [class.is-invalid]="(heureDepartRef.invalid && heureDepartRef.touched) || isHeureDepartInvalid">
+            @if (heureDepartRef.errors?.['required'] && heureDepartRef.touched) {
+              <div class="text-danger small">Departure time is required.</div>
+            }
+            @if (isHeureDepartInvalid) {
+              <div class="text-danger small">Departure time must be at least 30 min after current time (min {{ minTime }}).</div>
+            }
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="heureArrivee"><i class="fas fa-flag-checkered mr-1"></i> Arrival Time (estimated)</label>
+            <input type="time" id="heureArrivee" class="form-control" [(ngModel)]="covoiturage.heureArrivee" name="heureArrivee"
+              #heureArriveeRef="ngModel" required
+              [class.is-invalid]="(heureArriveeRef.invalid && heureArriveeRef.touched) || isHeureArriveeInvalid"
+              [max]="estimatedArrivalTime || undefined">
+            @if (heureArriveeRef.errors?.['required'] && heureArriveeRef.touched) {
+              <div class="text-danger small">Arrival time is required.</div>
+            }
+            @if (isHeureArriveeInvalid) {
+              <div class="text-danger small">Arrival time cannot exceed {{ estimatedArrivalTime }} (traffic estimate).</div>
+            }
+            @if (estimatedArrivalTime) {
+              <small style="color:#2e7d32;font-weight:600;"><i class="fas fa-magic mr-1"></i> Auto: {{ estimatedArrivalTime }} (duration {{ durationMin }} min)</small>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="availableSeats"><i class="fas fa-chair mr-1"></i> Available Seats</label>
+            <input type="number" id="availableSeats" class="form-control" [(ngModel)]="covoiturage.availableSeats" name="availableSeats"
+              #seatsRef="ngModel" required min="1" max="8"
+              (ngModelChange)="onSeatsChanged()"
+              [class.is-invalid]="seatsRef.invalid && seatsRef.touched">
+            <div class="invalid-feedback">
+              @if (seatsRef.errors?.['required']) { Number of seats is required. }
+              @if (seatsRef.errors?.['min']) { At least 1 seat must be available. }
+              @if (seatsRef.errors?.['max']) { Maximum 8 seats per carpool. }
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="price"><i class="fas fa-tag mr-1"></i> Price per seat (TND)</label>
+            <input type="number" id="price" class="form-control" [(ngModel)]="covoiturage.price" name="price"
+              #priceRef="ngModel" required min="1" [max]="estimatedPriceMax > 0 ? estimatedPriceMax : 500"
+              [class.is-invalid]="priceRef.invalid && priceRef.touched">
+            <div class="invalid-feedback">
+              @if (priceRef.errors?.['required']) { Price is required. }
+              @if (priceRef.errors?.['min']) { Price must be at least 1 TND. }
+              @if (priceRef.errors?.['max']) { Price cannot exceed {{ estimatedPriceMax > 0 ? estimatedPriceMax : 500 }} TND. }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      @if (estimatingPrice) {
+        <div class="alert" style="background:#e8f5e9;border:1px solid #c8e6c9;border-radius:10px;">
+          <i class="fas fa-spinner fa-spin mr-2" style="color:#2e7d32;"></i>
+          <span style="color:#2e7d32;font-weight:600;">Calculating distance and estimating price...</span>
+        </div>
+      }
+      @if (estimationError) {
+        <div class="alert" style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:10px;color:#e65100;">
+          <i class="fas fa-exclamation-triangle mr-1"></i> {{ estimationError }}
+        </div>
+      }
+      @if (distanceKm > 0 && !estimatingPrice) {
+        <div class="alert" style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1px solid #c8e6c9;border-radius:12px;padding:16px 20px;">
+          <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap" style="gap:6px;">
+            <div>
+              <i class="fas fa-route mr-2" style="color:#2e7d32;font-size:1.2rem;"></i>
+              <strong style="color:#2e7d32;font-size:1rem;">Trip Estimate</strong>
+            </div>
+            <div class="d-flex align-items-center" style="gap:6px;">
+              @if (isLiveTraffic) {
+                <span style="background:#c62828;color:#fff;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;animation:pulse 2s infinite;">
+                  <i class="fas fa-broadcast-tower mr-1"></i> LIVE TRAFFIC
+                </span>
+              }
+              @if (isPredictive) {
+                <span style="background:#1565c0;color:#fff;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;">
+                  <i class="fas fa-chart-line mr-1"></i> TRAFFIC PREDICTION ({{ covoiturage.date }} {{ covoiturage.heureDepart || '08:00' }})
+                </span>
+              }
+              <span style="background:#fff;padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:600;color:#1a237e;border:1px solid #c8e6c9;">
+                <i class="fas fa-tachometer-alt mr-1"></i> {{ routeType }}
+              </span>
+            </div>
+          </div>
+
+          <div class="row mb-2" style="gap:0;">
+            <div class="col-md-3 mb-1">
+              <div style="background:#fff;border-radius:8px;padding:10px;text-align:center;">
+                <i class="fas fa-road" style="color:#1a73e8;font-size:1.2rem;"></i>
+                <div style="font-size:1.15rem;font-weight:700;color:#1a237e;">{{ distanceKm }} km</div>
+                <small style="color:#666;">Distance</small>
+              </div>
+            </div>
+            <div class="col-md-3 mb-1">
+              <div style="background:#fff;border-radius:8px;padding:10px;text-align:center;">
+                <i class="fas fa-clock" style="color:#f57f17;font-size:1.2rem;"></i>
+                <div style="font-size:1.15rem;font-weight:700;color:#1a237e;">{{ durationMin }} min</div>
+                <small style="color:#666;">Duration with traffic</small>
+                @if (isLiveTraffic && durationNoTrafficMin > 0 && durationNoTrafficMin !== durationMin) {
+                  <div style="font-size:0.72rem;color:#888;text-decoration:line-through;">{{ durationNoTrafficMin }} min without traffic</div>
+                }
+              </div>
+            </div>
+            <div class="col-md-3 mb-1">
+              <div style="background:#fff;border-radius:8px;padding:10px;text-align:center;">
+                <i class="fas fa-tachometer-alt" style="color:#7b1fa2;font-size:1.2rem;"></i>
+                <div style="font-size:1.15rem;font-weight:700;color:#1a237e;">{{ avgSpeedKmh }} km/h</div>
+                <small style="color:#666;">Average speed</small>
+              </div>
+            </div>
+            <div class="col-md-3 mb-1">
+              <div style="background:#fff;border-radius:8px;padding:10px;text-align:center;">
+                <i class="fas fa-tag" style="color:#e65100;font-size:1.2rem;"></i>
+                <div style="font-size:1.1rem;font-weight:700;color:#2e7d32;">{{ estimatedPriceMin }} - {{ estimatedPriceMax }} TND</div>
+                <small style="color:#666;">Price / seat</small>
+              </div>
+            </div>
+          </div>
+
+          @if (isLiveTraffic) {
+            <div class="d-flex justify-content-center mb-2" style="gap:10px;">
+              <span style="padding:4px 14px;border-radius:20px;font-size:0.8rem;font-weight:600;"
+                [style.background]="trafficLevel === 'Light' ? '#e8f5e9' : trafficLevel === 'Moderate' ? '#fff8e1' : trafficLevel === 'Heavy' ? '#fff3e0' : '#fce4ec'"
+                [style.color]="trafficLevel === 'Light' ? '#2e7d32' : trafficLevel === 'Moderate' ? '#f57f17' : trafficLevel === 'Heavy' ? '#e65100' : '#c62828'">
+                <i class="fas fa-traffic-light mr-1"></i> Traffic: {{ trafficLevel }}
+              </span>
+              @if (trafficDelayMin > 0) {
+                <span style="background:#fce4ec;color:#c62828;padding:4px 14px;border-radius:20px;font-size:0.8rem;font-weight:600;">
+                  <i class="fas fa-hourglass-half mr-1"></i> +{{ trafficDelayMin }} min delay
+                </span>
+              }
+            </div>
+          }
+
+          <div class="d-flex justify-content-center flex-wrap" style="gap:8px;">
+            <button type="button" class="btn btn-sm" style="background:#2e7d32;color:#fff;border-radius:8px;" (click)="applyEstimatedPrice(estimatedPriceMin)">
+              <i class="fas fa-arrow-down mr-1"></i> Min ({{ estimatedPriceMin }} TND)
+            </button>
+            <button type="button" class="btn btn-sm" style="background:#1a73e8;color:#fff;border-radius:8px;" (click)="applyEstimatedPrice((estimatedPriceMin + estimatedPriceMax) / 2)">
+              <i class="fas fa-balance-scale mr-1"></i> Average ({{ ((estimatedPriceMin + estimatedPriceMax) / 2) | number:'1.0-0' }} TND)
+            </button>
+            <button type="button" class="btn btn-sm" style="background:#e65100;color:#fff;border-radius:8px;" (click)="applyEstimatedPrice(estimatedPriceMax)">
+              <i class="fas fa-arrow-up mr-1"></i> Max ({{ estimatedPriceMax }} TND)
+            </button>
+          </div>
+          <small class="d-block text-center mt-2" style="color:#888;">
+            <i class="fas fa-info-circle mr-1"></i>
+            @if (isLiveTraffic) { Real-time traffic data (TomTom) }
+            @else if (isPredictive) { Prediction based on historical traffic data (TomTom) }
+            @else { Estimate based on normal conditions (OSRM) }
+          </small>
+        </div>
+      }
+
+      <div class="form-group">
+        <label><i class="fas fa-map-marker-alt mr-1"></i> Departure Location</label>
+        <small class="text-muted d-block mb-2"><i class="fas fa-info-circle mr-1"></i> The map updates automatically when you type the departure location. You can also click directly on the map.</small>
+        <app-map-picker mapId="departureMap" [searchQuery]="covoiturage.departure" (locationSelected)="onDepartureLocationSelected($event)"></app-map-picker>
+      </div>
+
+      <div class="d-flex">
+        <button type="submit" class="btn btn-themed mr-2" [disabled]="submitting || covForm.invalid || isHeureDepartInvalid || isHeureArriveeInvalid">
+          <i class="fas fa-paper-plane mr-1"></i> {{ submitting ? 'Sending...' : 'Submit' }}
+        </button>
+        <a routerLink="/ticket/covoiturages" class="btn btn-themed-outline">
+          <i class="fas fa-arrow-left mr-1"></i> Back
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+}
+</div>

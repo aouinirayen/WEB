@@ -1,0 +1,220 @@
+<div class="document-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Documents</span>
+        <span>/</span>
+        <span>Details</span>
+      </div>
+      <h1 class="page-title">Document Details</h1>
+      <p class="page-subtitle">View document information and history</p>
+    </div>
+    <button class="btn btn-outline" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Back to List
+    </button>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="(error$ | async) as error" class="alert alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    <div>
+      <strong>Error</strong>
+      <p>{{ error }}</p>
+    </div>
+  </div>
+
+  <!-- Document not found -->
+  <div *ngIf="!document && !(loading$ | async)" class="alert alert-warning">
+    <i class="fas fa-info-circle"></i>
+    <div>
+      <strong>Not Found</strong>
+      <p>Document not found</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="(loading$ | async)" class="card" style="margin-top: 24px;">
+    <div class="card-body">
+      <div style="text-align: center; padding: 40px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #1a73e8;"></i>
+        <p style="margin-top: 16px; color: #999;">Loading document details...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document Details -->
+  <div *ngIf="document && !(loading$ | async)" class="row">
+    <div class="col-lg-8">
+      <!-- Status Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-file-alt"></i>
+            Document Information
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Status Section -->
+          <div class="info-section">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-item">
+                  <label class="info-label">Status</label>
+                  <span class="status-badge" [ngClass]="'status-' + (document.status | lowercase)">
+                    <span class="status-dot"></span>
+                    {{ getStatusLabel(document.status) }}
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item">
+                  <label class="info-label">Document ID</label>
+                  <p class="info-value">#{{ document.id }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Type Information -->
+          <div class="info-section">
+            <h5 class="section-title">Document Type Information</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-item">
+                  <label class="info-label">Type Name</label>
+                  <p class="info-value">{{ document.documentType.name }}</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item">
+                  <label class="info-label">Description</label>
+                  <p class="info-value">{{ document.documentType.description }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-item">
+                  <label class="info-label">Requires Expiry</label>
+                  <div>
+                    <span class="badge-pill badge-success" *ngIf="document.documentType.requiresExpiry">Yes</span>
+                    <span class="badge-pill badge-neutral" *ngIf="!document.documentType.requiresExpiry">No</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item">
+                  <label class="info-label">Allowed Roles</label>
+                  <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                    <span class="badge-pill badge-blue" *ngFor="let role of getAllowedRoles()">{{ role }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Information -->
+          <div class="info-section">
+            <h5 class="section-title">Upload Information</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-item">
+                  <label class="info-label">Upload Date</label>
+                  <p class="info-value">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ document.uploadDate | date: 'medium' }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item">
+                  <label class="info-label">Expiry Date</label>
+                  <p class="info-value">
+                    {{ document.expiryDate ? (document.expiryDate | date: 'medium') : 'No expiry' }}
+                    <span class="badge-expire" *ngIf="document.status === 'EXPIRED'">Expired</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Status Message -->
+          <div *ngIf="document.status === 'PENDING'" class="alert alert-info" style="margin-top: 20px;">
+            <i class="fas fa-info-circle"></i>
+            <div>
+              <strong>Pending Review</strong>
+              <p>Your document is currently awaiting admin review. You will be notified once it has been reviewed.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions Sidebar -->
+    <div class="col-lg-4">
+      <!-- Actions Card -->
+      <div class="card sticky-card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-tasks"></i>
+            Actions
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="actions-group">
+            <button class="btn btn-primary btn-block" (click)="downloadDocument()">
+              <i class="fas fa-download"></i>
+              Download Document
+            </button>
+            <button class="btn btn-warning btn-block" *ngIf="canReupload()" (click)="reupload()">
+              <i class="fas fa-redo"></i>
+              Re-upload Document
+            </button>
+            <button class="btn btn-outline btn-block" (click)="goBack()">
+              <i class="fas fa-arrow-left"></i>
+              Back to List
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Card -->
+      <div class="card" style="margin-top: 16px;">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-history"></i>
+            Timeline
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-marker">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <div class="timeline-content">
+                <p class="timeline-label">Uploaded</p>
+                <small class="timeline-date">{{ document.uploadDate | date: 'short' }}</small>
+              </div>
+            </div>
+
+            <div class="timeline-item" *ngIf="document.status !== 'PENDING'">
+              <div class="timeline-marker" [ngClass]="'status-' + (document.status | lowercase)">
+                <i class="fas fa-check-circle" *ngIf="document.status === 'VALID'"></i>
+                <i class="fas fa-times-circle" *ngIf="document.status === 'REJECTED'"></i>
+                <i class="fas fa-exclamation-circle" *ngIf="document.status === 'REQUEST_UPDATE'"></i>
+                <i class="fas fa-clock" *ngIf="document.status === 'EXPIRED'"></i>
+              </div>
+              <div class="timeline-content">
+                <p class="timeline-label">{{ getStatusLabel(document.status) }}</p>
+                <small class="timeline-date">Status updated</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

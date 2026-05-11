@@ -1,0 +1,17 @@
+package tn.esprit.pidev.enums;
+
+public enum AuditLogActionType {
+    LOGIN,
+    LOGOUT,
+    DOCUMENT_UPLOADED,
+    DOCUMENT_VIEWED,
+    DOCUMENT_DOWNLOADED,
+    DOCUMENT_APPROVED,
+    DOCUMENT_REJECTED,
+    USER_CREATED,
+    USER_UPDATED,
+    USER_DELETED,
+    PROFILE_UPDATED,
+    PASSWORD_CHANGED
+}
+

@@ -1,0 +1,288 @@
+<div style="background:white; border-radius:16px; box-shadow:0 2px 20px rgba(0,0,0,0.07); overflow:hidden;">
+
+  <!-- Header -->
+  <div style="padding:20px 25px; display:flex; justify-content:space-between; align-items:center;
+              border-bottom:1px solid #f0f2f5;">
+    <div>
+      <h3 style="margin:0; font-weight:700; color:#1a237e; font-size:1.2rem;">
+        <i class="fas fa-handshake mr-2"></i> Partners
+      </h3>
+      <small style="color:#999;">
+        {{ filteredPartners.length }} of {{ partners.length }} partners
+      </small>
+    </div>
+    <a routerLink="/admin/partners/new"
+       style="background:linear-gradient(135deg,#1a73e8,#0d47a1); color:white;
+              padding:9px 20px; border-radius:10px; text-decoration:none;
+              font-weight:600; font-size:0.9rem; display:inline-flex;
+              align-items:center; gap:8px; box-shadow:0 4px 12px rgba(26,115,232,0.3);
+              transition:opacity 0.2s;"
+       onmouseover="this.style.opacity='0.85'"
+       onmouseout="this.style.opacity='1'">
+      <i class="fas fa-plus"></i> Add Partner
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div style="padding:16px 25px; background:#f8f9ff; border-bottom:1px solid #f0f2f5;">
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+
+      <!-- Search -->
+      <div style="position:relative; flex:3; min-width:220px;">
+        <i class="fas fa-search"
+           style="position:absolute; left:14px; top:50%; transform:translateY(-50%);
+                  color:#aaa; font-size:0.85rem; pointer-events:none;"></i>
+        <input type="text"
+               [(ngModel)]="searchTerm"
+               (ngModelChange)="applyFilters()"
+               placeholder="Search by name, email, industry..."
+               style="width:100%; height:40px; border:1.5px solid #e0e4ef;
+                      border-radius:10px; padding:0 14px 0 40px;
+                      font-size:0.9rem; color:#333; outline:none;
+                      background:white; transition:border 0.2s;"
+               onfocus="this.style.border='1.5px solid #1a73e8'"
+               onblur="this.style.border='1.5px solid #e0e4ef'">
+      </div>
+
+      <!-- Status Filter -->
+      <div style="flex:1; min-width:140px; position:relative;">
+        <i class="fas fa-circle"
+           style="position:absolute; left:12px; top:50%; transform:translateY(-50%);
+                  color:#aaa; font-size:0.6rem; pointer-events:none;"></i>
+        <select [(ngModel)]="filterStatus"
+                (ngModelChange)="applyFilters()"
+                style="width:100%; height:40px; border:1.5px solid #e0e4ef;
+                       border-radius:10px; padding:0 14px 0 30px;
+                       font-size:0.9rem; color:#333; outline:none;
+                       background:white; appearance:none; cursor:pointer;"
+                onfocus="this.style.border='1.5px solid #1a73e8'"
+                onblur="this.style.border='1.5px solid #e0e4ef'">
+          <option value="">All Status</option>
+          <option value="ACTIVE">âœ… ACTIVE</option>
+          <option value="PENDING">â³ PENDING</option>
+          <option value="SUSPENDED">âš ï¸ SUSPENDED</option>
+          <option value="TERMINATED">âŒ TERMINATED</option>
+        </select>
+      </div>
+
+      <!-- Clear -->
+      <button (click)="clearFilters()"
+              style="height:40px; width:40px; border:1.5px solid #e0e4ef;
+                     background:white; border-radius:10px; cursor:pointer;
+                     display:flex; align-items:center; justify-content:center;
+                     color:#888; flex-shrink:0; transition:all 0.2s;"
+              onmouseover="this.style.background='#fee2e2'; this.style.color='#dc2626'; this.style.borderColor='#fca5a5'"
+              onmouseout="this.style.background='white'; this.style.color='#888'; this.style.borderColor='#e0e4ef'">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Active filter badges -->
+    <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;"
+         *ngIf="searchTerm || filterStatus">
+      <span *ngIf="searchTerm"
+            style="background:#e3f2fd; color:#1a73e8; padding:3px 12px;
+                   border-radius:20px; font-size:0.78rem; font-weight:600;
+                   display:inline-flex; align-items:center; gap:6px;">
+        <i class="fas fa-search"></i> "{{ searchTerm }}"
+        <i class="fas fa-times" style="cursor:pointer;"
+           (click)="searchTerm=''; applyFilters()"></i>
+      </span>
+      <span *ngIf="filterStatus"
+            style="background:#e8f5e9; color:#2e7d32; padding:3px 12px;
+                   border-radius:20px; font-size:0.78rem; font-weight:600;
+                   display:inline-flex; align-items:center; gap:6px;">
+        {{ filterStatus }}
+        <i class="fas fa-times" style="cursor:pointer;"
+           (click)="filterStatus=''; applyFilters()"></i>
+      </span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+      <tr style="background:#f8f9ff;">
+        <th style="padding:13px 20px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">NAME</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">INDUSTRY</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">EMAIL</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">PHONE</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">STATUS</th>
+        <th style="padding:13px 15px; text-align:left; font-size:0.72rem;
+                     font-weight:700; color:#1a237e; letter-spacing:0.8px;
+                     border-bottom:2px solid #e8ecf0;">ACTIONS</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let partner of paginatedPartners"
+          style="border-bottom:1px solid #f5f5f5; transition:background 0.15s;"
+          onmouseover="this.style.background='#f8f9ff'"
+          onmouseout="this.style.background='white'">
+
+        <!-- Name -->
+        <td style="padding:14px 20px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px; border-radius:50%;
+                          background:#e8f5e9; overflow:hidden; flex-shrink:0;
+                          display:flex; align-items:center; justify-content:center;
+                          border:2px solid #c8e6c9;">
+              <i class="fas fa-handshake" style="color:#2e7d32; font-size:0.85rem;"></i>
+            </div>
+            <span style="font-weight:600; color:#1a237e;">{{ partner.name }}</span>
+          </div>
+        </td>
+
+        <td style="padding:14px 15px; color:#666; font-size:0.9rem;">{{ partner.industrySector }}</td>
+        <td style="padding:14px 15px; color:#666; font-size:0.9rem;">{{ partner.email }}</td>
+        <td style="padding:14px 15px; color:#666; font-size:0.9rem;">{{ partner.phoneNumber }}</td>
+
+        <!-- Status -->
+        <td style="padding:14px 15px;">
+            <span style="padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;
+                         display:inline-flex; align-items:center; gap:5px;"
+                  [style.background]="partner.status === 'ACTIVE' ? '#e8f5e9' : partner.status === 'PENDING' ? '#fff8e1' : partner.status === 'SUSPENDED' ? '#fff3e0' : '#fce4ec'"
+                  [style.color]="partner.status === 'ACTIVE' ? '#2e7d32' : partner.status === 'PENDING' ? '#f57f17' : partner.status === 'SUSPENDED' ? '#e65100' : '#c62828'">
+              <span style="width:6px; height:6px; border-radius:50%; display:inline-block;"
+                    [style.background]="partner.status === 'ACTIVE' ? '#2e7d32' : partner.status === 'PENDING' ? '#f57f17' : partner.status === 'SUSPENDED' ? '#e65100' : '#c62828'">
+              </span>
+              {{ partner.status }}
+            </span>
+        </td>
+
+        <!-- Actions -->
+        <td style="padding:14px 15px;">
+          <div style="display:flex; gap:6px;">
+            <a [routerLink]="['/admin/partners/edit', partner.id]"
+               style="width:32px; height:32px; border-radius:8px; background:#fff8e1;
+                        color:#f57f17; display:flex; align-items:center; justify-content:center;
+                        text-decoration:none; transition:all 0.2s;"
+               title="Edit"
+               onmouseover="this.style.background='#f57f17'; this.style.color='white'"
+               onmouseout="this.style.background='#fff8e1'; this.style.color='#f57f17'">
+              <i class="fas fa-edit" style="font-size:0.8rem;"></i>
+            </a>
+            <a (click)="openContract(partner.id!)"
+               target="_blank"
+               style="width:32px; height:32px; border-radius:8px; background:#e3f2fd;
+                        color:#1a73e8; display:flex; align-items:center; justify-content:center;
+                        text-decoration:none; transition:all 0.2s;"
+               title="PDF Contract"
+               onmouseover="this.style.background='#1a73e8'; this.style.color='white'"
+               onmouseout="this.style.background='#e3f2fd'; this.style.color='#1a73e8'">
+              <i class="fas fa-file-pdf" style="font-size:0.8rem;"></i>
+            </a>
+            <button (click)="delete(partner.id ?? 0)"
+                    style="width:32px; height:32px; border-radius:8px; background:#fce4ec;
+                             color:#c62828; border:none; cursor:pointer;
+                             display:flex; align-items:center; justify-content:center;
+                             transition:all 0.2s;"
+                    title="Delete"
+                    onmouseover="this.style.background='#c62828'; this.style.color='white'"
+                    onmouseout="this.style.background='#fce4ec'; this.style.color='#c62828'">
+              <i class="fas fa-trash" style="font-size:0.8rem;"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      <tr *ngIf="paginatedPartners.length === 0">
+        <td colspan="6" style="text-align:center; padding:40px; color:#999;">
+          <i class="fas fa-search" style="font-size:2.5rem; display:block;
+               margin-bottom:12px; color:#ddd;"></i>
+          <div style="font-weight:600; margin-bottom:5px;">No partners found</div>
+          <small>Try adjusting your search or filters</small>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div style="padding:12px 20px; border-top:1px solid #f0f2f5; background:white;">
+    <app-pagination
+      [pageNumber]="currentPage - 1"
+      [totalElements]="filteredPartners.length"
+      [pageSize]="itemsPerPage"
+      [totalPages]="Math.ceil(filteredPartners.length / itemsPerPage)"
+      (pageChanged)="updatePage($event + 1)">
+    </app-pagination>
+  </div>
+</div>
+
+
+<!-- Contracts List Modal -->
+<div *ngIf="showContractsModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; padding:30px; max-width:800px; width:90%; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1a237e,#1a73e8); border-radius:10px; padding:20px; text-align:center; margin-bottom:20px;">
+      <div style="width:60px; height:60px; margin:0 auto 10px; background:rgba(255,255,255,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+        <i class="fas fa-file-contract" style="font-size:1.8rem; color:white;"></i>
+      </div>
+      <h4 style="color:white; margin:0; font-weight:700;">Contracts de {{ selectedPartnerName }}</h4>
+      <p style="color:rgba(255,255,255,0.85); margin:5px 0 0; font-size:0.9rem;">Download the PDF of each signed contract</p>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="contractsModalLoading" style="text-align:center; padding:30px;">
+      <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:#1a73e8;"></i>
+      <p style="color:#666; margin-top:10px;">Loading contracts...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!contractsModalLoading && selectedPartnerContracts.length === 0" style="text-align:center; padding:30px; color:#999;">
+      <i class="fas fa-inbox" style="font-size:3rem; margin-bottom:10px;"></i>
+      <p>No contracts found for this partner.</p>
+    </div>
+
+    <!-- Contracts list -->
+    <div *ngIf="!contractsModalLoading && selectedPartnerContracts.length > 0">
+      <div *ngFor="let contract of selectedPartnerContracts" style="border:1px solid #e0e0e0; border-radius:10px; padding:15px; margin-bottom:12px; background:#fafbfc;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div>
+            <span style="background:#1a73e8; color:white; padding:3px 10px; border-radius:20px; font-size:0.8rem; font-weight:600;">
+              #{{ contract.id }} - {{ contract.contractType }}
+            </span>
+            <span *ngIf="contract.isSigned" style="margin-left:8px; background:#e8f5e9; color:#2e7d32; padding:3px 10px; border-radius:20px; font-size:0.8rem; font-weight:600;">
+              <i class="fas fa-check-circle"></i> Signe
+            </span>
+            <span *ngIf="!contract.isSigned" style="margin-left:8px; background:#fff3e0; color:#e65100; padding:3px 10px; border-radius:20px; font-size:0.8rem; font-weight:600;">
+              <i class="fas fa-exclamation-triangle"></i> Non signe
+            </span>
+          </div>
+          <button (click)="downloadContractPdf(contract.id, selectedPartnerName, contract.organizationName)"
+                  style="background:#1a73e8; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600;">
+            <i class="fas fa-download mr-1"></i> PDF
+          </button>
+        </div>
+        <div style="font-size:0.85rem; color:#555;">
+          <div><strong>Organization :</strong> {{ contract.organizationName || 'N/A' }}</div>
+          <div><strong>Period :</strong> {{ contract.startDate | date:'dd/MM/yyyy' }} -> {{ contract.endDate | date:'dd/MM/yyyy' }}</div>
+          <div *ngIf="contract.isSigned">
+            <strong>Signed by :</strong> {{ contract.signedBy }} le {{ contract.signedAt | date:'dd/MM/yyyy HH:mm' }}
+          </div>
+          <div *ngIf="contract.isSigned && contract.contentHash" style="margin-top:5px;">
+            <strong>Hash SHA-256 :</strong>
+            <code style="background:#eee; padding:2px 6px; border-radius:4px; font-size:0.75rem;">{{ contract.contentHash?.substring(0, 32) }}...</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Close button -->
+    <button (click)="showContractsModal=false" class="btn btn-secondary w-100" style="margin-top:15px;">
+      <i class="fas fa-times mr-2"></i>Close
+    </button>
+  </div>
+</div>

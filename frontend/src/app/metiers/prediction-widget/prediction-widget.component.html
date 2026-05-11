@@ -1,0 +1,41 @@
+<!-- Drop this widget at the bottom of spare-part-list.component.html -->
+<div class="pred-widget mt-4">
+  <div class="pred-widget-header">
+    <span><i class="bi bi-cpu me-2"></i>Smart Predictions <small class="text-muted">(Top 5 urgent)</small></span>
+    <a routerLink="/admin/predictions" class="see-all-link">View all →</a>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-3">
+    <div class="spinner-border spinner-border-sm text-primary"></div>
+  </div>
+
+  <div class="widget-list" *ngIf="!loading">
+    <div class="widget-row" *ngFor="let p of predictions"
+         [ngClass]="'wrow-' + p.urgency.toLowerCase()">
+      <div class="widget-left">
+        <span class="w-part">{{ p.partName }}</span>
+        <span class="w-explanation">{{ p.explanation }}</span>
+      </div>
+      <div class="widget-right">
+        <span class="w-days"
+          [class.text-danger]="p.daysUntilNeeded <= 7"
+          [class.text-warning]="p.daysUntilNeeded > 7 && p.daysUntilNeeded <= 30"
+          [class.text-primary]="p.daysUntilNeeded > 30">
+          {{ p.daysUntilNeeded <= 0 ? 'OVERDUE' : 'in ' + p.daysUntilNeeded + 'd' }}
+        </span>
+        <span class="w-badge"
+          [ngClass]="'wbadge-' + p.urgency.toLowerCase()">
+          {{ p.urgency }}
+        </span>
+        <span class="w-method"
+          [ngClass]="p.method === 'LINEAR_REGRESSION' ? 'method-ai' : 'method-freq'">
+          {{ p.method === 'LINEAR_REGRESSION' ? '🤖' : '📊' }}
+        </span>
+      </div>
+    </div>
+
+    <div *ngIf="predictions.length === 0" class="text-center text-muted py-3" style="font-size:13px">
+      No predictions yet — add maintenance and part usage records first.
+    </div>
+  </div>
+</div>

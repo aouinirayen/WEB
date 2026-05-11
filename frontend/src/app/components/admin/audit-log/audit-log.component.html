@@ -1,0 +1,188 @@
+<div class="audit-log-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Admin</span>
+        <span>/</span>
+        <span>Audit Log</span>
+      </div>
+      <h1 class="page-title">System Audit Log</h1>
+      <p class="page-subtitle">View all system activities and user actions</p>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-filter"></i>
+        Filters
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="filterForm" class="filter-form">
+        <div class="filter-row">
+          <!-- Search by Username -->
+          <div class="filter-group">
+            <label for="username">Search by Username</label>
+            <input
+              id="username"
+              type="text"
+              class="form-control"
+              formControlName="username"
+              placeholder="Enter username..."
+              (input)="onSearchChange($any($event.target).value)">
+          </div>
+
+          <!-- Filter by Action Type -->
+          <div class="filter-group">
+            <label for="actionType">Filter by Action</label>
+            <select
+              id="actionType"
+              class="form-control"
+              formControlName="actionType"
+              (change)="onActionTypeChange()">
+              <option value="">All Actions</option>
+              <option *ngFor="let action of actionTypes" [value]="action">
+                {{ getActionLabel(action) }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Date Range Filters -->
+          <div class="filter-group">
+            <label for="dateFrom">From Date</label>
+            <input
+              id="dateFrom"
+              type="date"
+              class="form-control"
+              formControlName="dateFrom"
+              (change)="onDateChange()">
+          </div>
+
+          <div class="filter-group">
+            <label for="dateTo">To Date</label>
+            <input
+              id="dateTo"
+              type="date"
+              class="form-control"
+              formControlName="dateTo"
+              (change)="onDateChange()">
+          </div>
+
+          <!-- Reset Filters Button -->
+          <div class="filter-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="resetFilters()">
+              <i class="fas fa-redo"></i>
+              Reset
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Content Card -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="fas fa-history"></i>
+        Activity Logs ({{ totalElements }} total)
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Loading activity logs...</span>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error && !loading" class="error-banner">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && !error && auditLogs.length === 0" class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>No audit logs found</p>
+      </div>
+
+      <!-- Activity Logs List -->
+      <div *ngIf="!loading && !error && auditLogs.length > 0" class="activity-list">
+        <div class="activity-item-wrapper">
+          <div
+            *ngFor="let log of auditLogs"
+            class="activity-item"
+            [ngClass]="getStatusClass(log.status)">
+            <div class="activity-icon">
+              <i [ngClass]="getActionIcon(log.actionType)"></i>
+            </div>
+
+            <div class="activity-content">
+              <div class="activity-header">
+                <div>
+                  <span class="activity-action">{{ getActionLabel(log.actionType) }}</span>
+                  <span class="activity-username">by {{ log.username }}</span>
+                </div>
+                <span class="activity-status" [ngClass]="log.status === 'SUCCESS' ? 'success' : 'failed'">
+                  {{ log.status }}
+                </span>
+              </div>
+
+              <div class="activity-details">
+                <p class="activity-description" *ngIf="!shouldHideDescription(log.description)">{{ log.description }}</p>
+                <div class="activity-meta">
+                  <span class="meta-item" *ngIf="log.resourceName">
+                    <i class="fas fa-tag"></i>
+                    {{ log.resourceName }}
+                  </span>
+                  <span class="meta-item" *ngIf="log.ipAddress">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ getLocationFromIP(log.ipAddress) }}
+                  </span>
+                  <span class="meta-item" *ngIf="log.resourceType">
+                    <i class="fas fa-box"></i>
+                    {{ log.resourceType }}
+                  </span>
+                  <span class="meta-item">
+                    <i class="fas fa-clock"></i>
+                    {{ formatDate(log.timestamp) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div *ngIf="!loading && auditLogs.length > 0 && totalPages > 1" class="pagination-controls">
+        <button
+          class="btn btn-sm"
+          [disabled]="!canGoPrevious()"
+          (click)="previousPage()">
+          <i class="fas fa-chevron-left"></i>
+          Previous
+        </button>
+
+        <div class="pagination-info">
+          Page {{ currentPage + 1 }} of {{ totalPages }} ({{ totalElements }} total)
+        </div>
+
+        <button
+          class="btn btn-sm"
+          [disabled]="!canGoNext()"
+          (click)="nextPage()">
+          Next
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

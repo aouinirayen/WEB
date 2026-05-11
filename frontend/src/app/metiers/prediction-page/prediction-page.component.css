@@ -1,0 +1,97 @@
+.pred-page { padding: 24px 28px; }
+
+.pred-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+}
+
+/* Summary pills */
+.summary-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.sum-pill {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px 20px; border-radius: 12px; min-width: 110px;
+}
+.sum-num   { font-size: 26px; font-weight: 800; line-height: 1; }
+.sum-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+.pill-urgent  { background: #fee2e2; color: #991b1b; }
+.pill-soon    { background: #fef9c3; color: #92400e; }
+.pill-monitor { background: #dbeafe; color: #1d4ed8; }
+.pill-ai      { background: #f0fdf4; color: #15803d; }
+.pill-freq    { background: #f5f3ff; color: #6d28d9; }
+
+/* Prediction grid */
+.pred-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.pred-card {
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  border-top: 4px solid #e2e8f0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card-urgent  { border-top-color: #ef4444; }
+.card-soon    { border-top-color: #f59e0b; }
+.card-monitor { border-top-color: #3b82f6; }
+
+.pred-card-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.pred-part-name { display: block; font-size: 14px; font-weight: 700; color: #0f172a; }
+.pred-ref       { font-size: 10px; color: #94a3b8; display: block; margin-top: 2px; }
+
+.urgency-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 8px;
+  border-radius: 20px; letter-spacing: .3px;
+}
+.badge-urgent  { background: #fee2e2; color: #991b1b; }
+.badge-soon    { background: #fef9c3; color: #92400e; }
+.badge-monitor { background: #dbeafe; color: #1d4ed8; }
+
+.method-badge { font-size: 10px; padding: 2px 7px; border-radius: 20px; }
+.method-ai    { background: #f0fdf4; color: #15803d; }
+.method-freq  { background: #f5f3ff; color: #6d28d9; }
+
+/* Main prediction */
+.pred-main { display: flex; align-items: baseline; gap: 8px; }
+.pred-days { font-size: 20px; font-weight: 800; }
+.pred-date { font-size: 11px; }
+
+/* Confidence bar */
+.conf-row { display: flex; align-items: center; gap: 8px; }
+.conf-label { font-size: 10px; color: #94a3b8; flex-shrink: 0; }
+.conf-bar-bg {
+  flex: 1; height: 5px; background: #f1f5f9;
+  border-radius: 10px; overflow: hidden;
+}
+.conf-bar { height: 100%; border-radius: 10px; transition: width .5s; }
+.conf-high { background: #22c55e; }
+.conf-med  { background: #f59e0b; }
+.conf-low  { background: #94a3b8; }
+.conf-pct  { font-size: 11px; font-weight: 600; color: #64748b; flex-shrink: 0; }
+
+/* Details */
+.pred-details { display: flex; flex-direction: column; gap: 5px; }
+.pred-detail-row {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: #64748b;
+}
+
+/* Explanation */
+.pred-explanation {
+  font-size: 11px; color: #94a3b8;
+  background: #f8fafc; border-radius: 8px;
+  padding: 8px 10px; line-height: 1.5;
+}
+
+/* Empty state */
+.empty-pred {
+  text-align: center; padding: 60px 0; color: #94a3b8;
+}
+.empty-pred i { font-size: 48px; display: block; margin-bottom: 12px; }
+.empty-pred p { font-size: 14px; line-height: 1.6; }

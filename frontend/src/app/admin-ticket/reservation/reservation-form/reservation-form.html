@@ -1,0 +1,59 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">
+      <i class="fas fa-calendar-check mr-2"></i>
+      {{ isEdit ? 'Edit Reservation' : 'Add Reservation' }}
+    </h3>
+  </div>
+  <div class="card-body">
+    <form (ngSubmit)="save()">
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="clientName">Client Name</label>
+            <input type="text" id="clientName" class="form-control" [(ngModel)]="reservation.clientName" name="clientName" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" class="form-control" [(ngModel)]="reservation.phone" name="phone" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="seatsReserved">Seats Reserved</label>
+            <input type="number" id="seatsReserved" class="form-control" [(ngModel)]="reservation.seatsReserved" name="seatsReserved" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="bookingDate">Booking Date</label>
+            <input type="date" id="bookingDate" class="form-control" [(ngModel)]="reservation.bookingDate" name="bookingDate" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" class="form-control" [(ngModel)]="reservation.status" name="status" required>
+              <option value="PENDING">PENDING</option>
+              <option value="CONFIRMED">CONFIRMED</option>
+              <option value="CANCELLED">CANCELLED</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary mr-2">
+        <i class="fas fa-save mr-1"></i> {{ isEdit ? 'Update' : 'Create' }}
+      </button>
+      <a routerLink="/admin/ticket/reservations" class="btn btn-secondary">
+        <i class="fas fa-arrow-left mr-1"></i> Cancel
+      </a>
+    </form>
+  </div>
+</div>
