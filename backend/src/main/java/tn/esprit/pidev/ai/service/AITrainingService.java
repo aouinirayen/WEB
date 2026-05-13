@@ -1,4 +1,4 @@
-﻿package tn.esprit.pidev.ai.service;
+package tn.esprit.pidev.ai.service;
 
 import tn.esprit.pidev.ai.data.DataGenerator;
 import tn.esprit.pidev.ai.dto.AIStatsResponse;
