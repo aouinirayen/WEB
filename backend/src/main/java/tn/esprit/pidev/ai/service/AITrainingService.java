@@ -1,4 +1,4 @@
-package tn.esprit.pidev.ai.service;
+﻿package tn.esprit.pidev.ai.service;
 
 import tn.esprit.pidev.ai.data.DataGenerator;
 import tn.esprit.pidev.ai.dto.AIStatsResponse;
@@ -12,6 +12,7 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -41,6 +42,8 @@ public class AITrainingService {
     private LogisticRegression cancellationLR;
     private LinearRegression satisfactionLinReg;
     private boolean modelsReady = false;
+    @Value("${AI_TRAINING_ENABLED:true}")
+    private boolean aiTrainingEnabled;
 
     public AITrainingService(AITrainingDataRepository trainingDataRepository,
                               MatchingService matchingService,
@@ -58,6 +61,12 @@ public class AITrainingService {
             Path modelDir = Paths.get(MODEL_DIR);
             if (!Files.exists(modelDir)) {
                 Files.createDirectories(modelDir);
+            }
+
+            if (!aiTrainingEnabled) {
+                log.warn("=== AI training disabled by configuration. Skipping AI training. ===");
+                modelsReady = false;
+                return;
             }
 
             if (modelsExist()) {
@@ -132,7 +141,7 @@ public class AITrainingService {
             matchingNN.saveModel(MATCHING_MODEL_FILE);
             matchingPrep.save(MATCHING_PREPROCESSOR_FILE);
             matchingService.setModel(matchingNN, matchingPrep);
-            log.info("Matching NN — Train Accuracy: {} | TEST Accuracy: {}",
+            log.info("Matching NN â€” Train Accuracy: {} | TEST Accuracy: {}",
                     String.format("%.4f", matchingNN.getAccuracy()),
                     String.format("%.4f", matchingNN.getTestAccuracy()));
 
@@ -165,7 +174,7 @@ public class AITrainingService {
             cancellationLR.saveModel(CANCELLATION_MODEL_FILE);
             cancellationPrep.save(CANCELLATION_PREPROCESSOR_FILE);
             cancellationService.setModel(cancellationLR, cancellationPrep);
-            log.info("Cancellation LR — Train Accuracy: {} | TEST Accuracy: {}",
+            log.info("Cancellation LR â€” Train Accuracy: {} | TEST Accuracy: {}",
                     String.format("%.4f", cancellationLR.getAccuracy()),
                     String.format("%.4f", cancellationLR.getTestAccuracy()));
 
@@ -198,7 +207,7 @@ public class AITrainingService {
             satisfactionLinReg.saveModel(SATISFACTION_MODEL_FILE);
             satisfactionPrep.save(SATISFACTION_PREPROCESSOR_FILE);
             satisfactionService.setModel(satisfactionLinReg, satisfactionPrep);
-            log.info("Satisfaction LinReg — Train R2: {} | TEST R2: {}",
+            log.info("Satisfaction LinReg â€” Train R2: {} | TEST R2: {}",
                     String.format("%.4f", satisfactionLinReg.getR2Score()),
                     String.format("%.4f", satisfactionLinReg.getTestR2Score()));
 
@@ -336,3 +345,7 @@ public class AITrainingService {
         return modelsReady;
     }
 }
+
+
+
+
