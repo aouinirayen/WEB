@@ -20,17 +20,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push backend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: ./backend/Dockerfile.backend
-          push: true
-          tags: rayen121212/backend:latest
+        run: |
+          docker build -t rayen121212/backend:latest -f backend/Dockerfile.backend backend
+          docker push rayen121212/backend:latest
 
       - name: Build and push frontend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          file: Dockerfile
-          push: true
-          tags: rayen121212/frontend:latest
+        run: |
+          ls -la
+          ls -la frontend
+          docker build -t rayen121212/frontend:latest -f frontend/Dockerfile frontend
+          docker push rayen121212/frontend:latest
